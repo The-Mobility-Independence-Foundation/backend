@@ -19,7 +19,7 @@ jobs:
 
     steps:
     - name: Copy repository
-    - uses: actions/checkout@v4
+      uses: actions/checkout@v4
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
@@ -28,13 +28,13 @@ jobs:
         cache: 'npm'
     
     - name: Clean installation of dependencies
-    - run: npm ci
+      run: npm ci
 
     - name: Lint code
-    - run: npm run lint
+      run: npm run lint
 
     - name: Build code
-    - run: npm run build
+      run: npm run build
 
     - name: Test code with coverage
-    - run: npm run test:cov
+      run: npm run test:cov
