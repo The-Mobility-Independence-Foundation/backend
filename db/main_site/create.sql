@@ -3,6 +3,7 @@ CREATE TYPE listingState AS ENUM ('Active', 'Inactive', 'Complete', 'Archived');
 CREATE TYPE orderStatus AS ENUM ('Initiated', 'Pending', 'Fulfilled', 'Voided');
 CREATE TYPE requestStatus AS ENUM ('Pending', 'Accepted', 'Denied');
 CREATE TYPE inviteType AS ENUM ('Organization', 'Site');
+CREATE TYPE reportType AS ENUM ('Post', 'Listing', 'Profile');
 
 CREATE TABLE Inventory(
     inventoryID SERIAL PRIMARY KEY,
@@ -167,7 +168,7 @@ CREATE TABLE "Order"(
 );
 
 CREATE TABLE Bookmark(
-    bookmarkID INT NOT NULL,
+    bookmarkID SERIAL PRIMARY KEY,
     userID INT NOT NULL,
     listingID INT NOT NULL,
     FOREIGN KEY (userID) REFERENCES "User"(userID),
@@ -232,6 +233,122 @@ CREATE TABLE Review(
     FOREIGN KEY (reviewerID) REFERENCES "User"(userID),
     FOREIGN KEY (reviewedUserID) REFERENCES "User"(userID),
     FOREIGN KEY (orderID) REFERENCES "Order"(orderID)
+);
+
+CREATE TABLE Forum (
+    forumID SERIAL PRIMARY KEY,
+    parentID INT,
+    name VARCHAR(30) NOT NULL,
+    description TEXT NOT NULL,
+    isCategory BOOLEAN DEFAULT FALSE,
+    forum_order INT,
+    isLocked BOOLEAN DEFAULT FALSE,
+    numberOfPosts INT DEFAULT 0,
+    numberOfThreads INT DEFAULT 0,
+    FOREIGN KEY (parentID) REFERENCES Forum(forumID) ON DELETE SET NULL
+);
+
+CREATE TABLE Prefix (
+    prefixID SERIAL PRIMARY KEY,
+    name VARCHAR(20)
+);
+
+CREATE TABLE Thread (
+    threadID SERIAL PRIMARY KEY,
+    title VARCHAR(50) NOT NULL,
+    prefixID INT,
+    forumID INT NOT NULL,
+    postedOn TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    numberOfReplies INT DEFAULT 0,
+    userID INT NOT NULL,
+    isLocked BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (prefixID) REFERENCES Prefix(prefixID),
+    FOREIGN KEY (forumID) REFERENCES Forum(forumID),
+    FOREIGN KEY (userID) REFERENCES "User"(userID)
+);
+
+CREATE TABLE Post (
+    postID SERIAL PRIMARY KEY,
+    parentPostID INT,
+    threadID INT NOT NULL,
+    authorID INT NOT NULL,
+    forumID INT NOT NULL,
+    createdOn TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    editedOn TIMESTAMP DEFAULT NULL,
+    editedByID INT,
+    content TEXT NOT NULL,
+    FOREIGN KEY (parentPostID) REFERENCES Post(postID) ON DELETE SET NULL,
+    FOREIGN KEY (threadID) REFERENCES Thread(threadID),
+    FOREIGN KEY (authorID) REFERENCES "User"(userID),
+    FOREIGN KEY (forumID) REFERENCES Forum(forumID),
+    FOREIGN KEY (editedByID) REFERENCES "User"(userID)
+);
+
+CREATE TABLE threadSubscription (
+    subscriptionID SERIAL PRIMARY KEY,
+    threadID INT NOT NULL,
+    userID INT NOT NULL,
+    whenSubscribed TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (threadID) REFERENCES Thread(threadID),
+    FOREIGN KEY (userID) REFERENCES "User"(userID)
+);
+
+CREATE TABLE threadRead (
+    readID SERIAL PRIMARY KEY,
+    threadID INT NOT NULL,
+    userID INT NOT NULL,
+    whenRead TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (threadID) REFERENCES Thread(threadID),
+    FOREIGN KEY (userID) REFERENCES "User"(userID)
+);
+
+CREATE TABLE Moderator (
+    moderatorID SERIAL PRIMARY KEY,
+    forumID INT NOT NULL,
+    userID INT NOT NULL,
+    modPermissions TEXT,
+    FOREIGN KEY (forumID) REFERENCES Forum(forumID),
+    FOREIGN KEY (userID) REFERENCES "User"(userID)
+);
+
+CREATE TABLE ForumLinkPrefix (
+    ForumLinkPrefixID SERIAL PRIMARY KEY,
+    prefixID INT NOT NULL,
+    forumID INT NOT NULL,
+    FOREIGN KEY (prefixID) REFERENCES Prefix(prefixID),
+    FOREIGN KEY (forumID) REFERENCES Forum(forumID)
+);
+
+CREATE TABLE wordFilter (
+    wordFilterID SERIAL PRIMARY KEY,
+    badWord VARCHAR(15) NOT NULL,
+    replacement VARCHAR(15) DEFAULT '******'
+);
+
+CREATE TABLE Reports (
+    reportID SERIAL PRIMARY KEY,
+    reporterID INT NOT NULL,
+    respondentID INT NOT NULL,
+    listingID INT,
+    postID INT,
+    reportedOn TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    reason TEXT,
+    repType reportType DEFAULT 'Post',
+    FOREIGN KEY (reporterID) REFERENCES "User"(userID),
+    FOREIGN KEY (respondentID) REFERENCES "User"(userID),
+    FOREIGN KEY (listingID) REFERENCES Listing(listingID),
+    FOREIGN KEY (postID) REFERENCES Post(postID)
+);
+
+CREATE TABLE suspendedUser (
+    suspendedUserID SERIAL PRIMARY KEY,
+    userID INT NOT NULL,
+    suspendedByID INT NOT NULL,
+    suspendedON TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    suspensionEnd TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    reason TEXT,
+    FOREIGN KEY (userID) REFERENCES "User"(userID),
+    FOREIGN KEY (suspendedByID) REFERENCES "User"(userID)
 );
 
 -- Add foreign key constraints after data insertion
