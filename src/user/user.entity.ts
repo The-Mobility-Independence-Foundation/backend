@@ -1,0 +1,54 @@
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+
+export enum UserRole {
+    USER = "user", 
+    ADMIN = "admin",
+    MODERATOR = "moderator"
+}
+
+@Entity()
+export class User {
+    @PrimaryGeneratedColumn()
+    userID: number
+
+    @Column() // TODO: set foreign key on organization
+    organizationID: number 
+
+    @Column({ type: "varchar", length: 20 })
+    firstName: string 
+
+    @Column({ type: "varchar", length: 20 })
+    lastName: string 
+
+    @Column({ type: "varchar", length: 30 })
+    email: string 
+
+    @Column({ type: "varchar", length: 50 }) // TODO: update with a salt and a hash
+    password: string 
+
+    // returns a 500 server error unless we catch the duplicate name error ourselves. 
+    // userID will still increment if a unique name is sent though, leaving us with blank rows
+    @Column({ type: "varchar", length: 20, unique: true})
+    displayName: string 
+
+    @Column({ type: "enum", enum: UserRole, default: UserRole.USER })
+    accType: UserRole
+
+    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+    lastActivity: number
+
+    @Column({ default: false })
+    inactive: boolean 
+
+    @Column({ type: "varchar", default: '0000000000', length: 10 })
+    referralCode: string 
+
+    @Column({ nullable: true }) // TODO: set foreign key on user
+    referredBy: number 
+
+    @Column({ type: 'decimal', default: 0.0})
+    rating: number
+
+    @Column({ default: false })
+    signupComplete: boolean
+}
