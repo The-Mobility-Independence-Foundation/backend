@@ -11,12 +11,12 @@ export class Inventory {
     @Column()
     organizationID: number; // TODO: foreign key
 
-    @Column() // TODO: not null and set max chars
+    @Column({ type: "varchar", length: 40 }) // TODO: not null and set max chars
     name: string;
 
-    @Column() // TODO: set max chars
+    @Column({ type: "varchar", length: 4000 }) // TODO: set max chars
     description: string;
 
-    @Column() // TODO: set max chars
+    @Column({ type: "varchar", length: 100 }) // TODO: set max chars
     location: string;
 }
