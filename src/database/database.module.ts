@@ -6,6 +6,7 @@ import { UserModule } from '../user/user.module';
 import { OrganizationModule } from '../organization/organization.module';
 import { InviteModule } from '../invite/invite.module';
 import { RequestModule } from '../request/request.module';
+import { ReviewModule } from '../review/review.module';
 
 // When we set up the actual DB, we need to change this to read values from a file. 
 // That way, we aren't leaking db credentials on our public git repo.
@@ -25,6 +26,7 @@ import { RequestModule } from '../request/request.module';
     OrganizationModule,
     InviteModule,
     RequestModule, 
+    ReviewModule,
     ],
 })
 export class DatabaseModule {}
