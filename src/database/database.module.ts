@@ -9,6 +9,7 @@ import { RequestModule } from '../request/request.module';
 import { ReviewModule } from '../review/review.module';
 import { ConversationModule } from '../conversation/conversation.module';
 import { MessageModule } from '../message/message.module';
+import { BookmarkModule } from '../bookmark/bookmark.module';
 
 // When we set up the actual DB, we need to change this to read values from a file. 
 // That way, we aren't leaking db credentials on our public git repo.
@@ -31,6 +32,7 @@ import { MessageModule } from '../message/message.module';
     ReviewModule,
     ConversationModule,
     MessageModule,
+    BookmarkModule,
     ],
 })
 export class DatabaseModule {}
