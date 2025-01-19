@@ -8,7 +8,7 @@ export class InventoryController {
     constructor(private inventoryService: InventoryService) {}
 
     @Post()
-    create(@Body() createInventoryDto: CreateInventoryDto): Promise<Inventory> {
+    create(): Promise<Inventory> {
         return this.inventoryService.create();
     }
 
