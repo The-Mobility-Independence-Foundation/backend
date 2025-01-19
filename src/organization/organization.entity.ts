@@ -1,0 +1,56 @@
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+
+@Entity()
+export class Organization {
+
+    @PrimaryGeneratedColumn()
+    organizationID: number
+
+    @Column() // TODO: set foreign key on inventory NOT NULL
+    inventoryID: number 
+
+    @Column() // TODO: set foreign key on user NOT NULL
+    userID: number 
+
+    // returns a 500 server error unless we catch the duplicate name error ourselves. 
+    // organizationID will still increment if a unique name is sent though, leaving us with blank rows
+    @Column({ type: "varchar", length: 50 })
+    name: string 
+
+    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+    lastActivity: number
+
+    @Column({ default: false })
+    inactive: boolean 
+
+    @Column({ type: "varchar", length: 4000, default: "" })
+    services: string 
+
+    @Column({ type: 'decimal', default: 0.0 })
+    rating: number
+
+    @Column({ type: 'varchar', length: 50 })
+    address1: string
+
+    @Column({ type: 'varchar', length: 50, default: "" })
+    address2: string
+
+    @Column({ type: 'varchar', length: 30 })
+    city: string
+
+    @Column({ type: 'varchar', length: 15 })
+    state: string
+
+    @Column()
+    zipcode: number
+
+    @Column({ type: 'varchar', length: 20, nullable: true })
+    phoneNumber: string
+
+    @Column()
+    ein: number
+
+    @Column({ type: "varchar", length: 50, array: true, nullable: true })
+    socials: string[];
+
+}

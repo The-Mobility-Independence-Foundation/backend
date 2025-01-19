@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { InventoryModule } from '../inventory/inventory.module';
 import { UserModule } from '../user/user.module';
+import { OrganizationModule } from '../organization/organization.module';
 
 // When we set up the actual DB, we need to change this to read values from a file. 
 // That way, we aren't leaking db credentials on our public git repo.
@@ -19,6 +20,7 @@ import { UserModule } from '../user/user.module';
     }),
     InventoryModule,
     UserModule,
+    OrganizationModule,
     ],
 })
 export class DatabaseModule {}
