@@ -11,6 +11,7 @@ import { ConversationModule } from '../conversation/conversation.module';
 import { MessageModule } from '../message/message.module';
 import { BookmarkModule } from '../bookmark/bookmark.module';
 import { ListingModule } from '../listing/listing.module';
+import { OrderModule } from '../order/order.module';
 
 // When we set up the actual DB, we need to change this to read values from a file. 
 // That way, we aren't leaking db credentials on our public git repo.
@@ -35,6 +36,7 @@ import { ListingModule } from '../listing/listing.module';
     MessageModule,
     BookmarkModule,
     ListingModule,
+    OrderModule,
     ],
 })
 export class DatabaseModule {}
