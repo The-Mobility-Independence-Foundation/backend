@@ -9,29 +9,29 @@ export enum InviteType {
 export class Invite {
 
     @PrimaryGeneratedColumn()
-    inviteID: number
+    id: number;
 
     @Column() // TODO: foreign key on user
-    senderID: number
+    sender: number;
 
     @Column() // TODO: foreign key on organization
-    organizationID: number
+    organization: number;
 
     @Column({ type: "varchar", length: 32 })
-    recieverEmail: string
+    recieverEmail: string;
 
     @Column({ type: "varchar", length: 4000 })
-    description: string
+    description: string;
 
     @Column({ type: "enum", enum: InviteType, default: InviteType.ORGANIZATION })
-    invType: InviteType
+    invType: InviteType;
 
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-    sentOn: number
+    sentOn: Date;
 
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP + INTERVAL '14 day'" }) // TODO: make it set expiry date properly
-    expiresOn: number
+    expiresOn: Date;
 
     @Column({ type: "timestamp", nullable: true, default: null })
-    acceptedOn: number
+    acceptedOn: Date;
 }

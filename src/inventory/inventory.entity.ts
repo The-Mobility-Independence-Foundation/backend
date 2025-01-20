@@ -4,10 +4,10 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 't
 @Entity()
 export class Inventory {
     @PrimaryGeneratedColumn()
-    inventoryID: number;
+    id: number;
 
-    @Column()
-    parentInventoryID: number; // TODO: foreign key
+    @Column({ nullable: true })
+    parentInventory: number; // TODO: foreign key
 
     @JoinColumn()
     @ManyToOne(type => Organization, organization => organization.inventories)

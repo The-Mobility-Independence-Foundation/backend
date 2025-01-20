@@ -10,13 +10,13 @@ export enum ListingStatus {
 @Entity()
 export class Listing {
     @PrimaryGeneratedColumn()
-    listingID: number;
+    id: number;
 
     @Column({ nullable: false }) // TODO: set foreign key on inventoryItem
-    inventoryItemID: number;
+    inventoryItem: number;
 
     @Column({ nullable: false }) // TODO: set foreign key on user
-    userID: number;
+    owner: number;
 
     @Column({ type: "varchar", length: 40 })
     name: string;
@@ -40,12 +40,12 @@ export class Listing {
     @Column({ default: false })
     inactive: boolean;
 
-    @Column()
-    zipcode: number;
+    @Column({ type: "varchar", length: 10 })
+    zipcode: String;
 
     @Column({ type: "enum", enum: ListingStatus, default: ListingStatus.ACTIVE})
     state: ListingStatus;
 
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-    createdAt: number;
+    createdAt: Date;
 }

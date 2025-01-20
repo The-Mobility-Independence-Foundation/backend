@@ -13,8 +13,8 @@ export class MessageService {
 
     async create() {
         const message = new Message();
-        message.senderID = 1;
-        message.conversationID = 1;
+        message.sender = 1;
+        message.conversation = 1;
         message.messageContent = "This message is content!"
 
         return this.messageRepository.save(message);
@@ -28,7 +28,7 @@ export class MessageService {
 
     async findOne(id: number) {
 
-        return this.messageRepository.findOneBy({messageID: id});
+        return this.messageRepository.findOneBy({id: id});
 
     }
 

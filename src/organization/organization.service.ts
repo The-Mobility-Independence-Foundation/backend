@@ -22,12 +22,12 @@ export class OrganizationService {
     async create() {
         const organization = new Organization();
 
-        const owner = await this.userRepository.findOneBy({ userID: 3 });
-        const inventory = await this.inventoryRepository.findOneBy({ inventoryID: 1 });
+        const owner = await this.userRepository.findOneBy({ id: 4 });
+        const inventory = await this.inventoryRepository.findOneBy({ id: 1 });
         
         if (owner) {
             if (inventory) {
-                organization.inventories.push(inventory);
+                organization.inventories = [inventory];
             }
             organization.owner = owner;
             organization.name = "The Mobility Independence Foundation";
@@ -35,7 +35,7 @@ export class OrganizationService {
             organization.city = "Mount Upton";
             organization.state = "New York";
             organization.zipcode = 13809;
-            organization.ein = 920887459;
+            organization.ein = "92-0887459";
         }
 
         return this.organizationRepository.save(organization);
@@ -49,7 +49,7 @@ export class OrganizationService {
 
     async findOne(id: number) {
 
-        return this.organizationRepository.findOneBy({organizationID: id});
+        return this.organizationRepository.findOneBy({id: id});
 
     }
 

@@ -13,8 +13,8 @@ export class ConversationService {
 
     async create() {
         const conversation = new Conversation();
-        conversation.participant1ID = 1;
-        conversation.participant2ID = 2;
+        conversation.participant1 = 1;
+        conversation.participant2 = 2;
 
         return this.conversationRepository.save(conversation);
     }
@@ -27,7 +27,7 @@ export class ConversationService {
 
     async findOne(id: number) {
 
-        return this.conversationRepository.findOneBy({conversationID: id});
+        return this.conversationRepository.findOneBy({id: id});
 
     }
 

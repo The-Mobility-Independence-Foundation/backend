@@ -3,16 +3,16 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class InventoryItem {
     @PrimaryGeneratedColumn()
-    inventoryItemID: number;
+    id: number;
 
     @Column({ nullable: false }) // TODO: set foreign key on part
-    partID: number;
+    part: number;
     
     @Column({ nullable: false }) // TODO: set foreign key on model
-    modelID: number;
+    model: number;
 
     @Column({ nullable: false }) // TODO: set foreign key on inventory
-    inventoryID: number;
+    inventory: number;
 
     @Column({ default: 0 })
     quantity: number;

@@ -17,13 +17,13 @@ export class InventoryService {
 
     async create() {
         const inventory = new Inventory();
-        const organization = await this.organizationRepository.findOneBy({organizationID: 1});
+        const organization = await this.organizationRepository.findOneBy({id: 1});
         if (organization) {
             inventory.description = "Test Description";
             inventory.name = "Test Name";
             inventory.location = "Test Location";
             inventory.organization = organization;
-            inventory.parentInventoryID = 0;
+            inventory.parentInventory = 0;
         }
 
         return this.inventoryRepository.save(inventory);
@@ -37,7 +37,7 @@ export class InventoryService {
 
     async findOne(id: number) {
 
-        return this.inventoryRepository.findOneBy({inventoryID: id});
+        return this.inventoryRepository.findOneBy({id: id});
 
     }
 }

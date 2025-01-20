@@ -4,18 +4,18 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 export class Message {
 
     @PrimaryGeneratedColumn()
-    messageID: number;
+    id: number;
 
     @Column({ nullable: false }) // TODO: foreign key on user
-    senderID: number;
+    sender: number;
 
     @Column({ nullable: false }) // TODO: foreign key on conversation
-    conversationID: number;
+    conversation: number;
 
     @Column({ type: "varchar", length: 4000 })
     messageContent: string;
 
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-    readStatus: number;
+    readStatus: Date;
 
 }

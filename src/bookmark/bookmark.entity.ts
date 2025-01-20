@@ -4,12 +4,12 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 export class Bookmark {
 
     @PrimaryGeneratedColumn()
-    bookmarkID: number;
+    id: number;
 
     @Column({ nullable: false }) // TODO: foreign key on user
-    userID: number;
+    user: number;
 
     @Column({ nullable: false }) // TODO: foreign key on listing
-    listingID: number;
+    listing: number;
 
 }

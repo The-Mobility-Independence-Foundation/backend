@@ -6,7 +6,7 @@ import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, OneToOne
 export class Organization {
 
     @PrimaryGeneratedColumn()
-    organizationID: number;
+    id: number;
 
     @OneToMany(type => Inventory, inventory => inventory.organization)
     inventories: Inventory[];
@@ -21,7 +21,7 @@ export class Organization {
     name: string;
 
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-    lastActivity: number;
+    lastActivity: Date;
 
     @Column({ default: false })
     inactive: boolean;
@@ -44,14 +44,14 @@ export class Organization {
     @Column({ type: 'varchar', length: 15 })
     state: string;
 
-    @Column()
+    @Column({ type: "varchar", length: 10 })
     zipcode: number;
 
     @Column({ type: 'varchar', length: 20, nullable: true })
     phoneNumber: string;
 
-    @Column()
-    ein: number;
+    @Column({ type: "varchar", length: 10 })
+    ein: String;
 
     @Column({ type: "varchar", length: 50, array: true, nullable: true })
     socials: string[];

@@ -13,9 +13,9 @@ export class InventoryItemService {
 
     async create() {
         const inventoryItem = new InventoryItem();
-        inventoryItem.partID = 1;
-        inventoryItem.modelID = 1;
-        inventoryItem.inventoryID = 1;
+        inventoryItem.part = 1;
+        inventoryItem.model = 1;
+        inventoryItem.inventory = 1;
         inventoryItem.notes = "These are my notes!";
         inventoryItem.attributes = "These are my attributes!";
 
@@ -30,7 +30,7 @@ export class InventoryItemService {
 
     async findOne(id: number) {
 
-        return this.inventoryItemRepository.findOneBy({inventoryItemID: id});
+        return this.inventoryItemRepository.findOneBy({id: id});
 
     }
 

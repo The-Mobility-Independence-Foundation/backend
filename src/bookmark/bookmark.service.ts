@@ -13,8 +13,8 @@ export class BookmarkService {
 
     async create() {
         const bookmark = new Bookmark();
-        bookmark.userID = 1;
-        bookmark.listingID = 1;
+        bookmark.user = 1;
+        bookmark.listing = 1;
 
         return this.bookmarkRepository.save(bookmark);
     }
@@ -27,7 +27,7 @@ export class BookmarkService {
 
     async findOne(id: number) {
 
-        return this.bookmarkRepository.findOneBy({bookmarkID: id});
+        return this.bookmarkRepository.findOneBy({id: id});
 
     }
 

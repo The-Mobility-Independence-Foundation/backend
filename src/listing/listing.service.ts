@@ -13,14 +13,14 @@ export class ListingService {
 
     async create() {
         const listing = new Listing();
-        listing.inventoryItemID = 1;
-        listing.userID = 1;
+        listing.inventoryItem = 1;
+        listing.owner = 1;
         listing.name = "My listing.";
         listing.description = "This is my listing.";
         listing.attributes = "These are my attributes.";
         listing.latitude = 0.0;
         listing.longitude = 0.0;
-        listing.zipcode = 0;
+        listing.zipcode = "12345-6789";
 
         return this.listingRepository.save(listing);
     }
@@ -33,7 +33,7 @@ export class ListingService {
 
     async findOne(id: number) {
 
-        return this.listingRepository.findOneBy({listingID: id});
+        return this.listingRepository.findOneBy({id: id});
 
     }
 
