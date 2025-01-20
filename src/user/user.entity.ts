@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Organization } from 'src/organization/organization.entity';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 
 export enum UserRole {
     USER = "user", 
@@ -9,46 +10,47 @@ export enum UserRole {
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()
-    userID: number
+    userID: number;
 
-    @Column() // TODO: set foreign key on organization
-    organizationID: number 
-
-    @Column({ type: "varchar", length: 20 })
-    firstName: string 
+    @JoinColumn()
+    @ManyToOne(type => Organization, org => org.members)
+    organization: Organization; 
 
     @Column({ type: "varchar", length: 20 })
-    lastName: string 
+    firstName: string;
+
+    @Column({ type: "varchar", length: 20 })
+    lastName: string;
 
     @Column({ type: "varchar", length: 30 })
-    email: string 
+    email: string;
 
     @Column({ type: "varchar", length: 50 }) // TODO: update with a salt and a hash
-    password: string 
+    password: string;
 
     // returns a 500 server error unless we catch the duplicate name error ourselves. 
     // userID will still increment if a unique name is sent though, leaving us with blank rows
     @Column({ type: "varchar", length: 20, unique: true})
-    displayName: string 
+    displayName: string;
 
     @Column({ type: "enum", enum: UserRole, default: UserRole.USER })
-    accType: UserRole
+    accType: UserRole;
 
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-    lastActivity: number
+    lastActivity: number;
 
     @Column({ default: false })
-    inactive: boolean 
+    inactive: boolean;
 
     @Column({ type: "varchar", default: '0000000000', length: 10 })
-    referralCode: string 
+    referralCode: string;
 
     @Column({ nullable: true }) // TODO: set foreign key on user
-    referredBy: number 
+    referredBy: number;
 
     @Column({ type: 'decimal', default: 0.0})
-    rating: number
+    rating: number;
 
     @Column({ default: false })
-    signupComplete: boolean
+    signupComplete: boolean;
 }

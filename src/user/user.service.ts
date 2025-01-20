@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { User } from './user.entity';
+import { Organization } from 'src/organization/organization.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -9,16 +10,23 @@ export class UserService {
     constructor(
         @InjectRepository(User)
         private userRepository: Repository<User>,
+
+        @InjectRepository(Organization)
+        private organizationRepository: Repository<Organization>,
     ) {}
 
     async create() {
         const user = new User();
-        user.organizationID = 1;
-        user.firstName = "John";
-        user.lastName = "Test";
-        user.email = "johntest@gmail.com";
-        user.password = "BadPassword123";
-        user.displayName = "UniqueUsername";
+
+        const organization = await this.organizationRepository.findOneBy({organizationID: 1});
+        if (organization) {
+            user.organization = organization;
+            user.firstName = "John";
+            user.lastName = "Test";
+            user.email = "johntest@gmail.com";
+            user.password = "BadPassword123";
+            user.displayName = "UniqueUsername1";
+        }
 
         return this.userRepository.save(user);
     }
