@@ -1,5 +1,5 @@
 import { Organization } from 'src/organization/organization.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 
 export enum UserRole {
     USER = "user", 
@@ -45,12 +45,16 @@ export class User {
     @Column({ type: "varchar", default: '0000000000', length: 10 })
     referralCode: string;
 
-    @Column({ nullable: true }) // TODO: set foreign key on user
-    referredBy: number;
+    @JoinColumn()
+    @ManyToOne(type => User, user => user.referrals)
+    referredBy: User;
 
     @Column({ type: 'decimal', default: 0.0})
     rating: number;
 
     @Column({ default: false })
     signupComplete: boolean;
+
+    @OneToMany(type => User, user => user.referredBy)
+    referrals: User[];
 }
