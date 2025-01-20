@@ -3,15 +3,15 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class Conversation {
     @PrimaryGeneratedColumn()
-    conversationID: number;
+    id: number;
 
     @Column({ nullable: true, default: null }) // TODO: set foreign key on listing
-    listingID: number;
+    listing: number;
 
     @Column()
-    participant1ID: number;
+    participant1: number;
 
     @Column()
-    participant2ID: number;
+    participant2: number;
 
 }

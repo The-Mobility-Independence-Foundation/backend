@@ -13,7 +13,7 @@ export class OrderService {
 
     async create() {
         const order = new Order();
-        order.listingID = 1;
+        order.listing = 1;
         order.owner = 1;
         order.recipient = 1;
         order.quantity = 1;
@@ -29,7 +29,7 @@ export class OrderService {
 
     async findOne(id: number) {
 
-        return this.orderRepository.findOneBy({orderID: id});
+        return this.orderRepository.findOneBy({id: id});
 
     }
 

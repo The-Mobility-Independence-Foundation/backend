@@ -18,7 +18,7 @@ export class UserService {
     async create() {
         const user = new User();
 
-        const organization = await this.organizationRepository.findOneBy({organizationID: 1});
+        const organization = await this.organizationRepository.findOneBy({id: 1});
         user.organization = organization ? organization : null;
         user.firstName = "John";
         user.lastName = "Test";
@@ -26,7 +26,7 @@ export class UserService {
         user.password = "BadPassword123";
         user.displayName = "UniqueUsername1";
 
-        const referredBy = await this.userRepository.findOneBy({userID: 2});
+        const referredBy = await this.userRepository.findOneBy({id: 2});
         if (referredBy) {
             user.referredBy = referredBy;
         }
@@ -42,7 +42,7 @@ export class UserService {
 
     async findOne(id: number) {
 
-        return this.userRepository.findOneBy({userID: id});
+        return this.userRepository.findOneBy({id: id});
 
     }
 

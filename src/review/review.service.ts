@@ -13,9 +13,9 @@ export class ReviewService {
 
     async create() {
         const review = new Review();
-        review.reviewerID = 1;
-        review.reviewedUserID = 1;
-        review.orderID = 1;
+        review.reviewer = 1;
+        review.reviewedUser = 1;
+        review.order = 1;
         review.description = "This sucks!";
         review.rating = 1;
 
@@ -30,7 +30,7 @@ export class ReviewService {
 
     async findOne(id: number) {
 
-        return this.reviewRepository.findOneBy({reviewID: id});
+        return this.reviewRepository.findOneBy({id: id});
 
     }
 

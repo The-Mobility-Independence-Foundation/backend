@@ -6,16 +6,16 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 export class Review {
 
     @PrimaryGeneratedColumn()
-    reviewID: number;
+    id: number;
 
     @Column({ nullable: false }) // TODO: foreign key on user 
-    reviewerID: number;
+    reviewer: number;
 
     @Column({ nullable: false }) // TODO: foreign key on user
-    reviewedUserID: number;
+    reviewedUser: number;
 
     @Column({ nullable: false }) // TODO: foreign key on order 
-    orderID: number;
+    order: number;
 
     @Column({ type: "varchar", length: 4000 }) 
     description: string;
@@ -24,6 +24,6 @@ export class Review {
     rating: number;
 
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-    sentOn: number;
+    sentOn: Date;
 
 }

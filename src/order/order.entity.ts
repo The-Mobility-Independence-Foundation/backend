@@ -10,10 +10,10 @@ export enum OrderStatus {
 @Entity()
 export class Order {
     @PrimaryGeneratedColumn()
-    orderID: number;
+    id: number;
 
     @Column({ nullable: false }) // TODO: set foreign key on listing
-    listingID: number;
+    listing: number;
 
     @Column({ nullable: false }) // TODO: set foreign key on organization
     owner: number;
@@ -28,9 +28,9 @@ export class Order {
     status: OrderStatus;
 
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-    dateCreated: number;
+    dateCreated: Date;
 
     @Column({ type: "timestamp", nullable: true, default: null })
-    dateCompleted: number;
+    dateCompleted: Date;
 
 }

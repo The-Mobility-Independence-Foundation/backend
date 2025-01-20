@@ -10,7 +10,7 @@ export enum UserRole {
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()
-    userID: number;
+    id: number;
 
     @JoinColumn()
     @ManyToOne(type => Organization, org => org.members)
@@ -38,7 +38,7 @@ export class User {
     accType: UserRole;
 
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-    lastActivity: number;
+    lastActivity: Date;
 
     @Column({ default: false })
     inactive: boolean;

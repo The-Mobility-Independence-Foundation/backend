@@ -13,7 +13,7 @@ export class RequestService {
 
     async create() {
         const request = new Request();
-        request.ein = 920887459;
+        request.ein = "92-0887459";
         request.firstName = "Johnathan";
         request.lastName = "Test";
         request.email = "johntest@yahoo.gov";
@@ -30,7 +30,7 @@ export class RequestService {
 
     async findOne(id: number) {
 
-        return this.requestRepository.findOneBy({requestID: id});
+        return this.requestRepository.findOneBy({id: id});
 
     }
 

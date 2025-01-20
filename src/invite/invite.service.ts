@@ -13,8 +13,8 @@ export class InviteService {
 
     async create() {
         const invite = new Invite();
-        invite.senderID = 0;
-        invite.organizationID = 0;
+        invite.sender = 0;
+        invite.organization = 0;
         invite.recieverEmail = "johntest@rit.edu";
         invite.description = "John is my homie!";
         invite.invType = InviteType.ORGANIZATION;
@@ -30,7 +30,7 @@ export class InviteService {
 
     async findOne(id: number) {
 
-        return this.inviteRepository.findOneBy({inviteID: id});
+        return this.inviteRepository.findOneBy({id: id});
 
     }
 
