@@ -1,4 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Listing } from 'src/listing/listing.entity';
+import { Organization } from 'src/organization/organization.entity';
+import { User } from 'src/user/user.entity';
+import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 
 export enum OrderStatus {
     INITIATED = "initiated", 
@@ -12,14 +15,17 @@ export class Order {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ nullable: false }) // TODO: set foreign key on listing
-    listing: number;
+    @JoinColumn()
+    @ManyToOne(type => Listing, listing => listing.orders)
+    listing: Listing;
 
-    @Column({ nullable: false }) // TODO: set foreign key on organization
-    owner: number;
+    @JoinColumn()
+    @ManyToOne(type => Organization, org => org.orders)
+    owner: Organization;
 
-    @Column({ nullable: false }) // TODO: set foreign key on user
-    recipient: number;
+    @JoinColumn()
+    @ManyToOne(type => User, user => user.orders)
+    recipient: User;
 
     @Column()
     quantity: number;

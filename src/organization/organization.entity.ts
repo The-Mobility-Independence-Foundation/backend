@@ -1,4 +1,5 @@
 import { Inventory } from 'src/inventory/inventory.entity';
+import { Order } from 'src/order/order.entity';
 import { User } from 'src/user/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, OneToOne } from 'typeorm';
 
@@ -58,5 +59,8 @@ export class Organization {
 
     @OneToMany(type => User, user => user.organization)
     members: User[];
+
+    @OneToMany(type => Order, order => order.owner)
+    orders: Order[];
 
 }

@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Order } from 'src/order/order.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 export enum ListingStatus {
     ACTIVE = "active", 
@@ -48,4 +49,8 @@ export class Listing {
 
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
     createdAt: Date;
+
+    @OneToMany(type => Order, order => order.owner)
+    orders: Order[];
+
 }
