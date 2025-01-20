@@ -1,3 +1,4 @@
+import { Inventory } from 'src/inventory/inventory.entity';
 import { User } from 'src/user/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, OneToOne } from 'typeorm';
 
@@ -7,11 +8,11 @@ export class Organization {
     @PrimaryGeneratedColumn()
     organizationID: number;
 
-    @Column() // TODO: set foreign key on inventory NOT NULL
-    inventoryID: number;
+    @OneToMany(type => Inventory, inventory => inventory.organization)
+    inventories: Inventory[];
 
     @JoinColumn()
-    @OneToOne(type => User, owner => owner.organization)
+    @OneToOne(type => User, owner => owner.organization) // make unique eventually??
     owner: User;
 
     // returns a 500 server error unless we catch the duplicate name error ourselves. 
