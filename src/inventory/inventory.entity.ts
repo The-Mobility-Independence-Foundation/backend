@@ -6,9 +6,6 @@ export class Inventory {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ nullable: true })
-    parentInventory: number; // TODO: foreign key
-
     @JoinColumn()
     @ManyToOne(type => Organization, organization => organization.inventories)
     organization: Organization;
