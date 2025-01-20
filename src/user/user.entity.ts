@@ -14,7 +14,7 @@ export class User {
 
     @JoinColumn()
     @ManyToOne(type => Organization, org => org.members)
-    organization: Organization; 
+    organization: Organization | null; 
 
     @Column({ type: "varchar", length: 20 })
     firstName: string;

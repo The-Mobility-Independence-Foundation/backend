@@ -1,5 +1,5 @@
 import { User } from 'src/user/user.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, OneToOne } from 'typeorm';
 
 @Entity()
 export class Organization {
@@ -10,8 +10,9 @@ export class Organization {
     @Column() // TODO: set foreign key on inventory NOT NULL
     inventoryID: number;
 
-    @Column() // TODO: set foreign key on user NOT NULL
-    userID: number;
+    @JoinColumn()
+    @OneToOne(type => User, owner => owner.organization)
+    owner: User;
 
     // returns a 500 server error unless we catch the duplicate name error ourselves. 
     // organizationID will still increment if a unique name is sent though, leaving us with blank rows
@@ -54,7 +55,7 @@ export class Organization {
     @Column({ type: "varchar", length: 50, array: true, nullable: true })
     socials: string[];
 
-    @OneToMany(() => User, (user) => user.organization)
+    @OneToMany(type => User, user => user.organization)
     members: User[];
 
 }
