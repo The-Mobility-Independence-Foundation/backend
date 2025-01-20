@@ -23,7 +23,6 @@ export class InventoryService {
             inventory.name = "Test Name";
             inventory.location = "Test Location";
             inventory.organization = organization;
-            inventory.parentInventory = 0;
         }
 
         return this.inventoryRepository.save(inventory);
