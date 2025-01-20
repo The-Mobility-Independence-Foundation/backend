@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Organization } from './organization.entity';
 import { User } from 'src/user/user.entity';
+import { Inventory } from 'src/inventory/inventory.entity';
 
 @Injectable()
 export class OrganizationService {
@@ -13,14 +14,21 @@ export class OrganizationService {
 
         @InjectRepository(User)
         private userRepository: Repository<User>,
+
+        @InjectRepository(Inventory)
+        private inventoryRepository: Repository<Inventory>,
     ) {}
 
     async create() {
         const organization = new Organization();
 
-        const owner = await this.userRepository.findOneBy({ userID: 2 });
+        const owner = await this.userRepository.findOneBy({ userID: 3 });
+        const inventory = await this.inventoryRepository.findOneBy({ inventoryID: 1 });
+        
         if (owner) {
-            organization.inventoryID = 0;
+            if (inventory) {
+                organization.inventories.push(inventory);
+            }
             organization.owner = owner;
             organization.name = "The Mobility Independence Foundation";
             organization.address1 = "1789 State Highway 8";

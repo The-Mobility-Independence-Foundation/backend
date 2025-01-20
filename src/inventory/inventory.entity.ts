@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Organization } from 'src/organization/organization.entity';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 
 @Entity()
 export class Inventory {
@@ -8,8 +9,9 @@ export class Inventory {
     @Column()
     parentInventoryID: number; // TODO: foreign key
 
-    @Column()
-    organizationID: number; // TODO: foreign key
+    @JoinColumn()
+    @ManyToOne(type => Organization, organization => organization.inventories)
+    organization: Organization;
 
     @Column({ type: "varchar", length: 40 })
     name: string;
