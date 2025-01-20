@@ -19,18 +19,16 @@ export class UserService {
         const user = new User();
 
         const organization = await this.organizationRepository.findOneBy({organizationID: 1});
-        if (organization) {
-            user.organization = organization;
-            user.firstName = "John";
-            user.lastName = "Test";
-            user.email = "johntest@gmail.com";
-            user.password = "BadPassword123";
-            user.displayName = "UniqueUsername7";
+        user.organization = organization ? organization : null;
+        user.firstName = "John";
+        user.lastName = "Test";
+        user.email = "johntest@gmail.com";
+        user.password = "BadPassword123";
+        user.displayName = "UniqueUsername1";
 
-            const referredBy = await this.userRepository.findOneBy({userID: 2});
-            if (referredBy) {
-                user.referredBy = referredBy;
-            }
+        const referredBy = await this.userRepository.findOneBy({userID: 2});
+        if (referredBy) {
+            user.referredBy = referredBy;
         }
 
         return this.userRepository.save(user);
