@@ -25,7 +25,12 @@ export class UserService {
             user.lastName = "Test";
             user.email = "johntest@gmail.com";
             user.password = "BadPassword123";
-            user.displayName = "UniqueUsername1";
+            user.displayName = "UniqueUsername7";
+
+            const referredBy = await this.userRepository.findOneBy({userID: 2});
+            if (referredBy) {
+                user.referredBy = referredBy;
+            }
         }
 
         return this.userRepository.save(user);
