@@ -22,7 +22,7 @@ export class OrganizationService {
     async create() {
         const organization = new Organization();
 
-        const owner = await this.userRepository.findOneBy({ id: 4 });
+        const owner = await this.userRepository.findOneBy({ id: 1 });
         const inventory = await this.inventoryRepository.findOneBy({ id: 1 });
         
         if (owner) {
