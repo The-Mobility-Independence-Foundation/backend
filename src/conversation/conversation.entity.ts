@@ -8,7 +8,7 @@ export class Conversation {
     id: number;
 
     @JoinColumn() 
-    @ManyToOne(type => Listing, listing => listing.conversations)
+    @ManyToOne(() => Listing, listing => listing.conversations)
     listing: Listing | null;
 
     @Column() // TODO: foreign key on user (composite key?)
@@ -17,7 +17,7 @@ export class Conversation {
     @Column() // TODO: foreign key on user (composite key?)
     participant2: number;
 
-    @OneToMany(type => Message, message => message.conversation)
+    @OneToMany(() => Message, message => message.conversation)
     messages: Message[];
 
 }

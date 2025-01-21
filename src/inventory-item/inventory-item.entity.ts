@@ -14,7 +14,7 @@ export class InventoryItem {
     model: number;
 
     @JoinColumn()
-    @ManyToOne(type => Inventory, inventory => inventory.items)
+    @ManyToOne(() => Inventory, inventory => inventory.items)
     inventory: Inventory;
 
     @Column({ default: 0 })
@@ -29,7 +29,7 @@ export class InventoryItem {
     @Column({ type: "varchar", length: 4000 })
     attributes: string;
 
-    @OneToMany(type => Listing, listing => listing.inventoryItem)
+    @OneToMany(() => Listing, listing => listing.inventoryItem)
     listings: Listing[];
 
 }

@@ -10,11 +10,11 @@ export class Organization {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @OneToMany(type => Inventory, inventory => inventory.organization)
+    @OneToMany(() => Inventory, inventory => inventory.organization)
     inventories: Inventory[];
 
     @JoinColumn()
-    @OneToOne(type => User, owner => owner.organization) // make unique eventually??
+    @OneToOne(() => User, owner => owner.organization) // make unique eventually??
     owner: User;
 
     // returns a 500 server error unless we catch the duplicate name error ourselves. 
@@ -58,12 +58,12 @@ export class Organization {
     @Column({ type: "varchar", length: 50, array: true, nullable: true })
     socials: string[];
 
-    @OneToMany(type => User, user => user.organization)
+    @OneToMany(() => User, user => user.organization)
     members: User[];
 
-    @OneToMany(type => Order, order => order.owner)
+    @OneToMany(() => Order, order => order.owner)
     orders: Order[];
 
-    @OneToMany(type => Invite, invite => invite.organization)
+    @OneToMany(() => Invite, invite => invite.organization)
     sentInvites: Invite[];
 }

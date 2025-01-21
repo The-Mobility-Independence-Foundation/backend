@@ -14,7 +14,7 @@ export class Request {
     id: number;
 
     @JoinColumn()
-    @ManyToOne(type => User, user => user.approvedRequests)
+    @ManyToOne(() => User, user => user.approvedRequests)
     approver: User; 
 
     @Column({ type: "varchar", length: 10 })
