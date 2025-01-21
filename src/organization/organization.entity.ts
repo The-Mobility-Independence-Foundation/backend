@@ -1,4 +1,5 @@
 import { Inventory } from 'src/inventory/inventory.entity';
+import { Invite } from 'src/invite/invite.entity';
 import { Order } from 'src/order/order.entity';
 import { User } from 'src/user/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, OneToOne } from 'typeorm';
@@ -62,5 +63,8 @@ export class Organization {
 
     @OneToMany(type => Order, order => order.owner)
     orders: Order[];
+
+    @OneToMany(type => Invite, invite => invite.organization)
+    sentInvites: Invite[];
 
 }
