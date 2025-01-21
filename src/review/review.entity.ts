@@ -1,5 +1,6 @@
-import { LargeNumberLike } from 'crypto';
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Order } from 'src/order/order.entity';
+import { User } from 'src/user/user.entity';
+import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, ManyToOne } from 'typeorm';
 
 
 @Entity()
@@ -8,14 +9,17 @@ export class Review {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ nullable: false }) // TODO: foreign key on user 
-    reviewer: number;
+    @JoinColumn()
+    @ManyToOne(type => User, user => user.sentReviews)
+    reviewer: User;
 
-    @Column({ nullable: false }) // TODO: foreign key on user
-    reviewedUser: number;
+    @JoinColumn()
+    @ManyToOne(type => User, user => user.receivedReviews)
+    reviewedUser: User;
 
-    @Column({ nullable: false }) // TODO: foreign key on order 
-    order: number;
+    @JoinColumn()
+    @ManyToOne(type => Order, order => order.receivedReviews)
+    order: Order;
 
     @Column({ type: "varchar", length: 4000 }) 
     description: string;
@@ -25,5 +29,4 @@ export class Review {
 
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
     sentOn: Date;
-
 }

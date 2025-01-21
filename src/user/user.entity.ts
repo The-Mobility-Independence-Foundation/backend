@@ -1,6 +1,7 @@
 import { Invite } from 'src/invite/invite.entity';
 import { Order } from 'src/order/order.entity';
 import { Organization } from 'src/organization/organization.entity';
+import { Review } from 'src/review/review.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 
 export enum UserRole {
@@ -66,4 +67,10 @@ export class User {
 
     @OneToMany(type => Invite, invite => invite.sender)
     sentInvites: Invite[];
+
+    @OneToMany(type => Review, review => review.reviewer)
+    sentReviews: Review[];
+
+    @OneToMany(type => Review, review => review.reviewedUser)
+    receivedReviews: Review[];
 }

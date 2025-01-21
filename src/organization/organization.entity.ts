@@ -66,5 +66,4 @@ export class Organization {
 
     @OneToMany(type => Invite, invite => invite.organization)
     sentInvites: Invite[];
-
 }
