@@ -5,6 +5,7 @@ import { Review } from 'src/review/review.entity';
 import { Request } from 'src/request/request.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { Message } from 'src/message/message.entity';
+import { Listing } from 'src/listing/listing.entity';
 
 export enum UserRole {
     USER = "user", 
@@ -80,5 +81,8 @@ export class User {
     approvedRequests: Request[];
 
     @OneToMany(type => Message, message => message.sender)
-    sentMessages: Request[];
+    sentMessages: Message[];
+
+    @OneToMany(type => Listing, listing => listing.owner)
+    listings: Listing[];
 }

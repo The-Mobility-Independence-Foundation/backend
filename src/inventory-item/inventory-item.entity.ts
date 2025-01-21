@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Listing } from 'src/listing/listing.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 @Entity()
 export class InventoryItem {
@@ -25,5 +26,8 @@ export class InventoryItem {
 
     @Column({ type: "varchar", length: 4000 })
     attributes: string;
+
+    @OneToMany(type => Listing, listing => listing.inventoryItem)
+    listings: Listing[];
 
 }

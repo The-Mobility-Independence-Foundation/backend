@@ -1,5 +1,7 @@
+import { InventoryItem } from 'src/inventory-item/inventory-item.entity';
 import { Order } from 'src/order/order.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { User } from 'src/user/user.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
 
 export enum ListingStatus {
     ACTIVE = "active", 
@@ -13,11 +15,13 @@ export class Listing {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ nullable: false }) // TODO: set foreign key on inventoryItem
-    inventoryItem: number;
+    @JoinColumn()
+    @ManyToOne(type => InventoryItem, invItem => invItem.listings)
+    inventoryItem: InventoryItem;
 
-    @Column({ nullable: false }) // TODO: set foreign key on user
-    owner: number;
+    @JoinColumn()
+    @ManyToOne(type => User, user => user.listings)
+    owner: User;
 
     @Column({ type: "varchar", length: 40 })
     name: string;
