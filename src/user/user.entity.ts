@@ -4,6 +4,7 @@ import { Organization } from 'src/organization/organization.entity';
 import { Review } from 'src/review/review.entity';
 import { Request } from 'src/request/request.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Message } from 'src/message/message.entity';
 
 export enum UserRole {
     USER = "user", 
@@ -77,4 +78,7 @@ export class User {
 
     @OneToMany(type => Request, request => request.approver)
     approvedRequests: Request[];
+
+    @OneToMany(type => Message, message => message.sender)
+    sentMessages: Request[];
 }

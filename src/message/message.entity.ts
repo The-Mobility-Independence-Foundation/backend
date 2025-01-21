@@ -1,4 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Conversation } from 'src/conversation/conversation.entity';
+import { User } from 'src/user/user.entity';
+import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity()
 export class Message {
@@ -6,11 +8,13 @@ export class Message {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ nullable: false }) // TODO: foreign key on user
-    sender: number;
+    @JoinColumn()
+    @ManyToOne(type => User, user => user.sentMessages)
+    sender: User;
 
-    @Column({ nullable: false }) // TODO: foreign key on conversation
-    conversation: number;
+    @JoinColumn()
+    @ManyToOne(type => Conversation, conv => conv.messages)
+    conversation: Conversation;
 
     @Column({ type: "varchar", length: 4000 })
     messageContent: string;

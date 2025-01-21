@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Message } from './message.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/user/user.entity';
+import { Conversation } from 'src/conversation/conversation.entity';
 
 @Injectable()
 export class MessageService {
@@ -9,13 +11,24 @@ export class MessageService {
     constructor(
         @InjectRepository(Message)
         private messageRepository: Repository<Message>,
+
+        @InjectRepository(User)
+        private userRepository: Repository<User>,
+
+        @InjectRepository(Conversation)
+        private conversationRepository: Repository<Conversation>,
     ) {}
 
     async create() {
         const message = new Message();
-        message.sender = 1;
-        message.conversation = 1;
-        message.messageContent = "This message is content!"
+        const sender = await this.userRepository.findOneBy({ id: 1 });
+        const conversation = await this.conversationRepository.findOneBy({ id: 1 });
+
+        if (sender && conversation) {
+            message.sender = sender;
+            message.conversation = conversation;
+            message.messageContent = "This message is content!"
+        }
 
         return this.messageRepository.save(message);
     }
