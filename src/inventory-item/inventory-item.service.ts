@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InventoryItem } from './inventory-item.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Inventory } from 'src/inventory/inventory.entity';
 
 @Injectable()
 export class InventoryItemService {
@@ -9,15 +10,21 @@ export class InventoryItemService {
     constructor(
         @InjectRepository(InventoryItem)
         private inventoryItemRepository: Repository<InventoryItem>,
+
+        @InjectRepository(Inventory)
+        private inventoryRepository: Repository<Inventory>,
     ) {}
 
     async create() {
         const inventoryItem = new InventoryItem();
-        inventoryItem.part = 1;
-        inventoryItem.model = 1;
-        inventoryItem.inventory = 1;
-        inventoryItem.notes = "These are my notes!";
-        inventoryItem.attributes = "These are my attributes!";
+        const inventory = await this.inventoryRepository.findOneBy({ id: 1 });
+        if (inventory) {
+            inventoryItem.part = 1;
+            inventoryItem.model = 1;
+            inventoryItem.inventory = inventory;
+            inventoryItem.notes = "These are my notes!";
+            inventoryItem.attributes = "These are my attributes!";
+        }
 
         return this.inventoryItemRepository.save(inventoryItem);
     }

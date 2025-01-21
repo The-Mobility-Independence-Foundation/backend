@@ -1,5 +1,6 @@
+import { InventoryItem } from 'src/inventory-item/inventory-item.entity';
 import { Organization } from 'src/organization/organization.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 
 @Entity()
 export class Inventory {
@@ -18,4 +19,8 @@ export class Inventory {
 
     @Column({ type: "varchar", length: 100 }) 
     location: string;
+
+    @OneToMany(type => InventoryItem, item => item.inventory)
+    items: InventoryItem[];
+
 }
