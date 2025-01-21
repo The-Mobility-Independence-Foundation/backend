@@ -17,11 +17,11 @@ export class Listing {
     id: number;
 
     @JoinColumn()
-    @ManyToOne(type => InventoryItem, invItem => invItem.listings)
+    @ManyToOne(() => InventoryItem, invItem => invItem.listings)
     inventoryItem: InventoryItem;
 
     @JoinColumn()
-    @ManyToOne(type => User, user => user.listings)
+    @ManyToOne(() => User, user => user.listings)
     owner: User;
 
     @Column({ type: "varchar", length: 40 })
@@ -55,10 +55,10 @@ export class Listing {
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
     createdAt: Date;
 
-    @OneToMany(type => Order, order => order.owner)
+    @OneToMany(() => Order, order => order.owner)
     orders: Order[];
 
-    @OneToMany(type => Conversation, conversation => conversation.listing)
+    @OneToMany(() => Conversation, conversation => conversation.listing)
     conversations: Conversation[];
 
 }

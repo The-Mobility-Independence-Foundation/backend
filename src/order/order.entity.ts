@@ -17,15 +17,15 @@ export class Order {
     id: number;
 
     @JoinColumn()
-    @ManyToOne(type => Listing, listing => listing.orders)
+    @ManyToOne(() => Listing, listing => listing.orders)
     listing: Listing;
 
     @JoinColumn()
-    @ManyToOne(type => Organization, org => org.orders)
+    @ManyToOne(() => Organization, org => org.orders)
     owner: Organization;
 
     @JoinColumn()
-    @ManyToOne(type => User, user => user.orders)
+    @ManyToOne(() => User, user => user.orders)
     recipient: User;
 
     @Column()
@@ -40,6 +40,6 @@ export class Order {
     @Column({ type: "timestamp", nullable: true, default: null })
     dateCompleted: Date;
 
-    @OneToMany(type => Review, review => review.order)
+    @OneToMany(() => Review, review => review.order)
     receivedReviews: Review[];
 }

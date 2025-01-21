@@ -10,15 +10,15 @@ export class Review {
     id: number;
 
     @JoinColumn()
-    @ManyToOne(type => User, user => user.sentReviews)
+    @ManyToOne(() => User, user => user.sentReviews)
     reviewer: User;
 
     @JoinColumn()
-    @ManyToOne(type => User, user => user.receivedReviews)
+    @ManyToOne(() => User, user => user.receivedReviews)
     reviewedUser: User;
 
     @JoinColumn()
-    @ManyToOne(type => Order, order => order.receivedReviews)
+    @ManyToOne(() => Order, order => order.receivedReviews)
     order: Order;
 
     @Column({ type: "varchar", length: 4000 }) 

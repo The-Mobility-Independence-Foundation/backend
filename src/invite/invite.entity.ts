@@ -14,11 +14,11 @@ export class Invite {
     id: number;
 
     @JoinColumn() 
-    @ManyToOne( type => User, user => user.sentInvites )
+    @ManyToOne(() => User, user => user.sentInvites)
     sender: User;
 
     @JoinColumn() 
-    @ManyToOne( type => Organization, org => org.sentInvites )
+    @ManyToOne(() => Organization, org => org.sentInvites)
     organization: Organization;
 
     @Column({ type: "varchar", length: 32 })

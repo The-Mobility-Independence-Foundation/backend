@@ -19,7 +19,7 @@ export class User {
     id: number;
 
     @JoinColumn()
-    @ManyToOne(type => Organization, org => org.members)
+    @ManyToOne(() => Organization, org => org.members)
     organization: Organization | null; 
 
     @Column({ type: "varchar", length: 20 })
@@ -53,7 +53,7 @@ export class User {
     referralCode: string;
 
     @JoinColumn()
-    @ManyToOne(type => User, user => user.referrals)
+    @ManyToOne(() => User, user => user.referrals)
     referredBy: User;
 
     @Column({ type: 'decimal', default: 0.0})
@@ -62,27 +62,27 @@ export class User {
     @Column({ default: false })
     signupComplete: boolean;
 
-    @OneToMany(type => User, user => user.referredBy)
+    @OneToMany(() => User, user => user.referredBy)
     referrals: User[];
 
-    @OneToMany(type => Order, order => order.recipient)
+    @OneToMany(() => Order, order => order.recipient)
     orders: Order[];
 
-    @OneToMany(type => Invite, invite => invite.sender)
+    @OneToMany(() => Invite, invite => invite.sender)
     sentInvites: Invite[];
 
-    @OneToMany(type => Review, review => review.reviewer)
+    @OneToMany(() => Review, review => review.reviewer)
     sentReviews: Review[];
 
-    @OneToMany(type => Review, review => review.reviewedUser)
+    @OneToMany(() => Review, review => review.reviewedUser)
     receivedReviews: Review[];
 
-    @OneToMany(type => Request, request => request.approver)
+    @OneToMany(() => Request, request => request.approver)
     approvedRequests: Request[];
 
-    @OneToMany(type => Message, message => message.sender)
+    @OneToMany(() => Message, message => message.sender)
     sentMessages: Message[];
 
-    @OneToMany(type => Listing, listing => listing.owner)
+    @OneToMany(() => Listing, listing => listing.owner)
     listings: Listing[];
 }

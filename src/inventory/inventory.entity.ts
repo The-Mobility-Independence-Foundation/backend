@@ -8,7 +8,7 @@ export class Inventory {
     id: number;
 
     @JoinColumn()
-    @ManyToOne(type => Organization, organization => organization.inventories)
+    @ManyToOne(() => Organization, organization => organization.inventories)
     organization: Organization;
 
     @Column({ type: "varchar", length: 40 })
@@ -20,7 +20,7 @@ export class Inventory {
     @Column({ type: "varchar", length: 100 }) 
     location: string;
 
-    @OneToMany(type => InventoryItem, item => item.inventory)
+    @OneToMany(() => InventoryItem, item => item.inventory)
     items: InventoryItem[];
 
 }

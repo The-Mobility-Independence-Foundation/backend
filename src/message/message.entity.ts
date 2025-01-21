@@ -9,11 +9,11 @@ export class Message {
     id: number;
 
     @JoinColumn()
-    @ManyToOne(type => User, user => user.sentMessages)
+    @ManyToOne(() => User, user => user.sentMessages)
     sender: User;
 
     @JoinColumn()
-    @ManyToOne(type => Conversation, conv => conv.messages)
+    @ManyToOne(() => Conversation, conv => conv.messages)
     conversation: Conversation;
 
     @Column({ type: "varchar", length: 4000 })
