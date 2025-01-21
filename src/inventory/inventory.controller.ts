@@ -1,5 +1,4 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
-import { CreateInventoryDto } from './dto/create-inventory.dto';
+import { Controller, Get, Post, Param } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
 import { Inventory } from './inventory.entity';
 
