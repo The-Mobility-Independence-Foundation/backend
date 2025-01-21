@@ -24,11 +24,10 @@ export class MessageService {
         const sender = await this.userRepository.findOneBy({ id: 1 });
         const conversation = await this.conversationRepository.findOneBy({ id: 1 });
 
-        if (sender && conversation) {
-            message.sender = sender;
-            message.conversation = conversation;
-            message.messageContent = "This message is content!"
-        }
+        if (sender) { message.sender = sender; }
+        if (conversation) { message.conversation = conversation; }
+
+        message.messageContent = "This message is content!"
 
         return this.messageRepository.save(message);
     }

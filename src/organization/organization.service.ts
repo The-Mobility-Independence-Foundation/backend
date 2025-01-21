@@ -25,18 +25,15 @@ export class OrganizationService {
         const owner = await this.userRepository.findOneBy({ id: 1 });
         const inventory = await this.inventoryRepository.findOneBy({ id: 1 });
         
-        if (owner) {
-            if (inventory) {
-                organization.inventories = [inventory];
-            }
-            organization.owner = owner;
-            organization.name = "The Mobility Independence Foundation";
-            organization.address1 = "1789 State Highway 8";
-            organization.city = "Mount Upton";
-            organization.state = "New York";
-            organization.zipcode = 13809;
-            organization.ein = "92-0887459";
-        }
+        if (inventory) { organization.inventories = [inventory]; }
+        if (owner) { organization.owner = owner; }
+        
+        organization.name = "The Mobility Independence Foundation";
+        organization.address1 = "1789 State Highway 8";
+        organization.city = "Mount Upton";
+        organization.state = "New York";
+        organization.zipcode = 13809;
+        organization.ein = "92-0887459";
 
         return this.organizationRepository.save(organization);
     }

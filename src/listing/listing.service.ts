@@ -23,16 +23,16 @@ export class ListingService {
         const listing = new Listing();
         const owner = await this.userRepository.findOneBy({ id: 1 });
         const inventoryItem = await this.inventoryItemRepository.findOneBy({ id: 1 });
-        if (owner && inventoryItem) {
-            listing.inventoryItem = inventoryItem;
-            listing.owner = owner;
-            listing.name = "My listing.";
-            listing.description = "This is my listing.";
-            listing.attributes = "These are my attributes.";
-            listing.latitude = 0.0;
-            listing.longitude = 0.0;
-            listing.zipcode = "12345-6789";
-        }
+
+        if (inventoryItem) { listing.inventoryItem = inventoryItem; }
+        if (owner) { listing.owner = owner; }
+        
+        listing.name = "My listing.";
+        listing.description = "This is my listing.";
+        listing.attributes = "These are my attributes.";
+        listing.latitude = 0.0;
+        listing.longitude = 0.0;
+        listing.zipcode = "12345-6789";
 
         return this.listingRepository.save(listing);
     }

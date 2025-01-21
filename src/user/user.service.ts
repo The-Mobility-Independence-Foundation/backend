@@ -19,7 +19,7 @@ export class UserService {
         const user = new User();
 
         const organization = await this.organizationRepository.findOneBy({id: 1});
-        user.organization = organization ? organization : null;
+        user.organization = organization;
         user.firstName = "John";
         user.lastName = "Test";
         user.email = "johntest@gmail.com";
