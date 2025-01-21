@@ -1,4 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Organization } from 'src/organization/organization.entity';
+import { User } from 'src/user/user.entity';
+import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, ManyToOne } from 'typeorm';
 
 export enum InviteType {
     SITE = "site", 
@@ -11,11 +13,13 @@ export class Invite {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column() // TODO: foreign key on user
-    sender: number;
+    @JoinColumn() 
+    @ManyToOne( type => User, user => user.sentInvites )
+    sender: User;
 
-    @Column() // TODO: foreign key on organization
-    organization: number;
+    @JoinColumn() 
+    @ManyToOne( type => Organization, org => org.sentInvites )
+    organization: Organization;
 
     @Column({ type: "varchar", length: 32 })
     recieverEmail: string;

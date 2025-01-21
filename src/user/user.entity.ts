@@ -1,3 +1,4 @@
+import { Invite } from 'src/invite/invite.entity';
 import { Order } from 'src/order/order.entity';
 import { Organization } from 'src/organization/organization.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
@@ -62,4 +63,7 @@ export class User {
 
     @OneToMany(type => Order, order => order.recipient)
     orders: Order[];
+
+    @OneToMany(type => Invite, invite => invite.sender)
+    sentInvites: Invite[];
 }

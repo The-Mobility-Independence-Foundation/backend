@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Invite, InviteType } from './invite.entity';
 import { Repository } from 'typeorm';
+import { User } from 'src/user/user.entity';
+import { Organization } from 'src/organization/organization.entity';
 
 @Injectable()
 export class InviteService {
@@ -9,15 +11,27 @@ export class InviteService {
     constructor(
         @InjectRepository(Invite)
         private inviteRepository: Repository<Invite>,
+
+        @InjectRepository(User)
+        private userRepository: Repository<User>,
+
+        @InjectRepository(Organization)
+        private organizationRepository: Repository<Organization>,
     ) {}
 
     async create() {
         const invite = new Invite();
-        invite.sender = 0;
-        invite.organization = 0;
-        invite.recieverEmail = "johntest@rit.edu";
-        invite.description = "John is my homie!";
-        invite.invType = InviteType.ORGANIZATION;
+
+        const sender = await this.userRepository.findOneBy({ id: 1 });
+        const organization = await this.organizationRepository.findOneBy({ id: 1 });
+
+        if (sender && organization) {
+            invite.sender = sender;
+            invite.organization = organization;
+            invite.recieverEmail = "johntest@rit.edu";
+            invite.description = "John is my homie!";
+            invite.invType = InviteType.ORGANIZATION; 
+        }
 
         return this.inviteRepository.save(invite);
     }
