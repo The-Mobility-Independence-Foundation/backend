@@ -25,13 +25,12 @@ export class InviteService {
         const sender = await this.userRepository.findOneBy({ id: 1 });
         const organization = await this.organizationRepository.findOneBy({ id: 1 });
 
-        if (sender && organization) {
-            invite.sender = sender;
-            invite.organization = organization;
-            invite.recieverEmail = "johntest@rit.edu";
-            invite.description = "John is my homie!";
-            invite.invType = InviteType.ORGANIZATION; 
-        }
+        if (sender) { invite.sender = sender; }
+        if (organization) { invite.organization = organization; }
+        
+        invite.recieverEmail = "johntest@rit.edu";
+        invite.description = "John is my homie!";
+        invite.invType = InviteType.ORGANIZATION; 
 
         return this.inviteRepository.save(invite);
     }

@@ -26,13 +26,12 @@ export class ReviewService {
         const reviewedUser = await this.userRepository.findOneBy({ id: 2 });
         const order = await this.orderRepository.findOneBy({ id: 2 });
 
-        if (reviewer && reviewedUser && order) {
-            review.reviewer = reviewer;
-            review.reviewedUser = reviewedUser;
-            review.order = order;
-            review.description = "This sucks!";
-            review.rating = 1;
-        }
+        if (reviewer) { review.reviewer = reviewer; }
+        if (reviewedUser) { review.reviewedUser = reviewedUser; }
+        if (order) { review.order = order; }
+
+        review.description = "This sucks!";
+        review.rating = 1;
 
         return this.reviewRepository.save(review);
     }

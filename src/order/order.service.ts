@@ -29,12 +29,12 @@ export class OrderService {
         const recipient = await this.userRepository.findOneBy({ id: 1 });
         const owner = await this.organizationRepository.findOneBy({ id: 1 });
         const listing = await this.listingRepository.findOneBy({ id: 1 });
-        if (recipient && owner && listing) {
-            order.listing = listing;
-            order.owner = owner;
-            order.recipient = recipient;
-            order.quantity = 1;
-        }
+        
+        if (listing) { order.listing = listing; }
+        if (owner) { order.owner = owner; }
+        if (recipient) { order.recipient = recipient; }
+
+        order.quantity = 1;
 
         return this.orderRepository.save(order);
     }

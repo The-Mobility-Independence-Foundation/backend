@@ -18,6 +18,7 @@ export class ConversationService {
     async create() {
         const conversation = new Conversation();
         const listing = await this.listingRepository.findOneBy({ id: 1 });
+        
         conversation.participant1 = 1;
         conversation.participant2 = 2;
         conversation.listing = listing;
