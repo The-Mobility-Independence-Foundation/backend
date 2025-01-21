@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Review } from './review.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/user/user.entity';
+import { Order } from 'src/order/order.entity';
 
 @Injectable()
 export class ReviewService {
@@ -9,15 +11,28 @@ export class ReviewService {
     constructor(
         @InjectRepository(Review)
         private reviewRepository: Repository<Review>,
+
+        @InjectRepository(User)
+        private userRepository: Repository<User>,
+
+        @InjectRepository(Order)
+        private orderRepository: Repository<Order>,
     ) {}
 
     async create() {
         const review = new Review();
-        review.reviewer = 1;
-        review.reviewedUser = 1;
-        review.order = 1;
-        review.description = "This sucks!";
-        review.rating = 1;
+
+        const reviewer = await this.userRepository.findOneBy({ id: 1 });
+        const reviewedUser = await this.userRepository.findOneBy({ id: 2 });
+        const order = await this.orderRepository.findOneBy({ id: 2 });
+
+        if (reviewer && reviewedUser && order) {
+            review.reviewer = reviewer;
+            review.reviewedUser = reviewedUser;
+            review.order = order;
+            review.description = "This sucks!";
+            review.rating = 1;
+        }
 
         return this.reviewRepository.save(review);
     }
