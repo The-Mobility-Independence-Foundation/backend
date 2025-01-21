@@ -1,5 +1,6 @@
+import { Inventory } from 'src/inventory/inventory.entity';
 import { Listing } from 'src/listing/listing.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity()
 export class InventoryItem {
@@ -12,8 +13,9 @@ export class InventoryItem {
     @Column({ nullable: false }) // TODO: set foreign key on model
     model: number;
 
-    @Column({ nullable: false }) // TODO: set foreign key on inventory
-    inventory: number;
+    @JoinColumn()
+    @ManyToOne(type => Inventory, inventory => inventory.items)
+    inventory: Inventory;
 
     @Column({ default: 0 })
     quantity: number;
