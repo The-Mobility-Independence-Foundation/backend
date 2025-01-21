@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, Param } from '@nestjs/common';
+import { Controller, Post, Get, Param } from '@nestjs/common';
 import { Bookmark } from './bookmark.entity';
 import { BookmarkService } from './bookmark.service';
 
