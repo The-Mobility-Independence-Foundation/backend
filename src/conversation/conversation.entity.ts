@@ -1,18 +1,20 @@
+import { Listing } from 'src/listing/listing.entity';
 import { Message } from 'src/message/message.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity()
 export class Conversation {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ nullable: true, default: null }) // TODO: set foreign key on listing
-    listing: number;
+    @JoinColumn() 
+    @ManyToOne(type => Listing, listing => listing.conversations)
+    listing: Listing | null;
 
-    @Column()
+    @Column() // TODO: foreign key on user (composite key?)
     participant1: number;
 
-    @Column()
+    @Column() // TODO: foreign key on user (composite key?)
     participant2: number;
 
     @OneToMany(type => Message, message => message.conversation)

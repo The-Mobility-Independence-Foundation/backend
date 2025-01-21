@@ -1,3 +1,4 @@
+import { Conversation } from 'src/conversation/conversation.entity';
 import { InventoryItem } from 'src/inventory-item/inventory-item.entity';
 import { Order } from 'src/order/order.entity';
 import { User } from 'src/user/user.entity';
@@ -56,5 +57,8 @@ export class Listing {
 
     @OneToMany(type => Order, order => order.owner)
     orders: Order[];
+
+    @OneToMany(type => Conversation, conversation => conversation.listing)
+    conversations: Conversation[];
 
 }
