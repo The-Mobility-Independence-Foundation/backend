@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from 'src/user/user.entity';
+import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, ManyToOne } from 'typeorm';
 
 export enum RequestStatus {
     PENDING = "pending", 
@@ -12,8 +13,9 @@ export class Request {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ nullable: true, default: null }) // TODO: foreign key on user
-    approver: number;
+    @JoinColumn()
+    @ManyToOne(type => User, user => user.approvedRequests)
+    approver: User; 
 
     @Column({ type: "varchar", length: 10 })
     ein: String;
