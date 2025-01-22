@@ -1,11 +1,11 @@
-import { Invite } from 'src/invite/invite.entity';
-import { Order } from 'src/order/order.entity';
-import { Organization } from 'src/organization/organization.entity';
-import { Review } from 'src/review/review.entity';
-import { Request } from 'src/request/request.entity';
+import { Invite } from '../invite/invite.entity';
+import { Order } from '../order/order.entity';
+import { Organization } from '../organization/organization.entity';
+import { Review } from '../review/review.entity';
+import { Request } from '../request/request.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
-import { Message } from 'src/message/message.entity';
-import { Listing } from 'src/listing/listing.entity';
+import { Message } from '../message/message.entity';
+import { Listing } from '../listing/listing.entity';
 
 export enum UserRole {
     USER = "user", 

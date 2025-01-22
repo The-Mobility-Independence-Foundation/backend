@@ -1,5 +1,5 @@
-import { Order } from 'src/order/order.entity';
-import { User } from 'src/user/user.entity';
+import { Order } from '../order/order.entity';
+import { User } from '../user/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, ManyToOne } from 'typeorm';
 
 

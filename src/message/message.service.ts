@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Message } from './message.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/user/user.entity';
-import { Conversation } from 'src/conversation/conversation.entity';
+import { User } from '../user/user.entity';
+import { Conversation } from '../conversation/conversation.entity';
 
 @Injectable()
 export class MessageService {

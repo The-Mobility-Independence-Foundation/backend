@@ -1,5 +1,5 @@
-import { Listing } from 'src/listing/listing.entity';
-import { Message } from 'src/message/message.entity';
+import { Listing } from '../listing/listing.entity';
+import { Message } from '../message/message.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity()

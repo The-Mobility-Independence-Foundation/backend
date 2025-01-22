@@ -1,5 +1,5 @@
-import { Organization } from 'src/organization/organization.entity';
-import { User } from 'src/user/user.entity';
+import { Organization } from '../organization/organization.entity';
+import { User } from '../user/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, ManyToOne } from 'typeorm';
 
 export enum InviteType {

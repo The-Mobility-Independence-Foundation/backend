@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Conversation } from './conversation.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Listing } from 'src/listing/listing.entity';
+import { Listing } from '../listing/listing.entity';
 
 @Injectable()
 export class ConversationService {

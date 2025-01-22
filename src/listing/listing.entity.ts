@@ -1,7 +1,7 @@
-import { Conversation } from 'src/conversation/conversation.entity';
-import { InventoryItem } from 'src/inventory-item/inventory-item.entity';
-import { Order } from 'src/order/order.entity';
-import { User } from 'src/user/user.entity';
+import { Conversation } from '../conversation/conversation.entity';
+import { InventoryItem } from '../inventory-item/inventory-item.entity';
+import { Order } from '../order/order.entity';
+import { User } from '../user/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
 
 export enum ListingStatus {
