@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Organization } from './organization.entity';
-import { User } from 'src/user/user.entity';
-import { Inventory } from 'src/inventory/inventory.entity';
+import { User } from '../user/user.entity';
+import { Inventory } from '../inventory/inventory.entity';
 
 @Injectable()
 export class OrganizationService {

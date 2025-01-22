@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Invite, InviteType } from './invite.entity';
 import { Repository } from 'typeorm';
-import { User } from 'src/user/user.entity';
-import { Organization } from 'src/organization/organization.entity';
+import { User } from '../user/user.entity';
+import { Organization } from '../organization/organization.entity';
 
 @Injectable()
 export class InviteService {

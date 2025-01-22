@@ -1,7 +1,7 @@
-import { Inventory } from 'src/inventory/inventory.entity';
-import { Invite } from 'src/invite/invite.entity';
-import { Order } from 'src/order/order.entity';
-import { User } from 'src/user/user.entity';
+import { Inventory } from '../inventory/inventory.entity';
+import { Invite } from '../invite/invite.entity';
+import { Order } from '../order/order.entity';
+import { User } from '../user/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, OneToOne } from 'typeorm';
 
 @Entity()

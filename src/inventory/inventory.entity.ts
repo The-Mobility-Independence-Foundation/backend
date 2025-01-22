@@ -1,5 +1,5 @@
-import { InventoryItem } from 'src/inventory-item/inventory-item.entity';
-import { Organization } from 'src/organization/organization.entity';
+import { InventoryItem } from '../inventory-item/inventory-item.entity';
+import { Organization } from '../organization/organization.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 
 @Entity()
