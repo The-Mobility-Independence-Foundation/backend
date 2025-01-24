@@ -1,5 +1,5 @@
-import { Inventory } from '../inventory/inventory.entity';
-import { Listing } from '../listing/listing.entity';
+import { Inventory } from '../inventory.entity';
+import { Listing } from '../../listing/listing.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity()

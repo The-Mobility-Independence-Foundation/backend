@@ -1,5 +1,5 @@
 import { Conversation } from '../conversation/conversation.entity';
-import { InventoryItem } from '../inventory-item/inventory-item.entity';
+import { InventoryItem } from '../inventory/inventory-item/inventory-item.entity';
 import { Order } from '../order/order.entity';
 import { User } from '../user/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, ManyToOne } from 'typeorm';

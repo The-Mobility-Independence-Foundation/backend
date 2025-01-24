@@ -35,10 +35,10 @@ export class Organization {
     rating: number;
 
     @Column({ type: 'varchar', length: 50 })
-    address1: string;
+    addressLine1: string;
 
     @Column({ type: 'varchar', length: 50, default: "" })
-    address2: string;
+    addressLine2: string;
 
     @Column({ type: 'varchar', length: 30 })
     city: string;

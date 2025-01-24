@@ -19,11 +19,16 @@ export class InventoryService {
         const inventory = new Inventory();
         const organization = await this.organizationRepository.findOneBy({id: 1});
 
-        if (organization) { inventory.organization = organization; }
+        if (organization) { 
+            inventory.organization = organization;
+            inventory.addressLine1 = organization.addressLine1;
+            inventory.city = organization.city;
+            inventory.state = organization.state;
+            inventory.zipcode = organization.zipcode;
+         }
 
         inventory.description = "Test Description";
         inventory.name = "Test Name";
-        inventory.location = "Test Location";
             
 
         return this.inventoryRepository.save(inventory);

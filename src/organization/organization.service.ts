@@ -29,7 +29,7 @@ export class OrganizationService {
         if (owner) { organization.owner = owner; }
         
         organization.name = "The Mobility Independence Foundation";
-        organization.address1 = "1789 State Highway 8";
+        organization.addressLine1 = "1789 State Highway 8";
         organization.city = "Mount Upton";
         organization.state = "New York";
         organization.zipcode = 13809;

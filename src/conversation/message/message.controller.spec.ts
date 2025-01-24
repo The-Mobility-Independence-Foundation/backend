@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { MessageController } from './message.controller';
 import { MessageService } from './message.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Message } from './message.entity';
-import { User } from '../user/user.entity';
-import { Conversation } from '../conversation/conversation.entity';
+import { User } from '../../user/user.entity';
+import { Conversation } from '../../conversation/conversation.entity';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -12,11 +13,12 @@ export const mockRepository = jest.fn(() => ({
   },
 }));
 
-describe('MessageService', () => {
-  let service: MessageService;
+describe('MessageController', () => {
+  let controller: MessageController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      controllers: [MessageController],
       providers: [
         MessageService,
         {
@@ -34,10 +36,10 @@ describe('MessageService', () => {
       ]
     }).compile();
 
-    service = module.get<MessageService>(MessageService);
+    controller = module.get<MessageController>(MessageController);
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(controller).toBeDefined();
   });
 });

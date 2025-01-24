@@ -1,5 +1,4 @@
 import { Listing } from '../listing/listing.entity';
-import { Organization } from '../organization/organization.entity';
 import { Review } from '../review/review.entity';
 import { User } from '../user/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
@@ -21,8 +20,8 @@ export class Order {
     listing: Listing;
 
     @JoinColumn()
-    @ManyToOne(() => Organization, org => org.orders)
-    owner: Organization;
+    @ManyToOne(() => User, user => user.ordersManaged)
+    owner: User;
 
     @JoinColumn()
     @ManyToOne(() => User, user => user.orders)
