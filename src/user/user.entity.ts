@@ -4,7 +4,7 @@ import { Organization } from '../organization/organization.entity';
 import { Review } from '../review/review.entity';
 import { Request } from '../request/request.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
-import { Message } from '../message/message.entity';
+import { Message } from '../conversation/message/message.entity';
 import { Listing } from '../listing/listing.entity';
 
 export enum UserRole {
@@ -67,6 +67,9 @@ export class User {
 
     @OneToMany(() => Order, order => order.recipient)
     orders: Order[];
+
+    @OneToMany(() => Order, order => order.owner)
+    ordersManaged: Order[];
 
     @OneToMany(() => Invite, invite => invite.sender)
     sentInvites: Invite[];

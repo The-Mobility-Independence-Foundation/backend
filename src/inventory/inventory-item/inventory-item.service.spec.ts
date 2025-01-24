@@ -1,9 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { InventoryItemController } from './inventory-item.controller';
-import { InventoryItem } from './inventory-item.entity';
-import { Inventory } from '../inventory/inventory.entity';
-import { getRepositoryToken } from '@nestjs/typeorm';
 import { InventoryItemService } from './inventory-item.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { InventoryItem } from './inventory-item.entity';
+import { Inventory } from '../inventory.entity';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -12,12 +11,11 @@ export const mockRepository = jest.fn(() => ({
   },
 }));
 
-describe('InventoryItemController', () => {
-  let controller: InventoryItemController;
+describe('InventoryItemService', () => {
+  let service: InventoryItemService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [InventoryItemController],
       providers: [
         InventoryItemService,
         {
@@ -31,10 +29,10 @@ describe('InventoryItemController', () => {
       ]
     }).compile();
 
-    controller = module.get<InventoryItemController>(InventoryItemController);
+    service = module.get<InventoryItemService>(InventoryItemService);
   });
 
   it('should be defined', () => {
-    expect(controller).toBeDefined();
+    expect(service).toBeDefined();
   });
 });

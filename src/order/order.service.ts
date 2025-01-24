@@ -3,7 +3,6 @@ import { Order } from './order.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../user/user.entity';
-import { Organization } from '../organization/organization.entity';
 import { Listing } from '../listing/listing.entity';
 
 @Injectable()
@@ -16,8 +15,6 @@ export class OrderService {
         @InjectRepository(User)
         private userRepository: Repository<User>,
 
-        @InjectRepository(Organization)
-        private organizationRepository: Repository<Organization>,
 
         @InjectRepository(Listing)
         private listingRepository: Repository<Listing>,
@@ -27,7 +24,7 @@ export class OrderService {
         const order = new Order();
 
         const recipient = await this.userRepository.findOneBy({ id: 1 });
-        const owner = await this.organizationRepository.findOneBy({ id: 1 });
+        const owner = await this.userRepository.findOneBy({ id: 2 });
         const listing = await this.listingRepository.findOneBy({ id: 1 });
         
         if (listing) { order.listing = listing; }
