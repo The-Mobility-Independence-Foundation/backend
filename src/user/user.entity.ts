@@ -99,4 +99,11 @@ export class User {
   @JoinTable({ name: "bookmarks" })
   @ManyToMany(() => Listing, listing => listing.bookmarks)
   bookmarks: Listing[];
+
+  @JoinTable({ name: "connections" })
+  @ManyToMany(() => User, user => user.connectionsRecieved)
+  connectionsSent: User[];
+
+  @ManyToMany(() => User, user => user.connectionsSent)
+  connectionsRecieved: User[];
 }
