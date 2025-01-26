@@ -65,6 +65,10 @@ export class Listing {
   @OneToMany(() => Order, (order) => order.owner)
   orders: Order[];
 
-  @OneToMany(() => Conversation, (conversation) => conversation.listing)
+  @OneToMany(() => Conversation, conversation => conversation.listing)
   conversations: Conversation[];
+
+  @ManyToMany(() => User, user => user.bookmarks)
+  bookmarks: User[];
+
 }
