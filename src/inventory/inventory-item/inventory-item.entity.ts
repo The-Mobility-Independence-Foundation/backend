@@ -9,6 +9,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { Tag } from './tag/tag.entity';
+import { Model } from './model/model.entity';
 
 @Entity()
 export class InventoryItem {
@@ -17,6 +18,10 @@ export class InventoryItem {
 
   @Column({ nullable: false }) // TODO: set foreign key on part
   part: number;
+    
+  @JoinColumn()
+  @ManyToOne(() => Model, model => model.inventoryItems)
+  model: Model;
 
   @Column({ nullable: false }) // TODO: set foreign key on model
   model: number;
