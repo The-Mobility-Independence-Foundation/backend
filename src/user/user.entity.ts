@@ -3,7 +3,7 @@ import { Order } from '../order/order.entity';
 import { Organization } from '../organization/organization.entity';
 import { Review } from '../review/review.entity';
 import { Request } from '../request/request.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 import { Message } from '../conversation/message/message.entity';
 import { Listing } from '../listing/listing.entity';
 
@@ -88,4 +88,8 @@ export class User {
 
     @OneToMany(() => Listing, listing => listing.owner)
     listings: Listing[];
+
+    @JoinTable({ name: "bookmarks" })
+    @ManyToMany(() => Listing, listing => listing.bookmarks)
+    bookmarks: Listing[];
 }

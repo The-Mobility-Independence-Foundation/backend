@@ -2,7 +2,7 @@ import { Conversation } from '../conversation/conversation.entity';
 import { InventoryItem } from '../inventory/inventory-item/inventory-item.entity';
 import { Order } from '../order/order.entity';
 import { User } from '../user/user.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, ManyToOne, ManyToMany } from 'typeorm';
 
 export enum ListingStatus {
     ACTIVE = "active", 
@@ -60,5 +60,8 @@ export class Listing {
 
     @OneToMany(() => Conversation, conversation => conversation.listing)
     conversations: Conversation[];
+
+    @ManyToMany(() => User, user => user.bookmarks)
+    bookmarks: User[];
 
 }
