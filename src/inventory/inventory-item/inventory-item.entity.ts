@@ -2,6 +2,7 @@ import { Inventory } from '../inventory.entity';
 import { Listing } from '../../listing/listing.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, ManyToOne, ManyToMany, JoinTable } from 'typeorm';
 import { Tag } from './tag/tag.entity';
+import { Model } from './model/model.entity';
 
 @Entity()
 export class InventoryItem {
@@ -11,8 +12,9 @@ export class InventoryItem {
     @Column({ nullable: false }) // TODO: set foreign key on part
     part: number;
     
-    @Column({ nullable: false }) // TODO: set foreign key on model
-    model: number;
+    @JoinColumn()
+    @ManyToOne(() => Model, model => model.inventoryItems)
+    model: Model;
 
     @JoinColumn()
     @ManyToOne(() => Inventory, inventory => inventory.items)
