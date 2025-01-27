@@ -17,10 +17,10 @@ export class Inventory {
     @Column({ type: "varchar", length: 4000 })
     description: string;
 
-    @Column({ type: 'varchar', length: 50 })
+    @Column({ type: 'varchar', length: 100 })
     addressLine1: string;
 
-    @Column({ type: 'varchar', length: 50, default: "" })
+    @Column({ type: 'varchar', length: 100, default: "" })
     addressLine2: string;
 
     @Column({ type: 'varchar', length: 30 })

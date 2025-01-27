@@ -4,7 +4,7 @@ import { Inventory } from './inventory.entity';
 
 @Controller('inventory')
 export class InventoryController {
-    constructor(private inventoryService: InventoryService) {}
+    constructor(private readonly inventoryService: InventoryService) {}
 
     @Post()
     create(): Promise<Inventory> {

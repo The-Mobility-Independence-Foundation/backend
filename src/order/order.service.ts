@@ -10,14 +10,14 @@ export class OrderService {
 
     constructor(
         @InjectRepository(Order)
-        private orderRepository: Repository<Order>,
+        private readonly orderRepository: Repository<Order>,
 
         @InjectRepository(User)
-        private userRepository: Repository<User>,
+        private readonly userRepository: Repository<User>,
 
 
         @InjectRepository(Listing)
-        private listingRepository: Repository<Listing>,
+        private readonly listingRepository: Repository<Listing>,
     ) {}
 
     async create() {

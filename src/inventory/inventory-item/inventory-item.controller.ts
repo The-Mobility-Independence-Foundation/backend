@@ -5,7 +5,7 @@ import { InventoryItemService } from './inventory-item.service';
 @Controller('inventoryItem')
 export class InventoryItemController {
 
-    constructor(private inventoryItemService: InventoryItemService) {}
+    constructor(private readonly inventoryItemService: InventoryItemService) {}
     
     @Post()
     create(): Promise<InventoryItem> {

@@ -5,7 +5,7 @@ import { Organization } from './organization.entity';
 @Controller('organization')
 export class OrganizationController {
 
-    constructor(private organizationService: OrganizationService) {}
+    constructor(private readonly organizationService: OrganizationService) {}
     
     @Post()
     create(): Promise<Organization> {

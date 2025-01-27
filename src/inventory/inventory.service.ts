@@ -9,10 +9,10 @@ export class InventoryService {
 
     constructor(
         @InjectRepository(Inventory)
-        private inventoryRepository: Repository<Inventory>,
+        private readonly inventoryRepository: Repository<Inventory>,
 
         @InjectRepository(Organization)
-        private organizationRepository: Repository<Organization>,
+        private readonly organizationRepository: Repository<Organization>,
     ) {}
 
     async create() {

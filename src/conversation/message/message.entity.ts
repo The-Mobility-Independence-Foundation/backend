@@ -10,7 +10,7 @@ export class Message {
 
     @JoinColumn()
     @ManyToOne(() => User, user => user.sentMessages)
-    sender: User;
+    author: User;
 
     @JoinColumn()
     @ManyToOne(() => Conversation, conv => conv.messages)

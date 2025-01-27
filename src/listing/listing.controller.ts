@@ -5,7 +5,7 @@ import { ListingService } from './listing.service';
 @Controller('listing')
 export class ListingController {
 
-    constructor(private listingService: ListingService) {}
+    constructor(private readonly listingService: ListingService) {}
     
     @Post()
     create(): Promise<Listing> {

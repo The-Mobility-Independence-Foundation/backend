@@ -15,20 +15,20 @@ export class Invite {
 
     @JoinColumn() 
     @ManyToOne(() => User, user => user.sentInvites)
-    sender: User;
+    inviter: User;
 
     @JoinColumn() 
     @ManyToOne(() => Organization, org => org.sentInvites)
     organization: Organization;
 
     @Column({ type: "varchar", length: 32 })
-    recieverEmail: string;
+    inviteeEmail: string;
 
     @Column({ type: "varchar", length: 4000 })
     description: string;
 
     @Column({ type: "enum", enum: InviteType, default: InviteType.ORGANIZATION })
-    invType: InviteType;
+    type: InviteType;
 
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
     sentOn: Date;

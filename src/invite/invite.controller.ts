@@ -5,7 +5,7 @@ import { Invite } from './invite.entity';
 @Controller('invite')
 export class InviteController {
 
-    constructor(private inviteService: InviteService) {}
+    constructor(private readonly inviteService: InviteService) {}
     
     @Post()
     create(): Promise<Invite> {

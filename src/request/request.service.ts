@@ -18,6 +18,7 @@ export class RequestService {
         request.lastName = "Test";
         request.email = "johntest@yahoo.gov";
         request.description = "Let me in!";
+        request.name = "My organization! (so cool!)";
 
         return this.requestRepository.save(request);
     }

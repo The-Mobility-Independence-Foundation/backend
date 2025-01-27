@@ -10,13 +10,13 @@ export class ListingService {
 
     constructor(
         @InjectRepository(Listing)
-        private listingRepository: Repository<Listing>,
+        private readonly listingRepository: Repository<Listing>,
 
         @InjectRepository(User)
-        private userRepository: Repository<User>,
+        private readonly userRepository: Repository<User>,
 
         @InjectRepository(InventoryItem)
-        private inventoryItemRepository: Repository<InventoryItem>,
+        private readonly inventoryItemRepository: Repository<InventoryItem>,
     ) {}
 
     async create() {

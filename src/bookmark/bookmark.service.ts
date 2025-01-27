@@ -8,7 +8,7 @@ export class BookmarkService {
 
     constructor(
         @InjectRepository(Bookmark)
-        private bookmarkRepository: Repository<Bookmark>,
+        private readonly bookmarkRepository: Repository<Bookmark>,
     ) {}
 
     async create() {

@@ -17,6 +17,9 @@ export class Request {
     @ManyToOne(() => User, user => user.approvedRequests)
     approver: User; 
 
+    @Column({ type: "varchar", length: 50 })
+    name: String;
+
     @Column({ type: "varchar", length: 10 })
     ein: String;
 
