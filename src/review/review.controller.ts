@@ -5,7 +5,7 @@ import { ReviewService } from './review.service';
 @Controller('review')
 export class ReviewController {
 
-    constructor(private reviewService: ReviewService) {}
+    constructor(private readonly reviewService: ReviewService) {}
     
     @Post()
     create(): Promise<Review> {

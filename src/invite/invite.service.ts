@@ -10,27 +10,27 @@ export class InviteService {
 
     constructor(
         @InjectRepository(Invite)
-        private inviteRepository: Repository<Invite>,
+        private readonly inviteRepository: Repository<Invite>,
 
         @InjectRepository(User)
-        private userRepository: Repository<User>,
+        private readonly userRepository: Repository<User>,
 
         @InjectRepository(Organization)
-        private organizationRepository: Repository<Organization>,
+        private readonly organizationRepository: Repository<Organization>,
     ) {}
 
     async create() {
         const invite = new Invite();
 
-        const sender = await this.userRepository.findOneBy({ id: 1 });
+        const inviter = await this.userRepository.findOneBy({ id: 1 });
         const organization = await this.organizationRepository.findOneBy({ id: 1 });
 
-        if (sender) { invite.sender = sender; }
+        if (inviter) { invite.inviter = inviter; }
         if (organization) { invite.organization = organization; }
         
-        invite.recieverEmail = "johntest@rit.edu";
+        invite.inviteeEmail = "johntest@rit.edu";
         invite.description = "John is my homie!";
-        invite.invType = InviteType.ORGANIZATION; 
+        invite.type = InviteType.ORGANIZATION; 
 
         return this.inviteRepository.save(invite);
     }

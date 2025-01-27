@@ -5,7 +5,7 @@ import { BookmarkService } from './bookmark.service';
 @Controller('bookmark')
 export class BookmarkController {
 
-    constructor(private bookmarkService: BookmarkService) {}
+    constructor(private readonly bookmarkService: BookmarkService) {}
     
     @Post()
     create(): Promise<Bookmark> {

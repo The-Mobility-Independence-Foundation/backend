@@ -5,7 +5,7 @@ import { Request } from './request.entity';
 @Controller('request')
 export class RequestController {
 
-    constructor(private requestService: RequestService) {}
+    constructor(private readonly requestService: RequestService) {}
     
     @Post()
     create(): Promise<Request> {

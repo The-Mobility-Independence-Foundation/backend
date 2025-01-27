@@ -41,7 +41,7 @@ export class User {
     displayName: string;
 
     @Column({ type: "enum", enum: UserRole, default: UserRole.USER })
-    accType: UserRole;
+    type: UserRole;
 
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
     lastActivity: Date;
@@ -71,7 +71,7 @@ export class User {
     @OneToMany(() => Order, order => order.owner)
     ordersManaged: Order[];
 
-    @OneToMany(() => Invite, invite => invite.sender)
+    @OneToMany(() => Invite, invite => invite.inviter)
     sentInvites: Invite[];
 
     @OneToMany(() => Review, review => review.reviewer)
@@ -83,7 +83,7 @@ export class User {
     @OneToMany(() => Request, request => request.approver)
     approvedRequests: Request[];
 
-    @OneToMany(() => Message, message => message.sender)
+    @OneToMany(() => Message, message => message.author)
     sentMessages: Message[];
 
     @OneToMany(() => Listing, listing => listing.owner)

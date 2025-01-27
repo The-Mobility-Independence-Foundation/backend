@@ -24,7 +24,7 @@ export class MessageService {
         const sender = await this.userRepository.findOneBy({ id: 1 });
         const conversation = await this.conversationRepository.findOneBy({ id: 1 });
 
-        if (sender) { message.sender = sender; }
+        if (sender) { message.author = sender; }
         if (conversation) { message.conversation = conversation; }
 
         message.messageContent = "This message is content!"

@@ -17,8 +17,6 @@ export class Organization {
     @OneToOne(() => User, owner => owner.organization) // make unique eventually??
     owner: User;
 
-    // returns a 500 server error unless we catch the duplicate name error ourselves. 
-    // organizationID will still increment if a unique name is sent though, leaving us with blank rows
     @Column({ type: "varchar", length: 50 })
     name: string;
 
@@ -34,10 +32,10 @@ export class Organization {
     @Column({ type: 'decimal', default: 0.0 })
     rating: number;
 
-    @Column({ type: 'varchar', length: 50 })
+    @Column({ type: 'varchar', length: 100 })
     addressLine1: string;
 
-    @Column({ type: 'varchar', length: 50, default: "" })
+    @Column({ type: 'varchar', length: 100, default: "" })
     addressLine2: string;
 
     @Column({ type: 'varchar', length: 30 })

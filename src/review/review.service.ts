@@ -30,7 +30,7 @@ export class ReviewService {
         if (reviewedUser) { review.reviewedUser = reviewedUser; }
         if (order) { review.order = order; }
 
-        review.description = "This sucks!";
+        review.content = "This sucks!";
         review.rating = 1;
 
         return this.reviewRepository.save(review);

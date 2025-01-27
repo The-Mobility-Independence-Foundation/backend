@@ -9,10 +9,10 @@ export class ConversationService {
 
     constructor(
         @InjectRepository(Conversation)
-        private conversationRepository: Repository<Conversation>,
+        private readonly conversationRepository: Repository<Conversation>,
 
         @InjectRepository(Listing)
-        private listingRepository: Repository<Listing>,
+        private readonly listingRepository: Repository<Listing>,
     ) {}
 
     async create() {

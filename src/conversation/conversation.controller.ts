@@ -5,7 +5,7 @@ import { ConversationService } from './conversation.service';
 @Controller('conversation')
 export class ConversationController {
 
-    constructor(private conversationService: ConversationService) {}
+    constructor(private readonly conversationService: ConversationService) {}
     
     @Post()
     create(): Promise<Conversation> {

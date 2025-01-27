@@ -5,7 +5,7 @@ import { MessageService } from './message.service';
 @Controller('message')
 export class MessageController {
 
-    constructor(private messageService: MessageService) {}
+    constructor(private readonly messageService: MessageService) {}
     
     @Post()
     create(): Promise<Message> {

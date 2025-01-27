@@ -22,7 +22,7 @@ export class Review {
     order: Order;
 
     @Column({ type: "varchar", length: 4000 }) 
-    description: string;
+    content: string;
 
     @Column() 
     rating: number;
