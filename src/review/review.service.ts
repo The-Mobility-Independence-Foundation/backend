@@ -7,45 +7,45 @@ import { Order } from '../order/order.entity';
 
 @Injectable()
 export class ReviewService {
+  constructor(
+    @InjectRepository(Review)
+    private reviewRepository: Repository<Review>,
 
-    constructor(
-        @InjectRepository(Review)
-        private reviewRepository: Repository<Review>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
 
-        @InjectRepository(User)
-        private userRepository: Repository<User>,
+    @InjectRepository(Order)
+    private orderRepository: Repository<Order>,
+  ) {}
 
-        @InjectRepository(Order)
-        private orderRepository: Repository<Order>,
-    ) {}
+  async create() {
+    const review = new Review();
 
-    async create() {
-        const review = new Review();
+    const reviewer = await this.userRepository.findOneBy({ id: 1 });
+    const reviewedUser = await this.userRepository.findOneBy({ id: 2 });
+    const order = await this.orderRepository.findOneBy({ id: 2 });
 
-        const reviewer = await this.userRepository.findOneBy({ id: 1 });
-        const reviewedUser = await this.userRepository.findOneBy({ id: 2 });
-        const order = await this.orderRepository.findOneBy({ id: 2 });
-
-        if (reviewer) { review.reviewer = reviewer; }
-        if (reviewedUser) { review.reviewedUser = reviewedUser; }
-        if (order) { review.order = order; }
-
-        review.content = "This sucks!";
-        review.rating = 1;
-
-        return this.reviewRepository.save(review);
+    if (reviewer) {
+      review.reviewer = reviewer;
+    }
+    if (reviewedUser) {
+      review.reviewedUser = reviewedUser;
+    }
+    if (order) {
+      review.order = order;
     }
 
-    async findAll() {
-        
-        return this.reviewRepository.find();
-        
-    }
+    review.content = 'This sucks!';
+    review.rating = 1;
 
-    async findOne(id: number) {
+    return this.reviewRepository.save(review);
+  }
 
-        return this.reviewRepository.findOneBy({id: id});
+  async findAll() {
+    return this.reviewRepository.find();
+  }
 
-    }
-
+  async findOne(id: number) {
+    return this.reviewRepository.findOneBy({ id: id });
+  }
 }

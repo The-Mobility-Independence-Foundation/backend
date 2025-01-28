@@ -6,39 +6,35 @@ import { Inventory } from '../inventory.entity';
 
 @Injectable()
 export class InventoryItemService {
+  constructor(
+    @InjectRepository(InventoryItem)
+    private readonly inventoryItemRepository: Repository<InventoryItem>,
 
-    constructor(
-        @InjectRepository(InventoryItem)
-        private readonly inventoryItemRepository: Repository<InventoryItem>,
+    @InjectRepository(Inventory)
+    private readonly inventoryRepository: Repository<Inventory>,
+  ) {}
 
-        @InjectRepository(Inventory)
-        private readonly inventoryRepository: Repository<Inventory>,
-    ) {}
+  async create() {
+    const inventoryItem = new InventoryItem();
+    const inventory = await this.inventoryRepository.findOneBy({ id: 1 });
 
-    async create() {
-        const inventoryItem = new InventoryItem();
-        const inventory = await this.inventoryRepository.findOneBy({ id: 1 });
-
-        if (inventory) { inventoryItem.inventory = inventory; }
-
-        inventoryItem.part = 1;
-        inventoryItem.model = 1;
-        inventoryItem.notes = "These are my notes!";
-        inventoryItem.attributes = "These are my attributes!";
-
-        return this.inventoryItemRepository.save(inventoryItem);
+    if (inventory) {
+      inventoryItem.inventory = inventory;
     }
 
-    async findAll() {
-        
-        return this.inventoryItemRepository.find();
-        
-    }
+    inventoryItem.part = 1;
+    inventoryItem.model = 1;
+    inventoryItem.notes = 'These are my notes!';
+    inventoryItem.attributes = 'These are my attributes!';
 
-    async findOne(id: number) {
+    return this.inventoryItemRepository.save(inventoryItem);
+  }
 
-        return this.inventoryItemRepository.findOneBy({id: id});
+  async findAll() {
+    return this.inventoryItemRepository.find();
+  }
 
-    }
-
+  async findOne(id: number) {
+    return this.inventoryItemRepository.findOneBy({ id: id });
+  }
 }

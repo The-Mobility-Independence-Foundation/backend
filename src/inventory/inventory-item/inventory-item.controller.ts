@@ -4,22 +4,20 @@ import { InventoryItemService } from './inventory-item.service';
 
 @Controller('inventoryItem')
 export class InventoryItemController {
+  constructor(private readonly inventoryItemService: InventoryItemService) {}
 
-    constructor(private readonly inventoryItemService: InventoryItemService) {}
-    
-    @Post()
-    create(): Promise<InventoryItem> {
-        return this.inventoryItemService.create();
-    }
+  @Post()
+  create(): Promise<InventoryItem> {
+    return this.inventoryItemService.create();
+  }
 
-    @Get()
-    findAll(): Promise<InventoryItem[]> {
-        return this.inventoryItemService.findAll();
-    }
+  @Get()
+  findAll(): Promise<InventoryItem[]> {
+    return this.inventoryItemService.findAll();
+  }
 
-    @Get(':id')
-    findOne(@Param('id') id: number): Promise<InventoryItem | null> {
-        return this.inventoryItemService.findOne(id);
-    }
-
+  @Get(':id')
+  findOne(@Param('id') id: number): Promise<InventoryItem | null> {
+    return this.inventoryItemService.findOne(id);
+  }
 }

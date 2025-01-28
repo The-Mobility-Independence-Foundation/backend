@@ -5,30 +5,24 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class BookmarkService {
+  constructor(
+    @InjectRepository(Bookmark)
+    private readonly bookmarkRepository: Repository<Bookmark>,
+  ) {}
 
-    constructor(
-        @InjectRepository(Bookmark)
-        private readonly bookmarkRepository: Repository<Bookmark>,
-    ) {}
+  async create() {
+    const bookmark = new Bookmark();
+    bookmark.user = 1;
+    bookmark.listing = 1;
 
-    async create() {
-        const bookmark = new Bookmark();
-        bookmark.user = 1;
-        bookmark.listing = 1;
+    return this.bookmarkRepository.save(bookmark);
+  }
 
-        return this.bookmarkRepository.save(bookmark);
-    }
+  async findAll() {
+    return this.bookmarkRepository.find();
+  }
 
-    async findAll() {
-        
-        return this.bookmarkRepository.find();
-        
-    }
-
-    async findOne(id: number) {
-
-        return this.bookmarkRepository.findOneBy({id: id});
-
-    }
-
+  async findOne(id: number) {
+    return this.bookmarkRepository.findOneBy({ id: id });
+  }
 }

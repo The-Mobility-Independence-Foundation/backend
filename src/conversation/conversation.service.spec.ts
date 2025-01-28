@@ -17,16 +17,16 @@ describe('ConversationService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        ConversationService, 
+        ConversationService,
         {
-          provide: getRepositoryToken(Conversation), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Conversation),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(Listing), 
-          useClass: mockRepository
-        }
-      ]
+          provide: getRepositoryToken(Listing),
+          useClass: mockRepository,
+        },
+      ],
     }).compile();
 
     service = module.get<ConversationService>(ConversationService);

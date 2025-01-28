@@ -4,22 +4,20 @@ import { ReviewService } from './review.service';
 
 @Controller('review')
 export class ReviewController {
+  constructor(private readonly reviewService: ReviewService) {}
 
-    constructor(private readonly reviewService: ReviewService) {}
-    
-    @Post()
-    create(): Promise<Review> {
-        return this.reviewService.create();
-    }
+  @Post()
+  create(): Promise<Review> {
+    return this.reviewService.create();
+  }
 
-    @Get()
-    findAll(): Promise<Review[]> {
-        return this.reviewService.findAll();
-    }
+  @Get()
+  findAll(): Promise<Review[]> {
+    return this.reviewService.findAll();
+  }
 
-    @Get(':id')
-    findOne(@Param('id') id: number): Promise<Review | null> {
-        return this.reviewService.findOne(id);
-    }
-
+  @Get(':id')
+  findOne(@Param('id') id: number): Promise<Review | null> {
+    return this.reviewService.findOne(id);
+  }
 }

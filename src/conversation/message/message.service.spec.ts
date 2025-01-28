@@ -20,18 +20,18 @@ describe('MessageService', () => {
       providers: [
         MessageService,
         {
-          provide: getRepositoryToken(Message), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Message),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(User), 
-          useClass: mockRepository
+          provide: getRepositoryToken(User),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(Conversation), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Conversation),
+          useClass: mockRepository,
         },
-      ]
+      ],
     }).compile();
 
     service = module.get<MessageService>(MessageService);

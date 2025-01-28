@@ -23,22 +23,22 @@ describe('OrderController', () => {
       providers: [
         OrderService,
         {
-          provide: getRepositoryToken(Order), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Order),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(User), 
-          useClass: mockRepository
+          provide: getRepositoryToken(User),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(Organization), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Organization),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(Listing), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Listing),
+          useClass: mockRepository,
         },
-      ]
+      ],
     }).compile();
 
     controller = module.get<OrderController>(OrderController);

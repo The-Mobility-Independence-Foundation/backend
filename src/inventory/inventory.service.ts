@@ -6,43 +6,37 @@ import { Organization } from '../organization/organization.entity';
 
 @Injectable()
 export class InventoryService {
+  constructor(
+    @InjectRepository(Inventory)
+    private readonly inventoryRepository: Repository<Inventory>,
 
-    constructor(
-        @InjectRepository(Inventory)
-        private readonly inventoryRepository: Repository<Inventory>,
+    @InjectRepository(Organization)
+    private readonly organizationRepository: Repository<Organization>,
+  ) {}
 
-        @InjectRepository(Organization)
-        private readonly organizationRepository: Repository<Organization>,
-    ) {}
+  async create() {
+    const inventory = new Inventory();
+    const organization = await this.organizationRepository.findOneBy({ id: 1 });
 
-    async create() {
-        const inventory = new Inventory();
-        const organization = await this.organizationRepository.findOneBy({id: 1});
-
-        if (organization) { 
-            inventory.organization = organization;
-            inventory.addressLine1 = organization.addressLine1;
-            inventory.city = organization.city;
-            inventory.state = organization.state;
-            inventory.zipcode = organization.zipcode;
-         }
-
-        inventory.description = "Test Description";
-        inventory.name = "Test Name";
-            
-
-        return this.inventoryRepository.save(inventory);
+    if (organization) {
+      inventory.organization = organization;
+      inventory.addressLine1 = organization.addressLine1;
+      inventory.city = organization.city;
+      inventory.state = organization.state;
+      inventory.zipcode = organization.zipcode;
     }
 
-    async findAll() {
-        
-        return this.inventoryRepository.find();
-        
-    }
+    inventory.description = 'Test Description';
+    inventory.name = 'Test Name';
 
-    async findOne(id: number) {
+    return this.inventoryRepository.save(inventory);
+  }
 
-        return this.inventoryRepository.findOneBy({id: id});
+  async findAll() {
+    return this.inventoryRepository.find();
+  }
 
-    }
+  async findOne(id: number) {
+    return this.inventoryRepository.findOneBy({ id: id });
+  }
 }

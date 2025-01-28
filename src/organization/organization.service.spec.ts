@@ -20,18 +20,18 @@ describe('OrganizationService', () => {
       providers: [
         OrganizationService,
         {
-          provide: getRepositoryToken(Organization), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Organization),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(User), 
-          useClass: mockRepository
+          provide: getRepositoryToken(User),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(Inventory), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Inventory),
+          useClass: mockRepository,
         },
-      ]
+      ],
     }).compile();
 
     service = module.get<OrganizationService>(OrganizationService);

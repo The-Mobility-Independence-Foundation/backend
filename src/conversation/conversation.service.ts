@@ -6,36 +6,30 @@ import { Listing } from '../listing/listing.entity';
 
 @Injectable()
 export class ConversationService {
+  constructor(
+    @InjectRepository(Conversation)
+    private readonly conversationRepository: Repository<Conversation>,
 
-    constructor(
-        @InjectRepository(Conversation)
-        private readonly conversationRepository: Repository<Conversation>,
+    @InjectRepository(Listing)
+    private readonly listingRepository: Repository<Listing>,
+  ) {}
 
-        @InjectRepository(Listing)
-        private readonly listingRepository: Repository<Listing>,
-    ) {}
+  async create() {
+    const conversation = new Conversation();
+    const listing = await this.listingRepository.findOneBy({ id: 1 });
 
-    async create() {
-        const conversation = new Conversation();
-        const listing = await this.listingRepository.findOneBy({ id: 1 });
-        
-        conversation.participant1 = 1;
-        conversation.participant2 = 2;
-        conversation.listing = listing;
+    conversation.participant1 = 1;
+    conversation.participant2 = 2;
+    conversation.listing = listing;
 
-        return this.conversationRepository.save(conversation);
-    }
+    return this.conversationRepository.save(conversation);
+  }
 
-    async findAll() {
-        
-        return this.conversationRepository.find();
-        
-    }
+  async findAll() {
+    return this.conversationRepository.find();
+  }
 
-    async findOne(id: number) {
-
-        return this.conversationRepository.findOneBy({id: id});
-
-    }
-
+  async findOne(id: number) {
+    return this.conversationRepository.findOneBy({ id: id });
+  }
 }

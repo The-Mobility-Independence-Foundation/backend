@@ -18,9 +18,9 @@ describe('BookmarkService', () => {
       providers: [
         BookmarkService,
         {
-          provide: getRepositoryToken(Bookmark), 
-          useClass: mockRepository
-        }
+          provide: getRepositoryToken(Bookmark),
+          useClass: mockRepository,
+        },
       ],
     }).compile();
 

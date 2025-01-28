@@ -7,6 +7,6 @@ import { Bookmark } from './bookmark.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Bookmark])],
   controllers: [BookmarkController],
-  providers: [BookmarkService]
+  providers: [BookmarkService],
 })
 export class BookmarkModule {}

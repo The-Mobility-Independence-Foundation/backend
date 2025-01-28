@@ -7,41 +7,39 @@ import { Conversation } from '../../conversation/conversation.entity';
 
 @Injectable()
 export class MessageService {
+  constructor(
+    @InjectRepository(Message)
+    private messageRepository: Repository<Message>,
 
-    constructor(
-        @InjectRepository(Message)
-        private messageRepository: Repository<Message>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
 
-        @InjectRepository(User)
-        private userRepository: Repository<User>,
+    @InjectRepository(Conversation)
+    private conversationRepository: Repository<Conversation>,
+  ) {}
 
-        @InjectRepository(Conversation)
-        private conversationRepository: Repository<Conversation>,
-    ) {}
+  async create() {
+    const message = new Message();
+    const sender = await this.userRepository.findOneBy({ id: 1 });
+    const conversation = await this.conversationRepository.findOneBy({ id: 1 });
 
-    async create() {
-        const message = new Message();
-        const sender = await this.userRepository.findOneBy({ id: 1 });
-        const conversation = await this.conversationRepository.findOneBy({ id: 1 });
-
-        if (sender) { message.author = sender; }
-        if (conversation) { message.conversation = conversation; }
-
-        message.messageContent = "This message is content!"
-
-        return this.messageRepository.save(message);
+    if (sender) {
+      message.author = sender;
+    }
+    if (conversation) {
+      message.conversation = conversation;
     }
 
-    async findAll() {
-        
-        return this.messageRepository.find();
-        
-    }
+    message.messageContent = 'This message is content!';
 
-    async findOne(id: number) {
+    return this.messageRepository.save(message);
+  }
 
-        return this.messageRepository.findOneBy({id: id});
+  async findAll() {
+    return this.messageRepository.find();
+  }
 
-    }
-
+  async findOne(id: number) {
+    return this.messageRepository.findOneBy({ id: id });
+  }
 }

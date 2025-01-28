@@ -4,22 +4,20 @@ import { Invite } from './invite.entity';
 
 @Controller('invite')
 export class InviteController {
+  constructor(private readonly inviteService: InviteService) {}
 
-    constructor(private readonly inviteService: InviteService) {}
-    
-    @Post()
-    create(): Promise<Invite> {
-        return this.inviteService.create();
-    }
+  @Post()
+  create(): Promise<Invite> {
+    return this.inviteService.create();
+  }
 
-    @Get()
-    findAll(): Promise<Invite[]> {
-        return this.inviteService.findAll();
-    }
+  @Get()
+  findAll(): Promise<Invite[]> {
+    return this.inviteService.findAll();
+  }
 
-    @Get(':id')
-    findOne(@Param('id') id: number): Promise<Invite | null> {
-        return this.inviteService.findOne(id);
-    }
-
+  @Get(':id')
+  findOne(@Param('id') id: number): Promise<Invite | null> {
+    return this.inviteService.findOne(id);
+  }
 }

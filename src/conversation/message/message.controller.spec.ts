@@ -22,18 +22,18 @@ describe('MessageController', () => {
       providers: [
         MessageService,
         {
-          provide: getRepositoryToken(Message), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Message),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(User), 
-          useClass: mockRepository
+          provide: getRepositoryToken(User),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(Conversation), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Conversation),
+          useClass: mockRepository,
         },
-      ]
+      ],
     }).compile();
 
     controller = module.get<MessageController>(MessageController);
