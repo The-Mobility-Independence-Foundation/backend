@@ -9,10 +9,12 @@ import { RequestModule } from '../request/request.module';
 import { ReviewModule } from '../review/review.module';
 import { ConversationModule } from '../conversation/conversation.module';
 import { MessageModule } from '../conversation/message/message.module';
-import { BookmarkModule } from '../bookmark/bookmark.module';
 import { ListingModule } from '../listing/listing.module';
 import { OrderModule } from '../order/order.module';
 import { InventoryItemModule } from '../inventory/inventory-item/inventory-item.module';
+import { TagModule } from 'src/inventory/inventory-item/tag/tag.module';
+import { PartModule } from 'src/inventory/inventory-item/part/part.module';
+import { ModelModule } from 'src/inventory/inventory-item/model/model.module';
 
 // When we set up the actual DB, we need to change this to read values from a file.
 // That way, we aren't leaking db credentials on our public git repo.
@@ -36,10 +38,12 @@ import { InventoryItemModule } from '../inventory/inventory-item/inventory-item.
     ReviewModule,
     ConversationModule,
     MessageModule,
-    BookmarkModule,
     ListingModule,
     OrderModule,
     InventoryItemModule,
+    TagModule,
+    PartModule,
+    ModelModule,
   ],
 })
 export class DatabaseModule {}
