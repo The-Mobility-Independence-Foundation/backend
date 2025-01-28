@@ -1,5 +1,6 @@
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { InventoryItem } from "../inventory-item.entity";
+import { Part } from "../part/part.entity";
 
 @Entity()
 export class ModelType {
@@ -45,5 +46,8 @@ export class Model {
 
     @OneToMany(() => InventoryItem, item => item.model)
     inventoryItems: InventoryItem[];
+
+    @ManyToMany(() => Part, part => part.model)
+    parts: Part[];
     
 }
