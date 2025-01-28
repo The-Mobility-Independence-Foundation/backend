@@ -5,7 +5,7 @@ import { Tag } from './tag.entity';
 @Controller('tag')
 export class TagController {
 
-    constructor(private tagService: TagService) {}
+    constructor(private readonly tagService: TagService) {}
         
     @Post()
     create(): Promise<Tag> {
