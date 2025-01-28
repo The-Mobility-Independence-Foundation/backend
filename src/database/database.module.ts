@@ -13,6 +13,8 @@ import { BookmarkModule } from '../bookmark/bookmark.module';
 import { ListingModule } from '../listing/listing.module';
 import { OrderModule } from '../order/order.module';
 import { InventoryItemModule } from '../inventory/inventory-item/inventory-item.module';
+import { WordfilterModule } from '../wordfilter/wordfilter.module';
+
 
 // When we set up the actual DB, we need to change this to read values from a file. 
 // That way, we aren't leaking db credentials on our public git repo.
@@ -39,6 +41,7 @@ import { InventoryItemModule } from '../inventory/inventory-item/inventory-item.
     ListingModule,
     OrderModule,
     InventoryItemModule,
+    WordfilterModule,
     ],
 })
 export class DatabaseModule {}
