@@ -5,7 +5,7 @@ import { Model } from './model.entity';
 @Controller('model')
 export class ModelController {
 
-    constructor(private modelService: ModelService) {}
+    constructor(private readonly modelService: ModelService) {}
         
     @Post()
     create(): Promise<Model> {

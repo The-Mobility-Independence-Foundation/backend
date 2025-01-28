@@ -8,7 +8,7 @@ export class TagService {
 
     constructor(
         @InjectRepository(Tag)
-        private tagRepository: Repository<Tag>,
+        private readonly tagRepository: Repository<Tag>,
     ) {}
 
     async create() {

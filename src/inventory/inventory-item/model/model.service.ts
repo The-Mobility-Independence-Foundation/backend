@@ -8,10 +8,10 @@ export class ModelService {
 
     constructor(
         @InjectRepository(Model)
-        private modelRepository: Repository<Model>,
+        private readonly modelRepository: Repository<Model>,
 
         @InjectRepository(Manufacturer)
-        private manufacturerRepository: Repository<Manufacturer>,
+        private readonly manufacturerRepository: Repository<Manufacturer>,
     ) {}
 
     async create() {
