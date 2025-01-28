@@ -23,10 +23,10 @@ export class Request {
   approver: User;
 
   @Column({ type: 'varchar', length: 50 })
-  name: String;
+  name: string;
 
   @Column({ type: 'varchar', length: 10 })
-  ein: String;
+  ein: string;
 
   @Column({ type: 'varchar', length: 20 })
   firstName: string;

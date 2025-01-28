@@ -20,8 +20,6 @@ export class InviteService {
 
   async create() {
     const invite = new Invite();
-  async create() {
-    const invite = new Invite();
 
     const inviter = await this.userRepository.findOneBy({ id: 1 });
     const organization = await this.organizationRepository.findOneBy({ id: 1 });
@@ -39,19 +37,11 @@ export class InviteService {
 
     return this.inviteRepository.save(invite);
   }
-    return this.inviteRepository.save(invite);
-  }
 
   async findAll() {
     return this.inviteRepository.find();
   }
-  async findAll() {
-    return this.inviteRepository.find();
-  }
 
-  async findOne(id: number) {
-    return this.inviteRepository.findOneBy({ id: id });
-  }
   async findOne(id: number) {
     return this.inviteRepository.findOneBy({ id: id });
   }
