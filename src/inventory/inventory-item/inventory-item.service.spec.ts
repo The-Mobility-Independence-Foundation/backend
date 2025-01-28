@@ -20,18 +20,18 @@ describe('InventoryItemService', () => {
       providers: [
         InventoryItemService,
         {
-          provide: getRepositoryToken(InventoryItem), 
-          useClass: mockRepository
+          provide: getRepositoryToken(InventoryItem),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(Inventory), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Inventory),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(Model), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Model),
+          useClass: mockRepository,
         },
-      ]
+      ],
     }).compile();
 
     service = module.get<InventoryItemService>(InventoryItemService);

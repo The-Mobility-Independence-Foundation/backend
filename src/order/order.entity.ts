@@ -1,44 +1,51 @@
 import { Listing } from '../listing/listing.entity';
 import { Review } from '../review/review.entity';
 import { User } from '../user/user.entity';
-import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 
 export enum OrderStatus {
-    INITIATED = "initiated", 
-    PENDING = "pending",
-    FULFILLED = "fulfilled", 
-    VOIDED = "voided"
+  INITIATED = 'initiated',
+  PENDING = 'pending',
+  FULFILLED = 'fulfilled',
+  VOIDED = 'voided',
 }
 
 @Entity()
 export class Order {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @JoinColumn()
-    @ManyToOne(() => Listing, listing => listing.orders)
-    listing: Listing;
+  @JoinColumn()
+  @ManyToOne(() => Listing, (listing) => listing.orders)
+  listing: Listing;
 
-    @JoinColumn()
-    @ManyToOne(() => User, user => user.ordersManaged)
-    owner: User;
+  @JoinColumn()
+  @ManyToOne(() => User, (user) => user.ordersManaged)
+  owner: User;
 
-    @JoinColumn()
-    @ManyToOne(() => User, user => user.orders)
-    recipient: User;
+  @JoinColumn()
+  @ManyToOne(() => User, (user) => user.orders)
+  recipient: User;
 
-    @Column()
-    quantity: number;
+  @Column()
+  quantity: number;
 
-    @Column({ type: "enum", enum: OrderStatus, default: OrderStatus.PENDING })
-    status: OrderStatus;
+  @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.PENDING })
+  status: OrderStatus;
 
-    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-    dateCreated: Date;
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  dateCreated: Date;
 
-    @Column({ type: "timestamp", nullable: true, default: null })
-    dateCompleted: Date;
+  @Column({ type: 'timestamp', nullable: true, default: null })
+  dateCompleted: Date;
 
-    @OneToMany(() => Review, review => review.order)
-    receivedReviews: Review[];
+  @OneToMany(() => Review, (review) => review.order)
+  receivedReviews: Review[];
 }

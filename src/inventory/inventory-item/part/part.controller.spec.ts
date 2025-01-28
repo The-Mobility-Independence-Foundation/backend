@@ -21,18 +21,18 @@ describe('PartController', () => {
       providers: [
         PartService,
         {
-          provide: getRepositoryToken(Part), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Part),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(PartType), 
-          useClass: mockRepository
+          provide: getRepositoryToken(PartType),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(Tag), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Tag),
+          useClass: mockRepository,
         },
-      ]
+      ],
     }).compile();
 
     controller = module.get<PartController>(PartController);

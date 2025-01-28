@@ -4,22 +4,20 @@ import { Model } from './model.entity';
 
 @Controller('model')
 export class ModelController {
+  constructor(private readonly modelService: ModelService) {}
 
-    constructor(private readonly modelService: ModelService) {}
-        
-    @Post()
-    create(): Promise<Model> {
-        return this.modelService.create();
-    }
+  @Post()
+  create(): Promise<Model> {
+    return this.modelService.create();
+  }
 
-    @Get()
-    findAll(): Promise<Model[]> {
-        return this.modelService.findAll();
-    }
+  @Get()
+  findAll(): Promise<Model[]> {
+    return this.modelService.findAll();
+  }
 
-    @Get(':id')
-    findOne(@Param('id') id: number): Promise<Model | null> {
-        return this.modelService.findOne(id);
-    }
-
+  @Get(':id')
+  findOne(@Param('id') id: number): Promise<Model | null> {
+    return this.modelService.findOne(id);
+  }
 }

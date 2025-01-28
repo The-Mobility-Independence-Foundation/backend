@@ -18,8 +18,8 @@ describe('TagService', () => {
       providers: [
         TagService,
         {
-          provide: getRepositoryToken(Tag), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Tag),
+          useClass: mockRepository,
         },
       ],
     }).compile();

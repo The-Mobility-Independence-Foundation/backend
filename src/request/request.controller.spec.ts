@@ -20,10 +20,10 @@ describe('RequestController', () => {
       providers: [
         RequestService,
         {
-          provide: getRepositoryToken(Request), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Request),
+          useClass: mockRepository,
         },
-      ]
+      ],
     }).compile();
 
     controller = module.get<RequestController>(RequestController);

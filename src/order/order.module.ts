@@ -10,6 +10,6 @@ import { Listing } from '../listing/listing.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Order, User, Organization, Listing])],
   controllers: [OrderController],
-  providers: [OrderService]
+  providers: [OrderService],
 })
 export class OrderModule {}

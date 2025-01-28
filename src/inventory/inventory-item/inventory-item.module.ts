@@ -9,6 +9,6 @@ import { Model } from './model/model.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([InventoryItem, Inventory, Model])],
   controllers: [InventoryItemController],
-  providers: [InventoryItemService]
+  providers: [InventoryItemService],
 })
 export class InventoryItemModule {}

@@ -5,37 +5,32 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class ModelService {
+  constructor(
+    @InjectRepository(Model)
+    private readonly modelRepository: Repository<Model>,
 
-    constructor(
-        @InjectRepository(Model)
-        private readonly modelRepository: Repository<Model>,
+    @InjectRepository(Manufacturer)
+    private readonly manufacturerRepository: Repository<Manufacturer>,
+  ) {}
 
-        @InjectRepository(Manufacturer)
-        private readonly manufacturerRepository: Repository<Manufacturer>,
-    ) {}
+  async create() {
+    const model = new Model();
+    const manufacturer = await this.manufacturerRepository.findOneBy({ id: 1 });
 
-    async create() {
-        const model = new Model();
-        const manufacturer = await this.manufacturerRepository.findOneBy({ id: 1 });
-
-        if (manufacturer) { model.manufacturer = manufacturer; }
-        model.name = "Model Name";
-        model.year = 2025;
-
-        return this.modelRepository.save(model);
+    if (manufacturer) {
+      model.manufacturer = manufacturer;
     }
+    model.name = 'Model Name';
+    model.year = 2025;
 
-    async findAll() {
-        
-        return this.modelRepository.find();
-        
-    }
+    return this.modelRepository.save(model);
+  }
 
-    async findOne(id: number) {
+  async findAll() {
+    return this.modelRepository.find();
+  }
 
-        return this.modelRepository.findOneBy({id: id});
-
-    }
-
+  async findOne(id: number) {
+    return this.modelRepository.findOneBy({ id: id });
+  }
 }
-

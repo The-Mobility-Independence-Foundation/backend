@@ -7,43 +7,41 @@ import { Model } from './model/model.entity';
 
 @Injectable()
 export class InventoryItemService {
+  constructor(
+    @InjectRepository(InventoryItem)
+    private inventoryItemRepository: Repository<InventoryItem>,
 
-    constructor(
-        @InjectRepository(InventoryItem)
-        private inventoryItemRepository: Repository<InventoryItem>,
+    @InjectRepository(Inventory)
+    private inventoryRepository: Repository<Inventory>,
 
-        @InjectRepository(Inventory)
-        private inventoryRepository: Repository<Inventory>,
+    @InjectRepository(Model)
+    private modelRepository: Repository<Model>,
+  ) {}
 
-        @InjectRepository(Model)
-        private modelRepository: Repository<Model>,
-    ) {}
+  async create() {
+    const inventoryItem = new InventoryItem();
+    const inventory = await this.inventoryRepository.findOneBy({ id: 1 });
+    const model = await this.modelRepository.findOneBy({ id: 1 });
 
-    async create() {
-        const inventoryItem = new InventoryItem();
-        const inventory = await this.inventoryRepository.findOneBy({ id: 1 });
-        const model = await this.modelRepository.findOneBy({ id: 1 });
-
-        if (inventory) { inventoryItem.inventory = inventory; }
-        if (model) { inventoryItem.model = model; }
-
-        inventoryItem.part = 1;
-        inventoryItem.notes = "These are my notes!";
-        inventoryItem.attributes = "These are my attributes!";
-
-        return this.inventoryItemRepository.save(inventoryItem);
+    if (inventory) {
+      inventoryItem.inventory = inventory;
+    }
+    if (model) {
+      inventoryItem.model = model;
     }
 
-    async findAll() {
-        
-        return this.inventoryItemRepository.find();
-        
-    }
+    inventoryItem.part = 1;
+    inventoryItem.notes = 'These are my notes!';
+    inventoryItem.attributes = 'These are my attributes!';
 
-    async findOne(id: number) {
+    return this.inventoryItemRepository.save(inventoryItem);
+  }
 
-        return this.inventoryItemRepository.findOneBy({id: id});
+  async findAll() {
+    return this.inventoryItemRepository.find();
+  }
 
-    }
-
+  async findOne(id: number) {
+    return this.inventoryItemRepository.findOneBy({ id: id });
+  }
 }

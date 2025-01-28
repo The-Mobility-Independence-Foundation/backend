@@ -4,22 +4,20 @@ import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
+  constructor(private userService: UserService) {}
 
-    constructor(private userService: UserService) {}
-    
-    @Post()
-    create(): Promise<User> {
-        return this.userService.create();
-    }
+  @Post()
+  create(): Promise<User> {
+    return this.userService.create();
+  }
 
-    @Get()
-    findAll(): Promise<User[]> {
-        return this.userService.findAll();
-    }
+  @Get()
+  findAll(): Promise<User[]> {
+    return this.userService.findAll();
+  }
 
-    @Get(':id')
-    findOne(@Param('id') id: number): Promise<User | null> {
-        return this.userService.findOne(id);
-    }
-
+  @Get(':id')
+  findOne(@Param('id') id: number): Promise<User | null> {
+    return this.userService.findOne(id);
+  }
 }

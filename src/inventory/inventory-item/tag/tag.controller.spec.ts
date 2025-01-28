@@ -20,8 +20,8 @@ describe('TagController', () => {
       providers: [
         TagService,
         {
-          provide: getRepositoryToken(Tag), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Tag),
+          useClass: mockRepository,
         },
       ],
     }).compile();

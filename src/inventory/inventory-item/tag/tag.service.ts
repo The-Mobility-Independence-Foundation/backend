@@ -5,30 +5,24 @@ import { Tag } from './tag.entity';
 
 @Injectable()
 export class TagService {
+  constructor(
+    @InjectRepository(Tag)
+    private readonly tagRepository: Repository<Tag>,
+  ) {}
 
-    constructor(
-        @InjectRepository(Tag)
-        private readonly tagRepository: Repository<Tag>,
-    ) {}
+  async create() {
+    const tag = new Tag();
 
-    async create() {
-        const tag = new Tag();
+    tag.name = 'Test tag name.';
 
-        tag.name = "Test tag name.";
+    return this.tagRepository.save(tag);
+  }
 
-        return this.tagRepository.save(tag);
-    }
+  async findAll() {
+    return this.tagRepository.find();
+  }
 
-    async findAll() {
-        
-        return this.tagRepository.find();
-        
-    }
-
-    async findOne(id: number) {
-
-        return this.tagRepository.findOneBy({id: id});
-
-    }
-
+  async findOne(id: number) {
+    return this.tagRepository.findOneBy({ id: id });
+  }
 }

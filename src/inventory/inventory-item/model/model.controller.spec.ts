@@ -20,14 +20,14 @@ describe('ModelController', () => {
       providers: [
         ModelService,
         {
-          provide: getRepositoryToken(Model), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Model),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(Manufacturer), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Manufacturer),
+          useClass: mockRepository,
         },
-      ]
+      ],
     }).compile();
 
     controller = module.get<ModelController>(ModelController);
