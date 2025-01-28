@@ -4,22 +4,20 @@ import { Part } from './part.entity';
 
 @Controller('part')
 export class PartController {
+  constructor(private readonly partService: PartService) {}
 
-    constructor(private readonly partService: PartService) {}
-            
-    @Post()
-    create(): Promise<Part> {
-        return this.partService.create();
-    }
+  @Post()
+  create(): Promise<Part> {
+    return this.partService.create();
+  }
 
-    @Get()
-    findAll(): Promise<Part[]> {
-        return this.partService.findAll();
-    }
+  @Get()
+  findAll(): Promise<Part[]> {
+    return this.partService.findAll();
+  }
 
-    @Get(':id')
-    findOne(@Param('id') id: number): Promise<Part | null> {
-        return this.partService.findOne(id);
-    }
-
+  @Get(':id')
+  findOne(@Param('id') id: number): Promise<Part | null> {
+    return this.partService.findOne(id);
+  }
 }

@@ -42,8 +42,8 @@ import { ModelModule } from 'src/inventory/inventory-item/model/model.module';
     OrderModule,
     InventoryItemModule,
     TagModule,
-    PartModule, 
-    ModelModule
-    ],
+    PartModule,
+    ModelModule,
+  ],
 })
 export class DatabaseModule {}

@@ -9,6 +9,7 @@ import {
   OneToMany,
   JoinColumn,
   ManyToOne,
+  ManyToMany,
 } from 'typeorm';
 
 export enum ListingStatus {
@@ -54,7 +55,7 @@ export class Listing {
   inactive: boolean;
 
   @Column({ type: 'varchar', length: 10 })
-  zipcode: String;
+  zipcode: string;
 
   @Column({ type: 'enum', enum: ListingStatus, default: ListingStatus.ACTIVE })
   state: ListingStatus;
@@ -65,10 +66,9 @@ export class Listing {
   @OneToMany(() => Order, (order) => order.owner)
   orders: Order[];
 
-  @OneToMany(() => Conversation, conversation => conversation.listing)
+  @OneToMany(() => Conversation, (conversation) => conversation.listing)
   conversations: Conversation[];
 
-  @ManyToMany(() => User, user => user.bookmarks)
+  @ManyToMany(() => User, (user) => user.bookmarks)
   bookmarks: User[];
-
 }

@@ -11,11 +11,11 @@ export class InventoryItemService {
     @InjectRepository(InventoryItem)
     private readonly inventoryItemRepository: Repository<InventoryItem>,
 
-      @InjectRepository(Inventory)
-      private inventoryRepository: Repository<Inventory>,
+    @InjectRepository(Inventory)
+    private readonly inventoryRepository: Repository<Inventory>,
 
-      @InjectRepository(Model)
-      private modelRepository: Repository<Model>,
+    @InjectRepository(Model)
+    private readonly modelRepository: Repository<Model>,
   ) {}
 
   async create() {

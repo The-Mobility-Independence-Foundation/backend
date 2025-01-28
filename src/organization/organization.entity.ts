@@ -57,7 +57,7 @@ export class Organization {
   phoneNumber: string;
 
   @Column({ type: 'varchar', length: 10 })
-  ein: String;
+  ein: string;
 
   @Column({ type: 'varchar', length: 50, array: true, nullable: true })
   socials: string[];

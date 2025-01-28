@@ -4,22 +4,20 @@ import { Tag } from './tag.entity';
 
 @Controller('tag')
 export class TagController {
+  constructor(private readonly tagService: TagService) {}
 
-    constructor(private readonly tagService: TagService) {}
-        
-    @Post()
-    create(): Promise<Tag> {
-        return this.tagService.create();
-    }
+  @Post()
+  create(): Promise<Tag> {
+    return this.tagService.create();
+  }
 
-    @Get()
-    findAll(): Promise<Tag[]> {
-        return this.tagService.findAll();
-    }
+  @Get()
+  findAll(): Promise<Tag[]> {
+    return this.tagService.findAll();
+  }
 
-    @Get(':id')
-    findOne(@Param('id') id: number): Promise<Tag | null> {
-        return this.tagService.findOne(id);
-    }
-
+  @Get(':id')
+  findOne(@Param('id') id: number): Promise<Tag | null> {
+    return this.tagService.findOne(id);
+  }
 }

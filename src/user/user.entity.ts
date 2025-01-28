@@ -10,6 +10,8 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { Message } from '../conversation/message/message.entity';
 import { Listing } from '../listing/listing.entity';
@@ -90,20 +92,20 @@ export class User {
   @OneToMany(() => Request, (request) => request.approver)
   approvedRequests: Request[];
 
-  @OneToMany(() => Message, (message) => message.author)
+  @OneToMany(() => Message, (message) => message.sender)
   sentMessages: Message[];
 
-  @OneToMany(() => Listing, listing => listing.owner)
+  @OneToMany(() => Listing, (listing) => listing.owner)
   listings: Listing[];
 
-  @JoinTable({ name: "bookmarks" })
-  @ManyToMany(() => Listing, listing => listing.bookmarks)
+  @JoinTable({ name: 'bookmarks' })
+  @ManyToMany(() => Listing, (listing) => listing.bookmarks)
   bookmarks: Listing[];
 
-  @JoinTable({ name: "connections" })
-  @ManyToMany(() => User, user => user.connectionsRecieved)
+  @JoinTable({ name: 'connections' })
+  @ManyToMany(() => User, (user) => user.connectionsRecieved)
   connectionsSent: User[];
 
-  @ManyToMany(() => User, user => user.connectionsSent)
+  @ManyToMany(() => User, (user) => user.connectionsSent)
   connectionsRecieved: User[];
 }

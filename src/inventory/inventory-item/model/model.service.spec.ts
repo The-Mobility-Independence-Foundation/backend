@@ -18,14 +18,14 @@ describe('ModelService', () => {
       providers: [
         ModelService,
         {
-          provide: getRepositoryToken(Model), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Model),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(Manufacturer), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Manufacturer),
+          useClass: mockRepository,
         },
-      ]
+      ],
     }).compile();
 
     service = module.get<ModelService>(ModelService);

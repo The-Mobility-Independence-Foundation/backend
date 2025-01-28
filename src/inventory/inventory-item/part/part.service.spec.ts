@@ -19,18 +19,18 @@ describe('PartService', () => {
       providers: [
         PartService,
         {
-          provide: getRepositoryToken(Part), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Part),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(PartType), 
-          useClass: mockRepository
+          provide: getRepositoryToken(PartType),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(Tag), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Tag),
+          useClass: mockRepository,
         },
-      ]
+      ],
     }).compile();
 
     service = module.get<PartService>(PartService);

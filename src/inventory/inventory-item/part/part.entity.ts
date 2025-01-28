@@ -1,39 +1,46 @@
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Model } from "../model/model.entity";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Model } from '../model/model.entity';
 
 @Entity()
 export class PartType {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({ type: "varchar", length: 20 })
-    name: String;
+  @Column({ type: 'varchar', length: 20 })
+  name: string;
 
-    @ManyToMany(() => Part, part => part.types)
-    parts: Part[];
-    
+  @ManyToMany(() => Part, (part) => part.types)
+  parts: Part[];
 }
 
 @Entity()
 export class Part {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({ type: "varchar", length: 50 })
-    name: String;
+  @Column({ type: 'varchar', length: 50 })
+  name: string;
 
-    @Column({ type: "varchar", length: 200 })
-    description: String;
+  @Column({ type: 'varchar', length: 200 })
+  description: string;
 
-    @ManyToOne(() => Model, model => model.parts)
-    @JoinColumn()
-    model: Model;
+  @ManyToOne(() => Model, (model) => model.parts)
+  @JoinColumn()
+  model: Model;
 
-    @Column({ type: "varchar", length: 30 })
-    partNumber: String;
+  @Column({ type: 'varchar', length: 30 })
+  partNumber: string;
 
-    @ManyToMany(() => PartType, pt => pt.parts)
-    @JoinTable()
-    types: PartType[];
-    
+  @ManyToMany(() => PartType, (pt) => pt.parts)
+  @JoinTable()
+  types: PartType[];
 }

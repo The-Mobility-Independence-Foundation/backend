@@ -4,6 +4,7 @@ import { InventoryItem } from './inventory-item.entity';
 import { Inventory } from '../inventory.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { InventoryItemService } from './inventory-item.service';
+import { Model } from './model/model.entity';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -26,6 +27,10 @@ describe('InventoryItemController', () => {
         },
         {
           provide: getRepositoryToken(Inventory),
+          useClass: mockRepository,
+        },
+        {
+          provide: getRepositoryToken(Model),
           useClass: mockRepository,
         },
       ],
