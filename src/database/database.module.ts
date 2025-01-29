@@ -14,6 +14,8 @@ import { ListingModule } from '../listing/listing.module';
 import { OrderModule } from '../order/order.module';
 import { InventoryItemModule } from '../inventory/inventory-item/inventory-item.module';
 import { WordfilterModule } from '../wordfilter/wordfilter.module';
+import { ForumModule } from '../forum/forum.module';
+
 
 
 // When we set up the actual DB, we need to change this to read values from a file. 
@@ -42,6 +44,7 @@ import { WordfilterModule } from '../wordfilter/wordfilter.module';
     OrderModule,
     InventoryItemModule,
     WordfilterModule,
+    ForumModule
     ],
 })
 export class DatabaseModule {}
