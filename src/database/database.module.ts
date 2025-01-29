@@ -17,6 +17,8 @@ import { PartModule } from '../part/part.module';
 import { ModelModule } from '../model/model.module';
 import { WordfilterModule } from '../wordfilter/wordfilter.module';
 import { ForumModule } from '../forum/forum.module';
+import { PrefixModule } from '../prefix/prefix.module';
+
 
 
 // When we set up the actual DB, we need to change this to read values from a file.
@@ -48,7 +50,8 @@ import { ForumModule } from '../forum/forum.module';
     PartModule,
     ModelModule,
     WordfilterModule,
-    ForumModule
+    ForumModule,
+    PrefixModule
     ],
 })
 export class DatabaseModule {}

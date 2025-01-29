@@ -3,6 +3,7 @@ import { Forum } from './forum.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
+
 @Injectable()
 export class ForumService {
 
@@ -15,9 +16,7 @@ export class ForumService {
         const forum = new Forum();
 
         const parentForum = await this.forumRepository.findOneBy({ id: 1 });
-        if (parentForum) {
-            forum.parentForum = parentForum;
-        }
+        if (parentForum) {forum.parentForum = parentForum;}
 
         forum.name = "Power Chairs";
         forum.description = "Talking about power chairs and issues";
