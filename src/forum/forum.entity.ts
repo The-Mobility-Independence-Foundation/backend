@@ -41,7 +41,7 @@ export class Forum {
   @Column()
   numberOfThreads: number;
 
-  @OneToMany((void 0, () => Forum), (forum) => forum.parentForum)
+  @OneToMany((type) => Forum, (forum) => forum.parentForum)
   childForum: Forum[];
 
   @OneToMany(() => Prefix, (prefix) => prefix.forumsUsed)
