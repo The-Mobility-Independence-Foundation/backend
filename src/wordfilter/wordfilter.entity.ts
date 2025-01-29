@@ -6,9 +6,9 @@ export class Wordfilter {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column() 
-    badWord: String;
+    @Column({ type: "varchar", length: 32 }) 
+    badWord: string;
 
     @Column({default: () => "********" })
-    replacement: String;
+    replacement: string;
 }
