@@ -1,4 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColumn} from 'typeorm';
+import { Prefix } from '../prefix/prefix.entity';
+
 
 @Entity()
 export class Forum {
@@ -32,5 +34,8 @@ export class Forum {
     numberOfThreads: number;
 
     @OneToMany((type) => Forum, (forum) => forum.parentForum)
-    childForum: Forum[]
+    childForum: Forum[];
+
+    @OneToMany(() => Prefix, prefix => prefix.forumsUsed)
+    prefixes: Prefix[];
 }

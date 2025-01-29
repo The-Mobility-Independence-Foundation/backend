@@ -15,6 +15,8 @@ import { OrderModule } from '../order/order.module';
 import { InventoryItemModule } from '../inventory/inventory-item/inventory-item.module';
 import { WordfilterModule } from '../wordfilter/wordfilter.module';
 import { ForumModule } from '../forum/forum.module';
+import { PrefixModule } from '../prefix/prefix.module';
+
 
 
 
@@ -45,7 +47,8 @@ import { ForumModule } from '../forum/forum.module';
     OrderModule,
     InventoryItemModule,
     WordfilterModule,
-    ForumModule
+    ForumModule,
+    PrefixModule
     ],
 })
 export class DatabaseModule {}
