@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColumn} from 'typeorm';
 import { Prefix } from '../prefix/prefix.entity';
 import { Post } from '../post/post.entity';
+import { Comment } from '../comment/comment.entity';
 
 
 
@@ -43,4 +44,7 @@ export class Forum {
 
     @OneToMany(() => Post, (post) => post.forum) 
     posts: Post[];
+
+    @OneToMany(() => Comment, (comment) => comment.forum)  // One user can have many posts
+    comments: Comment[];
 }
