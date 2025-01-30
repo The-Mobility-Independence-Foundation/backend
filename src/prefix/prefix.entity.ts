@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn} from 'typeorm';
+import { Post } from '../post/post.entity';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany} from 'typeorm';
 import { Forum } from '../forum/forum.entity';
 
 
@@ -14,5 +15,8 @@ export class Prefix {
     @ManyToOne(() => Forum, forum => forum.prefixes)
     @JoinColumn({ name: 'forumId' })
     forumsUsed: Forum;
+
+    @OneToMany(() => Post, (post) => post.prefix) 
+    posts: Post[];
     
 }
