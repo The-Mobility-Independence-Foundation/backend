@@ -1,7 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany} from 'typeorm';
 import { Prefix } from '../prefix/prefix.entity';
 import { User } from '../user/user.entity';
 import { Forum } from '../forum/forum.entity';
+import { Comment } from '../comment/comment.entity';
 
 @Entity()
 export class Post{
@@ -32,4 +33,7 @@ export class Post{
 
     @Column({default: false})
     isLocked: boolean;
+
+    @OneToMany(() => Comment, (comment) => comment.post)  // One user can have many posts
+    comments: Comment[];
 }
