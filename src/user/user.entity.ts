@@ -14,6 +14,7 @@ import {
 import { Message } from '../conversation/message/message.entity';
 import { Listing } from '../listing/listing.entity';
 import { Post } from '../post/post.entity';
+import { Comment } from '../comment/comment.entity';
 
 export enum UserRole {
   USER = 'user',
@@ -97,6 +98,12 @@ export class User {
     @OneToMany(() => Listing, listing => listing.owner)
     listings: Listing[];
 
-    @OneToMany(() => Post, (post) => post.user)  // One user can have many posts
+    @OneToMany(() => Post, (post) => post.user) 
     posts: Post[];
+
+    @OneToMany(() => Comment, (comment) => comment.author)  
+    comments: Comment[];
+
+    @OneToMany(() => Comment, (comment) => comment.editedBy)  
+    editedComments: Comment[];
 }
