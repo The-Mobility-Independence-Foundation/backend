@@ -18,6 +18,8 @@ import { ModelModule } from '../model/model.module';
 import { WordfilterModule } from '../wordfilter/wordfilter.module';
 import { ForumModule } from '../forum/forum.module';
 import { PrefixModule } from '../prefix/prefix.module';
+import { PostModule } from '../post/post.module';
+
 
 
 
@@ -51,7 +53,8 @@ import { PrefixModule } from '../prefix/prefix.module';
     ModelModule,
     WordfilterModule,
     ForumModule,
-    PrefixModule
+    PrefixModule,
+    PostModule
     ],
 })
 export class DatabaseModule {}
