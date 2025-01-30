@@ -13,6 +13,7 @@ import {
 } from 'typeorm';
 import { Message } from '../conversation/message/message.entity';
 import { Listing } from '../listing/listing.entity';
+import { Post } from '../post/post.entity';
 
 export enum UserRole {
   USER = 'user',
@@ -93,6 +94,9 @@ export class User {
   @OneToMany(() => Message, (message) => message.author)
   sentMessages: Message[];
 
-  @OneToMany(() => Listing, (listing) => listing.owner)
-  listings: Listing[];
+    @OneToMany(() => Listing, listing => listing.owner)
+    listings: Listing[];
+
+    @OneToMany(() => Post, (post) => post.user)  // One user can have many posts
+    posts: Post[];
 }
