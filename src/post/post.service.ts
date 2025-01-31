@@ -8,42 +8,48 @@ import { Prefix } from '../prefix/prefix.entity';
 
 @Injectable()
 export class PostService {
-    constructor(
-        @InjectRepository(Post)
-        private postRepository: Repository<Post>,
+  constructor(
+    @InjectRepository(Post)
+    private postRepository: Repository<Post>,
 
-        @InjectRepository(User)
-        private userRepository: Repository<User>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
 
-        @InjectRepository(Forum)
-        private forumRepository: Repository<Forum>,
+    @InjectRepository(Forum)
+    private forumRepository: Repository<Forum>,
 
-        @InjectRepository(Prefix)
-        private prefixRepository: Repository<Prefix>
-    ) {}
+    @InjectRepository(Prefix)
+    private prefixRepository: Repository<Prefix>,
+  ) {}
 
-    async create(){
-        const post = new Post();
+  async create() {
+    const post = new Post();
 
-        const user = await this.userRepository.findOneBy({id: 1});
-        const prefix = await this.prefixRepository.findOneBy({id: 1});
-        const forum = await this.forumRepository.findOneBy({id: 1});
+    const user = await this.userRepository.findOneBy({ id: 1 });
+    const prefix = await this.prefixRepository.findOneBy({ id: 1 });
+    const forum = await this.forumRepository.findOneBy({ id: 1 });
 
-        if (user) {post.user = user; }
-        if (prefix) {post.prefix = prefix; }
-        if (forum) {post.forum = forum; }
-
-        post.title = "Seized wheel nut";
-        post.numberOfComments = 2;
-
-        return this.postRepository.save(post);
+    if (user) {
+      post.user = user;
+    }
+    if (prefix) {
+      post.prefix = prefix;
+    }
+    if (forum) {
+      post.forum = forum;
     }
 
-    async findAll(){
-        return this.postRepository.find();
-    }
+    post.title = 'Seized wheel nut';
+    post.numberOfComments = 2;
 
-    async findOne(id: number){
-        return this.postRepository.findOneBy({id: id});
-    }
+    return this.postRepository.save(post);
+  }
+
+  async findAll() {
+    return this.postRepository.find();
+  }
+
+  async findOne(id: number) {
+    return this.postRepository.findOneBy({ id: id });
+  }
 }

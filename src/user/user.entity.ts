@@ -95,15 +95,15 @@ export class User {
   @OneToMany(() => Message, (message) => message.author)
   sentMessages: Message[];
 
-    @OneToMany(() => Listing, listing => listing.owner)
-    listings: Listing[];
+  @OneToMany(() => Listing, (listing) => listing.owner)
+  listings: Listing[];
 
-    @OneToMany(() => Post, (post) => post.user) 
-    posts: Post[];
+  @OneToMany(() => Post, (post) => post.user)
+  posts: Post[];
 
-    @OneToMany(() => Comment, (comment) => comment.author)  
-    comments: Comment[];
+  @OneToMany(() => Comment, (comment) => comment.author)
+  comments: Comment[];
 
-    @OneToMany(() => Comment, (comment) => comment.editedBy)  
-    editedComments: Comment[];
+  @OneToMany(() => Comment, (comment) => comment.editedBy)
+  editedComments: Comment[];
 }

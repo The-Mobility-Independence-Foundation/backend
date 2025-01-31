@@ -2,8 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { WordfilterService } from './wordfilter.service';
 import { Wordfilter } from './wordfilter.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { mock } from 'node:test';
-
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -21,8 +19,8 @@ describe('WordfilterService', () => {
         WordfilterService,
         {
           provide: getRepositoryToken(Wordfilter),
-          useClass: mockRepository
-        }
+          useClass: mockRepository,
+        },
       ],
     }).compile();
 
