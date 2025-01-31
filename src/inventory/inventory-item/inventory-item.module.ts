@@ -5,9 +5,10 @@ import { InventoryItemService } from './inventory-item.service';
 import { InventoryItem } from './inventory-item.entity';
 import { Inventory } from '../inventory.entity';
 import { Model } from './model/model.entity';
+import { Part } from './part/part.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([InventoryItem, Inventory, Model])],
+  imports: [TypeOrmModule.forFeature([InventoryItem, Inventory, Model, Part])],
   controllers: [InventoryItemController],
   providers: [InventoryItemService],
 })

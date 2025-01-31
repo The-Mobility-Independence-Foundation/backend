@@ -12,14 +12,16 @@ import {
 } from 'typeorm';
 import { Tag } from './tag/tag.entity';
 import { Model } from './model/model.entity';
+import { Part } from './part/part.entity';
 
 @Entity()
 export class InventoryItem {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false }) // TODO: set foreign key on part
-  part: number;
+  @JoinColumn()
+  @ManyToOne(() => Part, (part) => part.inventoryItems)
+  part: Part;
 
   @JoinColumn()
   @ManyToOne(() => Model, (model) => model.inventoryItems)

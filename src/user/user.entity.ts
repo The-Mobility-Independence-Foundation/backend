@@ -43,9 +43,6 @@ export class User {
   @Column({ type: 'varchar', length: 50 }) // TODO: update with a salt and a hash
   password: string;
 
-  // make unique eventually?
-  // returns a 500 server error unless we catch the duplicate name error ourselves.
-  // userID will still increment if a unique name is sent though, leaving us with blank rows
   @Column({ type: 'varchar', length: 20 })
   displayName: string;
 
