@@ -41,9 +41,8 @@ export class InventoryItemService {
     inventoryItem.notes = 'These are my notes!';
     inventoryItem.attributes = 'These are my attributes!';
 
-      return this.inventoryItemRepository.save(inventoryItem);
+    return this.inventoryItemRepository.save(inventoryItem);
   }
-
 
   async findAll() {
     return this.inventoryItemRepository.find();

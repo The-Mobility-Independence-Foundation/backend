@@ -89,7 +89,7 @@ export class User {
   @OneToMany(() => Request, (request) => request.approver)
   approvedRequests: Request[];
 
-  @OneToMany(() => Message, (message) => message.sender)
+  @OneToMany(() => Message, (message) => message.author)
   sentMessages: Message[];
 
   @OneToMany(() => Listing, (listing) => listing.owner)
