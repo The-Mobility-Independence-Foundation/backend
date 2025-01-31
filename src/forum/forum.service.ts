@@ -3,7 +3,6 @@ import { Forum } from './forum.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
-
 @Injectable()
 export class ForumService {
   constructor(
