@@ -1,14 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Wordfilter {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @PrimaryGeneratedColumn()
-    id: number;
+  @Column({ type: 'varchar', length: 32 })
+  badWord: string;
 
-    @Column({ type: "varchar", length: 32 }) 
-    badWord: string;
-
-    @Column({default: () => "********" })
-    replacement: string;
+  @Column({ default: () => '********' })
+  replacement: string;
 }

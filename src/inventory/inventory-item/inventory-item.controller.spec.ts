@@ -21,14 +21,14 @@ describe('InventoryItemController', () => {
       providers: [
         InventoryItemService,
         {
-          provide: getRepositoryToken(InventoryItem), 
-          useClass: mockRepository
+          provide: getRepositoryToken(InventoryItem),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(Inventory), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Inventory),
+          useClass: mockRepository,
         },
-      ]
+      ],
     }).compile();
 
     controller = module.get<InventoryItemController>(InventoryItemController);

@@ -22,18 +22,18 @@ describe('ReviewController', () => {
       providers: [
         ReviewService,
         {
-          provide: getRepositoryToken(Review), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Review),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(User), 
-          useClass: mockRepository
+          provide: getRepositoryToken(User),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(Order), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Order),
+          useClass: mockRepository,
         },
-      ]
+      ],
     }).compile();
 
     controller = module.get<ReviewController>(ReviewController);

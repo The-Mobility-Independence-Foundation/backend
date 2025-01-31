@@ -9,6 +9,6 @@ import { Organization } from '../organization/organization.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Invite, User, Organization])],
   controllers: [InviteController],
-  providers: [InviteService]
+  providers: [InviteService],
 })
 export class InviteModule {}

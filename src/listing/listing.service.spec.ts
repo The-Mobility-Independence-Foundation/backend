@@ -20,18 +20,18 @@ describe('ListingService', () => {
       providers: [
         ListingService,
         {
-          provide: getRepositoryToken(Listing), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Listing),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(User), 
-          useClass: mockRepository
+          provide: getRepositoryToken(User),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(InventoryItem), 
-          useClass: mockRepository
+          provide: getRepositoryToken(InventoryItem),
+          useClass: mockRepository,
         },
-      ]
+      ],
     }).compile();
 
     service = module.get<ListingService>(ListingService);

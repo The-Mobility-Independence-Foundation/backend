@@ -21,20 +21,20 @@ describe('PostService', () => {
       providers: [
         PostService,
         {
-          provide: getRepositoryToken(Post), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Post),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(User), 
-          useClass: mockRepository
+          provide: getRepositoryToken(User),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(Forum), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Forum),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(Prefix), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Prefix),
+          useClass: mockRepository,
         },
       ],
     }).compile();

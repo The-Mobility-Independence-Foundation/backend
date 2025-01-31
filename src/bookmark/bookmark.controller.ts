@@ -4,22 +4,20 @@ import { BookmarkService } from './bookmark.service';
 
 @Controller('bookmark')
 export class BookmarkController {
+  constructor(private bookmarkService: BookmarkService) {}
 
-    constructor(private bookmarkService: BookmarkService) {}
-    
-    @Post()
-    create(): Promise<Bookmark> {
-        return this.bookmarkService.create();
-    }
+  @Post()
+  create(): Promise<Bookmark> {
+    return this.bookmarkService.create();
+  }
 
-    @Get()
-    findAll(): Promise<Bookmark[]> {
-        return this.bookmarkService.findAll();
-    }
+  @Get()
+  findAll(): Promise<Bookmark[]> {
+    return this.bookmarkService.findAll();
+  }
 
-    @Get(':id')
-    findOne(@Param('id') id: number): Promise<Bookmark | null> {
-        return this.bookmarkService.findOne(id);
-    }
-
+  @Get(':id')
+  findOne(@Param('id') id: number): Promise<Bookmark | null> {
+    return this.bookmarkService.findOne(id);
+  }
 }

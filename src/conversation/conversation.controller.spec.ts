@@ -19,16 +19,16 @@ describe('ConversationController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ConversationController],
       providers: [
-        ConversationService, 
+        ConversationService,
         {
-          provide: getRepositoryToken(Conversation), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Conversation),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(Listing), 
-          useClass: mockRepository
-        }
-      ]
+          provide: getRepositoryToken(Listing),
+          useClass: mockRepository,
+        },
+      ],
     }).compile();
 
     controller = module.get<ConversationController>(ConversationController);

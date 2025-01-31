@@ -18,12 +18,12 @@ describe('BookmarkController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [BookmarkController],
       providers: [
-        BookmarkService, 
+        BookmarkService,
         {
-          provide: getRepositoryToken(Bookmark), 
-          useClass: mockRepository
-        }
-      ]
+          provide: getRepositoryToken(Bookmark),
+          useClass: mockRepository,
+        },
+      ],
     }).compile();
 
     controller = module.get<BookmarkController>(BookmarkController);

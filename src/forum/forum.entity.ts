@@ -1,50 +1,55 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColumn} from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { Prefix } from '../prefix/prefix.entity';
 import { Post } from '../post/post.entity';
 import { Comment } from '../comment/comment.entity';
 
-
-
 @Entity()
 export class Forum {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @PrimaryGeneratedColumn()
-    id: number;
+  @Column()
+  @ManyToOne((void 0, () => Forum), (forum) => forum.childForum, {
+    nullable: true,
+  })
+  parentForum: Forum | null;
 
-    @Column() 
-    @ManyToOne((type) => Forum, (forum) => forum.childForum, {nullable: true})
-    parentForum: Forum | null;
+  @Column({ type: 'varchar', length: 80, nullable: false })
+  name: string;
 
-    @Column({type: "varchar",length: 80, nullable: false })
-    name: string;
+  @Column({ type: 'varchar', length: 8000 })
+  description: string;
 
-    @Column({type: "varchar", length: 8000})
-    description: string;
+  @Column({ default: false })
+  isCategory: boolean;
 
-    @Column({default: false})
-    isCategory: boolean;
+  @Column()
+  order: number;
 
-    @Column()
-    order: number;
+  @Column({ default: false })
+  isLocked: boolean;
 
-    @Column({default: false})
-    isLocked: boolean;
+  @Column()
+  numberOfPosts: number;
 
-    @Column()
-    numberOfPosts: number;
+  @Column()
+  numberOfThreads: number;
 
-    @Column()
-    numberOfThreads: number;
+  @OneToMany((void 0, () => Forum), (forum) => forum.parentForum)
+  childForum: Forum[];
 
-    @OneToMany((type) => Forum, (forum) => forum.parentForum)
-    childForum: Forum[];
+  @OneToMany(() => Prefix, (prefix) => prefix.forumsUsed)
+  prefixes: Prefix[];
 
-    @OneToMany(() => Prefix, prefix => prefix.forumsUsed)
-    prefixes: Prefix[];
+  @OneToMany(() => Post, (post) => post.forum)
+  posts: Post[];
 
-    @OneToMany(() => Post, (post) => post.forum) 
-    posts: Post[];
-
-    @OneToMany(() => Comment, (comment) => comment.forum)  // One user can have many posts
-    comments: Comment[];
+  @OneToMany(() => Comment, (comment) => comment.forum) // One user can have many posts
+  comments: Comment[];
 }

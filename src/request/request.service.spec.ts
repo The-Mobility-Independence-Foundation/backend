@@ -18,10 +18,10 @@ describe('RequestService', () => {
       providers: [
         RequestService,
         {
-          provide: getRepositoryToken(Request), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Request),
+          useClass: mockRepository,
         },
-      ]
+      ],
     }).compile();
 
     service = module.get<RequestService>(RequestService);

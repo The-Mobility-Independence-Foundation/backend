@@ -4,22 +4,20 @@ import { MessageService } from './message.service';
 
 @Controller('message')
 export class MessageController {
+  constructor(private messageService: MessageService) {}
 
-    constructor(private messageService: MessageService) {}
-    
-    @Post()
-    create(): Promise<Message> {
-        return this.messageService.create();
-    }
+  @Post()
+  create(): Promise<Message> {
+    return this.messageService.create();
+  }
 
-    @Get()
-    findAll(): Promise<Message[]> {
-        return this.messageService.findAll();
-    }
+  @Get()
+  findAll(): Promise<Message[]> {
+    return this.messageService.findAll();
+  }
 
-    @Get(':id')
-    findOne(@Param('id') id: number): Promise<Message | null> {
-        return this.messageService.findOne(id);
-    }
-
+  @Get(':id')
+  findOne(@Param('id') id: number): Promise<Message | null> {
+    return this.messageService.findOne(id);
+  }
 }

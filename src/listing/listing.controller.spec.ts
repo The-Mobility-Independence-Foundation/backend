@@ -22,18 +22,18 @@ describe('ListingController', () => {
       providers: [
         ListingService,
         {
-          provide: getRepositoryToken(Listing), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Listing),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(User), 
-          useClass: mockRepository
+          provide: getRepositoryToken(User),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(InventoryItem), 
-          useClass: mockRepository
+          provide: getRepositoryToken(InventoryItem),
+          useClass: mockRepository,
         },
-      ]
+      ],
     }).compile();
 
     controller = module.get<ListingController>(ListingController);

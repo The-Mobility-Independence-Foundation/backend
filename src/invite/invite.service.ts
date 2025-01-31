@@ -7,44 +7,42 @@ import { Organization } from '../organization/organization.entity';
 
 @Injectable()
 export class InviteService {
+  constructor(
+    @InjectRepository(Invite)
+    private inviteRepository: Repository<Invite>,
 
-    constructor(
-        @InjectRepository(Invite)
-        private inviteRepository: Repository<Invite>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
 
-        @InjectRepository(User)
-        private userRepository: Repository<User>,
+    @InjectRepository(Organization)
+    private organizationRepository: Repository<Organization>,
+  ) {}
 
-        @InjectRepository(Organization)
-        private organizationRepository: Repository<Organization>,
-    ) {}
+  async create() {
+    const invite = new Invite();
 
-    async create() {
-        const invite = new Invite();
+    const sender = await this.userRepository.findOneBy({ id: 1 });
+    const organization = await this.organizationRepository.findOneBy({ id: 1 });
 
-        const sender = await this.userRepository.findOneBy({ id: 1 });
-        const organization = await this.organizationRepository.findOneBy({ id: 1 });
-
-        if (sender) { invite.sender = sender; }
-        if (organization) { invite.organization = organization; }
-        
-        invite.recieverEmail = "johntest@rit.edu";
-        invite.description = "John is my homie!";
-        invite.invType = InviteType.ORGANIZATION; 
-
-        return this.inviteRepository.save(invite);
+    if (sender) {
+      invite.sender = sender;
+    }
+    if (organization) {
+      invite.organization = organization;
     }
 
-    async findAll() {
-        
-        return this.inviteRepository.find();
-        
-    }
+    invite.recieverEmail = 'johntest@rit.edu';
+    invite.description = 'John is my homie!';
+    invite.invType = InviteType.ORGANIZATION;
 
-    async findOne(id: number) {
+    return this.inviteRepository.save(invite);
+  }
 
-        return this.inviteRepository.findOneBy({id: id});
+  async findAll() {
+    return this.inviteRepository.find();
+  }
 
-    }
-
+  async findOne(id: number) {
+    return this.inviteRepository.findOneBy({ id: id });
+  }
 }

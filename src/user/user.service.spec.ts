@@ -19,14 +19,14 @@ describe('UserService', () => {
       providers: [
         UserService,
         {
-          provide: getRepositoryToken(User), 
-          useClass: mockRepository
+          provide: getRepositoryToken(User),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(Organization), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Organization),
+          useClass: mockRepository,
         },
-      ]
+      ],
     }).compile();
 
     service = module.get<UserService>(UserService);

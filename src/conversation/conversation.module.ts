@@ -8,6 +8,6 @@ import { Listing } from '../listing/listing.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Conversation, Listing])],
   controllers: [ConversationController],
-  providers: [ConversationService]
+  providers: [ConversationService],
 })
 export class ConversationModule {}

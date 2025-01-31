@@ -21,9 +21,9 @@ describe('PrefixController', () => {
         PrefixService,
         {
           provide: getRepositoryToken(Prefix),
-          useClass: mockRepository
-        }
-      ]
+          useClass: mockRepository,
+        },
+      ],
     }).compile();
 
     controller = module.get<PrefixController>(PrefixController);

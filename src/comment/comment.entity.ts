@@ -1,44 +1,51 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany} from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
 import { Post } from '../post/post.entity';
 import { User } from '../user/user.entity';
 import { Forum } from '../forum/forum.entity';
 
 @Entity()
-export class Comment{
+export class Comment {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @PrimaryGeneratedColumn()
-    id: number;
+  @Column()
+  @ManyToOne((void 0, () => Comment), (comment) => comment.childComment, {
+    nullable: true,
+  })
+  parentComment: Comment | null;
 
-    @Column() 
-    @ManyToOne((type) => Comment, (comment) => comment.childComment, {nullable: true})
-    parentComment: Comment | null;
+  @OneToMany((void 0, () => Comment), (comment) => comment.parentComment)
+  childComment: Comment[];
 
-    @OneToMany((type) => Comment, (comment) => comment.parentComment)
-    childComment: Comment[];
+  @ManyToOne(() => Post, (post) => post.comments)
+  @JoinColumn({ name: 'postId' })
+  post: Post;
 
-    @ManyToOne(() => Post, (post) => post.comments) 
-    @JoinColumn({ name: 'postId' })  
-    post: Post;
+  @ManyToOne(() => User, (user) => user.comments)
+  @JoinColumn({ name: 'userId' })
+  author: User;
 
-    @ManyToOne(() => User, (user) => user.comments) 
-    @JoinColumn({ name: 'userId' })  
-    author: User;
+  @ManyToOne(() => Forum, (forum) => forum.comments)
+  @JoinColumn({ name: 'forumId' })
+  forum: Forum;
 
-    @ManyToOne(() => Forum, (forum) => forum.comments) 
-    @JoinColumn({ name: 'forumId' })  
-    forum: Forum;
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  postedOn: Date;
 
-    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-    postedOn: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  editedOn: Date | null;
 
-    @Column({ type: "timestamp", nullable: true })
-    editedOn: Date | null;
+  @ManyToOne(() => User, (user) => user.editedComments)
+  @JoinColumn({ name: 'userId' })
+  editedBy: User;
 
-    @ManyToOne(() => User, (user) => user.editedComments) 
-    @JoinColumn({ name: 'userId' })  
-    editedBy: User;
-
-    @Column({type: 'jsonb'})
-    content: Record<string, any>;
-
+  @Column({ type: 'jsonb' })
+  content: Record<string, any>;
 }

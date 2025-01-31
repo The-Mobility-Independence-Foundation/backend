@@ -22,18 +22,18 @@ describe('InviteController', () => {
       providers: [
         InviteService,
         {
-          provide: getRepositoryToken(Invite), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Invite),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(User), 
-          useClass: mockRepository
+          provide: getRepositoryToken(User),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(Organization), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Organization),
+          useClass: mockRepository,
         },
-      ]
+      ],
     }).compile();
 
     controller = module.get<InviteController>(InviteController);

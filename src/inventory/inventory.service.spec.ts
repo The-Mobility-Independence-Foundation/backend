@@ -17,16 +17,16 @@ describe('InventoryService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        InventoryService, 
+        InventoryService,
         {
-          provide: getRepositoryToken(Inventory), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Inventory),
+          useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(Organization), 
-          useClass: mockRepository
+          provide: getRepositoryToken(Organization),
+          useClass: mockRepository,
         },
-      ]
+      ],
     }).compile();
 
     service = module.get<InventoryService>(InventoryService);
