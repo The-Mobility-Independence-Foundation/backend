@@ -1,5 +1,5 @@
 import { Listing } from '../listing/listing.entity';
-import { Message } from './message/message.entity';
+import { Message } from '../message/message.entity';
 import {
   Entity,
   Column,

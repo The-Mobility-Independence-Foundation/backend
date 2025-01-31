@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Model } from '../model/model.entity';
-import { InventoryItem } from '../inventory-item.entity';
+import { InventoryItem } from '../inventory-item/inventory-item.entity';
 
 @Entity()
 export class PartType {

@@ -2,9 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { InventoryItemService } from './inventory-item.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { InventoryItem } from './inventory-item.entity';
-import { Inventory } from '../inventory.entity';
-import { Model } from './model/model.entity';
-import { Part } from './part/part.entity';
+import { Inventory } from '../inventory/inventory.entity';
+import { Model } from '../model/model.entity';
+import { Part } from '../part/part.entity';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {

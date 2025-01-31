@@ -1,4 +1,4 @@
-import { InventoryItem } from './inventory-item/inventory-item.entity';
+import { InventoryItem } from '../inventory-item/inventory-item.entity';
 import { Organization } from '../organization/organization.entity';
 import {
   Entity,

@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
-import { InventoryItem } from '../inventory-item.entity';
+import { InventoryItem } from '../inventory-item/inventory-item.entity';
 
 @Entity()
 export class Tag {

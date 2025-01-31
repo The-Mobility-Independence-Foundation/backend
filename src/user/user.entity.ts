@@ -13,7 +13,7 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
-import { Message } from '../conversation/message/message.entity';
+import { Message } from '../message/message.entity';
 import { Listing } from '../listing/listing.entity';
 
 export enum UserRole {

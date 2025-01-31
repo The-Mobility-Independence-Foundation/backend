@@ -1,5 +1,5 @@
-import { Inventory } from '../inventory.entity';
-import { Listing } from '../../listing/listing.entity';
+import { Inventory } from '../inventory/inventory.entity';
+import { Listing } from '../listing/listing.entity';
 import {
   Entity,
   Column,
@@ -10,9 +10,9 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
-import { Tag } from './tag/tag.entity';
-import { Model } from './model/model.entity';
-import { Part } from './part/part.entity';
+import { Tag } from '../tag/tag.entity';
+import { Model } from '../model/model.entity';
+import { Part } from '../part/part.entity';
 
 @Entity()
 export class InventoryItem {

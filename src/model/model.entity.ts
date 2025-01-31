@@ -7,7 +7,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { InventoryItem } from '../inventory-item.entity';
+import { InventoryItem } from '../inventory-item/inventory-item.entity';
 import { Part } from '../part/part.entity';
 
 @Entity()

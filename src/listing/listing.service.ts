@@ -3,7 +3,7 @@ import { Listing } from './listing.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../user/user.entity';
-import { InventoryItem } from '../inventory/inventory-item/inventory-item.entity';
+import { InventoryItem } from '../inventory-item/inventory-item.entity';
 
 @Injectable()
 export class ListingService {

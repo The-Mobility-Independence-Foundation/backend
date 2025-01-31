@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InventoryItem } from './inventory-item.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Inventory } from '../inventory.entity';
-import { Model } from './model/model.entity';
-import { Part } from './part/part.entity';
+import { Inventory } from '../inventory/inventory.entity';
+import { Model } from '../model/model.entity';
+import { Part } from '../part/part.entity';
 
 @Injectable()
 export class InventoryItemService {
