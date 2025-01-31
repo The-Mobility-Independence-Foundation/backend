@@ -107,6 +107,9 @@ export class User {
   @ManyToMany(() => User, (user) => user.connectionsSent)
   connectionsRecieved: User[];
 
-  @OneToMany(() => Conversation, (conversation) => conversation.participant1 && conversation.participant2)
+  @OneToMany(
+    () => Conversation,
+    (conversation) => conversation.participant1 && conversation.participant2,
+  )
   conversations: Conversation[];
 }
