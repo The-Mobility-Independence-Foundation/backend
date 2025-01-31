@@ -15,6 +15,7 @@ import {
 } from 'typeorm';
 import { Message } from '../message/message.entity';
 import { Listing } from '../listing/listing.entity';
+import { Conversation } from '../conversation/conversation.entity';
 
 export enum UserRole {
   USER = 'user',
@@ -105,4 +106,7 @@ export class User {
 
   @ManyToMany(() => User, (user) => user.connectionsSent)
   connectionsRecieved: User[];
+
+  @OneToMany(() => Conversation, (conversation) => conversation.participant1 && conversation.participant2)
+  conversations: Conversation[];
 }

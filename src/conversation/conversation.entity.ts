@@ -1,3 +1,4 @@
+import { User } from '../user/user.entity';
 import { Listing } from '../listing/listing.entity';
 import { Message } from '../message/message.entity';
 import {
@@ -18,11 +19,11 @@ export class Conversation {
   @ManyToOne(() => Listing, (listing) => listing.conversations)
   listing: Listing | null;
 
-  @Column() // TODO: foreign key on user (composite key?)
-  participant1: number;
+  @ManyToOne(() => User, (user) => user.conversations)
+  participant1: User;
 
-  @Column() // TODO: foreign key on user (composite key?)
-  participant2: number;
+  @ManyToOne(() => User, (user) => user.conversations)
+  participant2: User;
 
   @OneToMany(() => Message, (message) => message.conversation)
   messages: Message[];
