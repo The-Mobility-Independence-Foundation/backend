@@ -21,9 +21,9 @@ describe('ForumController', () => {
         ForumService,
         {
           provide: getRepositoryToken(Forum),
-          useClass: mockRepository
-        }
-      ]
+          useClass: mockRepository,
+        },
+      ],
     }).compile();
 
     controller = module.get<ForumController>(ForumController);

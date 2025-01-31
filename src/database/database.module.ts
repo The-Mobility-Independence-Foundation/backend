@@ -57,7 +57,7 @@ import { CommentModule } from '../comment/comment.module';
     ForumModule,
     PrefixModule,
     PostModule,
-    CommentModule
-    ],
+    CommentModule,
+  ],
 })
 export class DatabaseModule {}

@@ -7,6 +7,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 @Module({
   imports: [TypeOrmModule.forFeature([Forum])],
   controllers: [ForumController],
-  providers: [ForumService]
+  providers: [ForumService],
 })
 export class ForumModule {}

@@ -19,8 +19,8 @@ describe('ForumService', () => {
         ForumService,
         {
           provide: getRepositoryToken(Forum),
-          useClass: mockRepository
-        }
+          useClass: mockRepository,
+        },
       ],
     }).compile();
 

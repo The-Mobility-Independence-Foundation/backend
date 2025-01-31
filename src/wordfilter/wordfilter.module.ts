@@ -7,6 +7,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 @Module({
   imports: [TypeOrmModule.forFeature([Wordfilter])],
   controllers: [WordfilterController],
-  providers: [WordfilterService]
+  providers: [WordfilterService],
 })
 export class WordfilterModule {}

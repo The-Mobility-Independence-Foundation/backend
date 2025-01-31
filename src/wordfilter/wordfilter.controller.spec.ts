@@ -21,9 +21,9 @@ describe('WordfilterController', () => {
         WordfilterService,
         {
           provide: getRepositoryToken(Wordfilter),
-          useClass: mockRepository
-        }
-      ]
+          useClass: mockRepository,
+        },
+      ],
     }).compile();
 
     controller = module.get<WordfilterController>(WordfilterController);
