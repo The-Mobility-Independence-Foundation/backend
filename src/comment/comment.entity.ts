@@ -39,7 +39,7 @@ export class Comment {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   postedOn: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true, default: null })
   editedOn: Date | null;
 
   @ManyToOne(() => User, (user) => user.editedComments)
