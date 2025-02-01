@@ -14,15 +14,23 @@ export const mockRepository = jest.fn(() => ({
 describe('PrefixController', () => {
   let controller: PrefixController;
 
+  const mockPrefixService = {
+    // Mock necessary methods if the controller calls them
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [PrefixController],
       providers: [
-        PrefixService,
+        {
+          provide: PrefixService,
+          useValue: mockPrefixService, 
+        },
         {
           provide: getRepositoryToken(Prefix),
           useClass: mockRepository,
         },
+        
       ],
     }).compile();
 
