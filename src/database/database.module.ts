@@ -20,6 +20,8 @@ import { ForumModule } from '../forum/forum.module';
 import { PrefixModule } from '../prefix/prefix.module';
 import { PostModule } from '../post/post.module';
 import { CommentModule } from '../comment/comment.module';
+import { PostSubscriptionModule } from '../post-subscription/post-subscription.module';
+
 
 
 
@@ -58,6 +60,7 @@ import { CommentModule } from '../comment/comment.module';
     PrefixModule,
     PostModule,
     CommentModule,
+    PostSubscriptionModule,
   ],
 })
 export class DatabaseModule {}
