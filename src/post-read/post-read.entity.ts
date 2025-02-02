@@ -13,13 +13,13 @@ export class PostRead {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.readPosts)
+  @ManyToOne(() => User, (user) => user.postsRead)
   @JoinColumn({ name: 'userID' })
-  reader: User;
+  user: User;
 
   @ManyToOne(() => Post, (post) => post.readPosts)
   @JoinColumn({ name: 'postID' })
-  readPost: Post;
+  post: Post;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   dateRead: Date;

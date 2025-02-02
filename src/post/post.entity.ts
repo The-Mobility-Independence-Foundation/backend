@@ -36,7 +36,7 @@ export class Post {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   postedOn: Date;
 
-  @Column()
+  @Column({ type: 'int', default: 0 })
   numberOfComments: number;
 
   @Column({ default: false })
@@ -51,6 +51,7 @@ export class Post {
   )
   subscriptions: PostSubscription[];
 
-  @OneToMany(() => PostRead, (postRead) => postRead.readPost)
+  // TODO: Think of a better name for column
+  @OneToMany(() => PostRead, (postRead) => postRead.post)
   readPosts: PostRead[];
 }

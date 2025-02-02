@@ -115,6 +115,6 @@ export class User {
   )
   subscriptions: PostSubscription[];
 
-  @OneToMany(() => PostRead, (postRead) => postRead.reader)
-  readPosts: PostRead[];
+  @OneToMany(() => PostRead, (postRead) => postRead.user)
+  postsRead: PostRead[];
 }
