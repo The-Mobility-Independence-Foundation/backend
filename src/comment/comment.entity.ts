@@ -19,7 +19,7 @@ export class Comment {
   @JoinColumn({ name: "parentCommentId" })
   parentComment: Comment | null;
 
-  @OneToMany((void 0, () => Comment), (comment) => comment.parentComment)
+  @OneToMany((() => Comment), (comment) => comment.parentComment)
   childComment: Comment[];
 
   @ManyToOne(() => Post, (post) => post.comments)
@@ -27,7 +27,7 @@ export class Comment {
   post: Post;
 
   @ManyToOne(() => User, (user) => user.comments)
-  @JoinColumn({ name: 'userId' })
+  @JoinColumn({ name: 'authorId' })
   author: User;
 
   @ManyToOne(() => Forum, (forum) => forum.comments)
@@ -41,7 +41,7 @@ export class Comment {
   editedOn: Date | null;
 
   @ManyToOne(() => User, (user) => user.editedComments)
-  @JoinColumn({ name: 'userId' })
+  @JoinColumn({ name: 'editorId' })
   editedBy: User;
 
   @Column({ type: 'jsonb' })
