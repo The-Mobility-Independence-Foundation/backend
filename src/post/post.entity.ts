@@ -10,6 +10,7 @@ import { Prefix } from '../prefix/prefix.entity';
 import { User } from '../user/user.entity';
 import { Forum } from '../forum/forum.entity';
 import { Comment } from '../comment/comment.entity';
+import { PostSubscription } from '../post-subscription/post-subscription.entity';
 
 @Entity()
 export class Post {
@@ -42,4 +43,7 @@ export class Post {
 
   @OneToMany(() => Comment, (comment) => comment.post) // One user can have many posts
   comments: Comment[];
+
+  @OneToMany(() => PostSubscription, (postSubscription) => postSubscription.post)
+  subscriptions: PostSubscription[];
 }
