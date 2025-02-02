@@ -24,13 +24,12 @@ describe('PrefixController', () => {
       providers: [
         {
           provide: PrefixService,
-          useValue: mockPrefixService, 
+          useValue: mockPrefixService,
         },
         {
           provide: getRepositoryToken(Prefix),
           useClass: mockRepository,
         },
-        
       ],
     }).compile();
 

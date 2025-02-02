@@ -9,6 +9,6 @@ import { PostSubscriptionService } from './post-subscription.service';
 @Module({
   imports: [TypeOrmModule.forFeature([PostSubscription, User, Post])],
   controllers: [PostSubscriptionController],
-  providers: [PostSubscriptionService]
+  providers: [PostSubscriptionService],
 })
 export class PostSubscriptionModule {}

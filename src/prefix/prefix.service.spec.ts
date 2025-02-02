@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { PrefixService } from './prefix.service';
-import {Prefix} from './prefix.entity';
+import { Prefix } from './prefix.entity';
 
 describe('PrefixService', () => {
   let service: PrefixService;

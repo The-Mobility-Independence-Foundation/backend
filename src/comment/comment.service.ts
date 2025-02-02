@@ -8,51 +8,51 @@ import { Forum } from '../forum/forum.entity';
 
 @Injectable()
 export class CommentService {
-    constructor(
-        @InjectRepository(Comment)
-        private readonly commentRepository: Repository<Comment>,
-    
-        @InjectRepository(User)
-        private readonly userRepository: Repository<User>,
-    
-        @InjectRepository(Post)
-        private readonly postRepository: Repository<Post>,
+  constructor(
+    @InjectRepository(Comment)
+    private readonly commentRepository: Repository<Comment>,
 
-        @InjectRepository(Forum)
-        private readonly forumRepository: Repository<Forum>,
-      ) {}
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
 
-   async create() {
-       const comment = new Comment();
+    @InjectRepository(Post)
+    private readonly postRepository: Repository<Post>,
 
-       const user = await this.userRepository.findOneBy({id: 1});
-       const post = await this.postRepository.findOneBy({id: 1});
-       const forum = await this.forumRepository.findOneBy({id: 1});
-       const editor = await this.userRepository.findOneBy({id: 2});
+    @InjectRepository(Forum)
+    private readonly forumRepository: Repository<Forum>,
+  ) {}
 
-       if (user) {
-           comment.author = user;
-       }
-       if (post) {
-           comment.post = post;
-       }
-       if (forum) {
-           comment.forum = forum;
-       }
-       if (editor) {
-           comment.editedBy = editor;
-       }
-       
-       comment.content = { text: "I completely agree with what you are saying"};
+  async create() {
+    const comment = new Comment();
 
-       return this.commentRepository.save(comment);
-   }
+    const user = await this.userRepository.findOneBy({ id: 1 });
+    const post = await this.postRepository.findOneBy({ id: 1 });
+    const forum = await this.forumRepository.findOneBy({ id: 1 });
+    const editor = await this.userRepository.findOneBy({ id: 2 });
 
-   async findAll() {
-       return this.commentRepository.find();
-   }
+    if (user) {
+      comment.author = user;
+    }
+    if (post) {
+      comment.post = post;
+    }
+    if (forum) {
+      comment.forum = forum;
+    }
+    if (editor) {
+      comment.editedBy = editor;
+    }
 
-   async findOne(id: number) {
-       return this.commentRepository.findOneBy({id: id});
-   }
+    comment.content = { text: 'I completely agree with what you are saying' };
+
+    return this.commentRepository.save(comment);
+  }
+
+  async findAll() {
+    return this.commentRepository.find();
+  }
+
+  async findOne(id: number) {
+    return this.commentRepository.findOneBy({ id: id });
+  }
 }

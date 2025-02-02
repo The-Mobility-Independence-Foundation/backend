@@ -19,6 +19,7 @@ import { Conversation } from '../conversation/conversation.entity';
 import { Post } from '../post/post.entity';
 import { Comment } from '../comment/comment.entity';
 import { PostSubscription } from '../post-subscription/post-subscription.entity';
+import { PostRead } from '../post-read/post-read.entity';
 
 export enum UserRole {
   USER = 'user',
@@ -125,6 +126,12 @@ export class User {
   @OneToMany(() => Comment, (comment) => comment.editedBy)  
   editedComments: Comment[];
 
-  @OneToMany(() => PostSubscription, (postSubscription) => postSubscription.subscriber)
+  @OneToMany(
+    () => PostSubscription,
+    (postSubscription) => postSubscription.subscriber,
+  )
   subscriptions: PostSubscription[];
+
+  @OneToMany(() => PostRead, (postRead) => postRead.reader)
+  readPosts: PostRead[];
 }

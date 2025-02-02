@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PostSubscriptionController } from './post-subscription.controller';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from '../user/user.entity';
+import { PostReadController } from './post-read.controller';
+import { PostRead } from './post-read.entity';
+import { PostReadService } from './post-read.service';
 import { Post } from '../post/post.entity';
-import { PostSubscription } from './post-subscription.entity';
-import { PostSubscriptionService } from './post-subscription.service';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -13,16 +13,16 @@ export const mockRepository = jest.fn(() => ({
   },
 }));
 
-describe('PostSubscriptionController', () => {
-  let controller: PostSubscriptionController;
+describe('PostReadController', () => {
+  let controller: PostReadController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [PostSubscriptionController],
+      controllers: [PostReadController],
       providers: [
-        PostSubscriptionService,
+        PostReadService,
         {
-          provide: getRepositoryToken(PostSubscription),
+          provide: getRepositoryToken(PostRead),
           useClass: mockRepository,
         },
         {
@@ -36,9 +36,7 @@ describe('PostSubscriptionController', () => {
       ],
     }).compile();
 
-    controller = module.get<PostSubscriptionController>(
-      PostSubscriptionController,
-    );
+    controller = module.get<PostReadController>(PostReadController);
   });
 
   it('should be defined', () => {
