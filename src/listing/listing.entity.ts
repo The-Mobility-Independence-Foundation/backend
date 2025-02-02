@@ -54,7 +54,7 @@ export class Listing {
   inactive: boolean;
 
   @Column({ type: 'varchar', length: 10 })
-  zipcode: String;
+  zipcode: string;
 
   @Column({ type: 'enum', enum: ListingStatus, default: ListingStatus.ACTIVE })
   state: ListingStatus;

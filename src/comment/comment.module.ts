@@ -7,7 +7,6 @@ import { Post } from '../post/post.entity';
 import { User } from '../user/user.entity';
 import { Forum } from '../forum/forum.entity';
 
-
 @Module({
   imports: [TypeOrmModule.forFeature([Comment, User, Post, Forum])],
   providers: [CommentService],

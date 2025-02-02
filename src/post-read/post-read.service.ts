@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { PostSubscription } from './post-subscription.entity';
+import { PostRead } from './post-read.entity';
 import { User } from '../user/user.entity';
 import { Post } from '../post/post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 @Injectable()
-export class PostSubscriptionService {
+export class PostReadService {
   constructor(
-    @InjectRepository(PostSubscription)
-    private postsubscriptionRepository: Repository<PostSubscription>,
+    @InjectRepository(PostRead)
+    private postreadRepository: Repository<PostRead>,
 
     @InjectRepository(Post)
     private postRepository: Repository<Post>,
@@ -19,27 +19,27 @@ export class PostSubscriptionService {
   ) {}
 
   async create() {
-    const subscription = new PostSubscription();
+    const postRead = new PostRead();
 
     const post = await this.postRepository.findOneBy({ id: 1 });
     const user = await this.userRepository.findOneBy({ id: 1 });
 
     if (post) {
-      subscription.post = post;
+      postRead.readPost = post;
     }
 
     if (user) {
-      subscription.subscriber = user;
+      postRead.reader = user;
     }
 
-    return this.postsubscriptionRepository.save(subscription);
+    return this.postreadRepository.save(postRead);
   }
 
   async findAll() {
-    return this.postsubscriptionRepository.find();
+    return this.postreadRepository.find();
   }
 
   async findOne(id: number) {
-    return this.postsubscriptionRepository.findOneBy({ id: id });
+    return this.postreadRepository.findOneBy({ id: id });
   }
 }

@@ -9,18 +9,18 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class PostSubscription {
+export class PostRead {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.subscriptions)
+  @ManyToOne(() => User, (user) => user.readPosts)
   @JoinColumn({ name: 'userID' })
-  subscriber: User;
+  reader: User;
 
-  @ManyToOne(() => Post, (post) => post.subscriptions)
+  @ManyToOne(() => Post, (post) => post.readPosts)
   @JoinColumn({ name: 'postID' })
-  post: Post;
+  readPost: Post;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  whenSubscribed: Date;
+  dateRead: Date;
 }

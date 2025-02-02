@@ -11,6 +11,7 @@ import { User } from '../user/user.entity';
 import { Forum } from '../forum/forum.entity';
 import { Comment } from '../comment/comment.entity';
 import { PostSubscription } from '../post-subscription/post-subscription.entity';
+import { PostRead } from '../post-read/post-read.entity';
 
 @Entity()
 export class Post {
@@ -44,6 +45,12 @@ export class Post {
   @OneToMany(() => Comment, (comment) => comment.post) // One user can have many posts
   comments: Comment[];
 
-  @OneToMany(() => PostSubscription, (postSubscription) => postSubscription.post)
+  @OneToMany(
+    () => PostSubscription,
+    (postSubscription) => postSubscription.post,
+  )
   subscriptions: PostSubscription[];
+
+  @OneToMany(() => PostRead, (postRead) => postRead.readPost)
+  readPosts: PostRead[];
 }

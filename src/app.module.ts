@@ -11,7 +11,7 @@ import { DatabaseModule } from './database/database.module';
       isGlobal: true,
     }),
     DatabaseModule,
-    ],
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
