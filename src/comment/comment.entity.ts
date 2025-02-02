@@ -15,10 +15,8 @@ export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  @ManyToOne((void 0, () => Comment), (comment) => comment.childComment, {
-    nullable: true,
-  })
+  @ManyToOne(() => Comment, (comment) => comment.childComment, { nullable: true })
+  @JoinColumn({ name: "parentCommentId" })
   parentComment: Comment | null;
 
   @OneToMany((void 0, () => Comment), (comment) => comment.parentComment)

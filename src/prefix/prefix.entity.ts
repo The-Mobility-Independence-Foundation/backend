@@ -14,7 +14,7 @@ export class Prefix {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 32 })
+  @Column({ type: 'varchar', length: 16 })
   name: string;
 
   @ManyToOne(() => Forum, (forum) => forum.prefixes)

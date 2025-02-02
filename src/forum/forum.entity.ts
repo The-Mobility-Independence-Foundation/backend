@@ -4,6 +4,7 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   OneToMany,
+  JoinColumn,
 } from 'typeorm';
 import { Prefix } from '../prefix/prefix.entity';
 import { Post } from '../post/post.entity';
@@ -14,16 +15,14 @@ export class Forum {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  @ManyToOne((void 0, () => Forum), (forum) => forum.childForum, {
-    nullable: true,
-  })
+  @ManyToOne(() => Forum, (forum) => forum.childForums, { nullable: true })
+  @JoinColumn({ name: "parentForumId" })
   parentForum: Forum | null;
 
   @Column({ type: 'varchar', length: 80, nullable: false })
   name: string;
 
-  @Column({ type: 'varchar', length: 8000 })
+  @Column({ type: 'varchar', length: 200 })
   description: string;
 
   @Column({ default: false })
@@ -35,14 +34,14 @@ export class Forum {
   @Column({ default: false })
   isLocked: boolean;
 
-  @Column()
+  @Column({ type: 'int', default: 0 })
   numberOfPosts: number;
 
-  @Column()
+  @Column({ type: 'int', default: 0 })
   numberOfThreads: number;
 
-  @OneToMany((type) => Forum, (forum) => forum.parentForum)
-  childForum: Forum[];
+  @OneToMany(() => Forum, (forum) => forum.parentForum)
+  childForums: Forum[];
 
   @OneToMany(() => Prefix, (prefix) => prefix.forumsUsed)
   prefixes: Prefix[];
@@ -50,6 +49,6 @@ export class Forum {
   @OneToMany(() => Post, (post) => post.forum)
   posts: Post[];
 
-  @OneToMany(() => Comment, (comment) => comment.forum) // One user can have many posts
+  @OneToMany(() => Comment, (comment) => comment.forum) 
   comments: Comment[];
 }

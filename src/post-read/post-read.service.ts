@@ -25,11 +25,11 @@ export class PostReadService {
     const user = await this.userRepository.findOneBy({ id: 1 });
 
     if (post) {
-      postRead.readPost = post;
+      postRead.post = post;
     }
 
     if (user) {
-      postRead.reader = user;
+      postRead.user = user;
     }
 
     return this.postreadRepository.save(postRead);
