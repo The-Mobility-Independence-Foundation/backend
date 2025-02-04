@@ -16,7 +16,7 @@ export class Forum {
   id: number;
 
   @ManyToOne(() => Forum, (forum) => forum.childForums, { nullable: true })
-  @JoinColumn({ name: "parentForumId" })
+  @JoinColumn({ name: 'parentForumId' })
   parentForum: Forum | null;
 
   @Column({ type: 'varchar', length: 80, nullable: false })
@@ -49,6 +49,6 @@ export class Forum {
   @OneToMany(() => Post, (post) => post.forum)
   posts: Post[];
 
-  @OneToMany(() => Comment, (comment) => comment.forum) 
+  @OneToMany(() => Comment, (comment) => comment.forum)
   comments: Comment[];
 }
