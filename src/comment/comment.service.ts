@@ -43,7 +43,7 @@ export class CommentService {
       comment.editedBy = editor;
     }
 
-    comment.content = { text: 'I completely agree with what you are saying' };
+    comment.content = 'I completely agree with what you are saying' ;
 
     return this.commentRepository.save(comment);
   }

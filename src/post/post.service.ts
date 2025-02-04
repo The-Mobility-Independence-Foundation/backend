@@ -41,6 +41,7 @@ export class PostService {
 
     post.title = 'Seized wheel nut';
     post.numberOfComments = 2;
+    post.content = "Anyone know of a good mechanic near ROC";
 
     return this.postRepository.save(post);
   }

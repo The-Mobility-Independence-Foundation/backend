@@ -45,6 +45,9 @@ export class Post {
   @OneToMany(() => Comment, (comment) => comment.post) // One user can have many posts
   comments: Comment[];
 
+  @Column({ type: 'varchar', length: 4000 })
+  content: string;
+
   @OneToMany(
     () => PostSubscription,
     (postSubscription) => postSubscription.post,

@@ -22,6 +22,7 @@ import { PostModule } from '../post/post.module';
 import { CommentModule } from '../comment/comment.module';
 import { PostSubscriptionModule } from '../post-subscription/post-subscription.module';
 import { PostReadModule } from '../post-read/post-read.module';
+import { ReportsModule } from '../reports/reports.module';
 
 // When we set up the actual DB, we need to change this to read values from a file.
 // That way, we aren't leaking db credentials on our public git repo.
@@ -58,6 +59,7 @@ import { PostReadModule } from '../post-read/post-read.module';
     CommentModule,
     PostSubscriptionModule,
     PostReadModule,
+    ReportsModule
   ],
 })
 export class DatabaseModule {}

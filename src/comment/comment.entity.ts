@@ -44,6 +44,6 @@ export class Comment {
   @JoinColumn({ name: 'editorId' })
   editedBy: User;
 
-  @Column({ type: 'jsonb' })
-  content: Record<string, any>;
+  @Column({ type: 'varchar', length: 4000 })
+  content: string;
 }
