@@ -15,11 +15,13 @@ export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Comment, (comment) => comment.childComment, { nullable: true })
-  @JoinColumn({ name: "parentCommentId" })
+  @ManyToOne(() => Comment, (comment) => comment.childComment, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'parentCommentId' })
   parentComment: Comment | null;
 
-  @OneToMany((() => Comment), (comment) => comment.parentComment)
+  @OneToMany(() => Comment, (comment) => comment.parentComment)
   childComment: Comment[];
 
   @ManyToOne(() => Post, (post) => post.comments)
@@ -46,4 +48,7 @@ export class Comment {
 
   @Column({ type: 'varchar', length: 4000 })
   content: string;
+
+  @Column({default: true})
+  isVisible: boolean;
 }

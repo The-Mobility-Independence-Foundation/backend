@@ -55,7 +55,7 @@ import { ReportsModule } from '../reports/reports.module';
     CommentModule,
     PostSubscriptionModule,
     PostReadModule,
-    ReportsModule
+    ReportsModule,
   ],
 })
 export class DatabaseModule {}
