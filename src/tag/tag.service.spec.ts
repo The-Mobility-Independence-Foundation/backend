@@ -1,8 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BookmarkController } from './bookmark.controller';
-import { BookmarkService } from './bookmark.service';
+import { TagService } from './tag.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Bookmark } from './bookmark.entity';
+import { Tag } from './tag.entity';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -11,25 +10,24 @@ export const mockRepository = jest.fn(() => ({
   },
 }));
 
-describe('BookmarkController', () => {
-  let controller: BookmarkController;
+describe('TagService', () => {
+  let service: TagService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [BookmarkController],
       providers: [
-        BookmarkService,
+        TagService,
         {
-          provide: getRepositoryToken(Bookmark),
+          provide: getRepositoryToken(Tag),
           useClass: mockRepository,
         },
       ],
     }).compile();
 
-    controller = module.get<BookmarkController>(BookmarkController);
+    service = module.get<TagService>(TagService);
   });
 
   it('should be defined', () => {
-    expect(controller).toBeDefined();
+    expect(service).toBeDefined();
   });
 });

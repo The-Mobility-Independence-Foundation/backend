@@ -1,9 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ListingService } from './listing.service';
+import { PartService } from './part.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Listing } from './listing.entity';
-import { User } from '../user/user.entity';
-import { InventoryItem } from '../inventory-item/inventory-item.entity';
+import { Part, PartType } from './part.entity';
+import { Tag } from '../tag/tag.entity';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -12,29 +11,29 @@ export const mockRepository = jest.fn(() => ({
   },
 }));
 
-describe('ListingService', () => {
-  let service: ListingService;
+describe('PartService', () => {
+  let service: PartService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        ListingService,
+        PartService,
         {
-          provide: getRepositoryToken(Listing),
+          provide: getRepositoryToken(Part),
           useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(User),
+          provide: getRepositoryToken(PartType),
           useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(InventoryItem),
+          provide: getRepositoryToken(Tag),
           useClass: mockRepository,
         },
       ],
     }).compile();
 
-    service = module.get<ListingService>(ListingService);
+    service = module.get<PartService>(PartService);
   });
 
   it('should be defined', () => {

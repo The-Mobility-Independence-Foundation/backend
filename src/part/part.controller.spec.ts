@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MessageService } from './message.service';
+import { PartController } from './part.controller';
+import { PartService } from './part.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Message } from './message.entity';
-import { User } from '../../user/user.entity';
-import { Conversation } from '../../conversation/conversation.entity';
+import { Part, PartType } from './part.entity';
+import { Tag } from '../tag/tag.entity';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -12,32 +12,33 @@ export const mockRepository = jest.fn(() => ({
   },
 }));
 
-describe('MessageService', () => {
-  let service: MessageService;
+describe('PartController', () => {
+  let controller: PartController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      controllers: [PartController],
       providers: [
-        MessageService,
+        PartService,
         {
-          provide: getRepositoryToken(Message),
+          provide: getRepositoryToken(Part),
           useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(User),
+          provide: getRepositoryToken(PartType),
           useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(Conversation),
+          provide: getRepositoryToken(Tag),
           useClass: mockRepository,
         },
       ],
     }).compile();
 
-    service = module.get<MessageService>(MessageService);
+    controller = module.get<PartController>(PartController);
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(controller).toBeDefined();
   });
 });

@@ -3,8 +3,8 @@ import { MessageController } from './message.controller';
 import { MessageService } from './message.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Message } from './message.entity';
-import { User } from '../../user/user.entity';
-import { Conversation } from '../../conversation/conversation.entity';
+import { User } from '../user/user.entity';
+import { Conversation } from '../conversation/conversation.entity';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {

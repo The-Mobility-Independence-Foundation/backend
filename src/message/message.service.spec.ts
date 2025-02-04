@@ -1,10 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ListingController } from './listing.controller';
-import { ListingService } from './listing.service';
+import { MessageService } from './message.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Listing } from './listing.entity';
+import { Message } from './message.entity';
 import { User } from '../user/user.entity';
-import { InventoryItem } from '../inventory-item/inventory-item.entity';
+import { Conversation } from '../conversation/conversation.entity';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -13,16 +12,15 @@ export const mockRepository = jest.fn(() => ({
   },
 }));
 
-describe('ListingController', () => {
-  let controller: ListingController;
+describe('MessageService', () => {
+  let service: MessageService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [ListingController],
       providers: [
-        ListingService,
+        MessageService,
         {
-          provide: getRepositoryToken(Listing),
+          provide: getRepositoryToken(Message),
           useClass: mockRepository,
         },
         {
@@ -30,16 +28,16 @@ describe('ListingController', () => {
           useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(InventoryItem),
+          provide: getRepositoryToken(Conversation),
           useClass: mockRepository,
         },
       ],
     }).compile();
 
-    controller = module.get<ListingController>(ListingController);
+    service = module.get<MessageService>(MessageService);
   });
 
   it('should be defined', () => {
-    expect(controller).toBeDefined();
+    expect(service).toBeDefined();
   });
 });

@@ -10,9 +10,12 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
-import { Message } from '../conversation/message/message.entity';
+import { Message } from '../message/message.entity';
 import { Listing } from '../listing/listing.entity';
+import { Conversation } from '../conversation/conversation.entity';
 
 export enum UserRole {
   USER = 'user',
@@ -41,9 +44,6 @@ export class User {
   @Column({ type: 'varchar', length: 50 }) // TODO: update with a salt and a hash
   password: string;
 
-  // make unique eventually?
-  // returns a 500 server error unless we catch the duplicate name error ourselves.
-  // userID will still increment if a unique name is sent though, leaving us with blank rows
   @Column({ type: 'varchar', length: 20 })
   displayName: string;
 
@@ -95,4 +95,21 @@ export class User {
 
   @OneToMany(() => Listing, (listing) => listing.owner)
   listings: Listing[];
+
+  @JoinTable({ name: 'bookmarks' })
+  @ManyToMany(() => Listing, (listing) => listing.bookmarks)
+  bookmarks: Listing[];
+
+  @JoinTable({ name: 'connections' })
+  @ManyToMany(() => User, (user) => user.connectionsRecieved)
+  connectionsSent: User[];
+
+  @ManyToMany(() => User, (user) => user.connectionsSent)
+  connectionsRecieved: User[];
+
+  @OneToMany(
+    () => Conversation,
+    (conversation) => conversation.participant1 && conversation.participant2,
+  )
+  conversations: Conversation[];
 }

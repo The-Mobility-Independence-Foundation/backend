@@ -3,6 +3,7 @@ import { ConversationService } from './conversation.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Conversation } from './conversation.entity';
 import { Listing } from '../listing/listing.entity';
+import { User } from '../user/user.entity';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -24,6 +25,10 @@ describe('ConversationService', () => {
         },
         {
           provide: getRepositoryToken(Listing),
+          useClass: mockRepository,
+        },
+        {
+          provide: getRepositoryToken(User),
           useClass: mockRepository,
         },
       ],
