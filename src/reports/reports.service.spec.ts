@@ -5,6 +5,7 @@ import { Post as PostEntity } from '../post/post.entity';
 import { User } from '../user/user.entity';
 import { Report } from './report.entity';
 import { ReportsService } from './reports.service';
+import { Comment } from '../comment/comment.entity';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -34,6 +35,10 @@ describe('ReportsService', () => {
         },
         {
           provide: getRepositoryToken(PostEntity),
+          useClass: mockRepository,
+        },
+        {
+          provide: getRepositoryToken(Comment),
           useClass: mockRepository,
         },
       ],

@@ -5,6 +5,7 @@ import { Post as PostEntity } from '../post/post.entity';
 import { User } from '../user/user.entity';
 import { Listing } from '../listing/listing.entity';
 import { Report, ReportType } from './report.entity';
+import { Comment } from '../comment/comment.entity';
 
 @Injectable()
 export class ReportsService {
@@ -20,6 +21,9 @@ export class ReportsService {
 
     @InjectRepository(Listing)
     private listingRepository: Repository<Listing>,
+
+    @InjectRepository(Comment)
+    private commentRepository: Repository<Comment>,
   ) {}
 
   async create() {
@@ -27,7 +31,7 @@ export class ReportsService {
 
     const reporter = await this.userRepository.findOneBy({ id: 1 });
     const listing = await this.listingRepository.findOneBy({ id: 1 });
-    const respondent = await this.userRepository.findOneBy({ id: 2 });
+    const moderator = await this.userRepository.findOneBy({ id: 2 });
 
     if (reporter) {
       report.reporter = reporter;
@@ -35,8 +39,8 @@ export class ReportsService {
     if (listing) {
       report.listing = listing;
     }
-    if (respondent) {
-      report.respondent = respondent;
+    if (moderator) {
+      report.moderatorID = moderator;
     }
 
     report.reason = 'fake profile';

@@ -9,6 +9,7 @@ import {
 import { Post } from '../post/post.entity';
 import { User } from '../user/user.entity';
 import { Forum } from '../forum/forum.entity';
+import { Report } from '../reports/report.entity';
 
 @Entity()
 export class Comment {
@@ -51,4 +52,7 @@ export class Comment {
 
   @Column({ default: true })
   isVisible: boolean;
+
+  @OneToMany(() => Report, (report) => report.comment)
+  commentReport: Report[];
 }
