@@ -139,6 +139,9 @@ export class User {
   @OneToMany(() => Report, (report) => report.reporter)
   reportsSent: Report[];
 
-  @OneToMany(() => Report, (report) => report.respondent)
+  @OneToMany(() => Report, (report) => report.reportedID)
   respondedReports: Report[];
+
+  @OneToMany(() => Report, (report) => report.moderatorID)
+  reportsHandled: Report[];
 }

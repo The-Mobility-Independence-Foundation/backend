@@ -6,9 +6,12 @@ import { Post as PostEntity } from '../post/post.entity';
 import { Listing } from '../listing/listing.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../user/user.entity';
+import { Comment } from '../comment/comment.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Report, User, PostEntity, Listing])],
+  imports: [
+    TypeOrmModule.forFeature([Report, User, PostEntity, Listing, Comment]),
+  ],
   providers: [ReportsService],
   controllers: [ReportsController],
 })

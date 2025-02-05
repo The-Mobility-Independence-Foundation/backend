@@ -7,6 +7,7 @@ import { Report } from './report.entity';
 import { ReportsController } from './reports.controller';
 import { ReportsService } from './reports.service';
 import { mockRepository } from './reports.service.spec';
+import { Comment } from '../comment/comment.entity';
 
 describe('ReportsController', () => {
   let controller: ReportsController;
@@ -30,6 +31,10 @@ describe('ReportsController', () => {
         },
         {
           provide: getRepositoryToken(PostEntity),
+          useClass: mockRepository,
+        },
+        {
+          provide: getRepositoryToken(Comment),
           useClass: mockRepository,
         },
       ],
