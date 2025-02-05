@@ -2,6 +2,7 @@ import { Conversation } from '../conversation/conversation.entity';
 import { InventoryItem } from '../inventory-item/inventory-item.entity';
 import { Order } from '../order/order.entity';
 import { User } from '../user/user.entity';
+import { Report } from '../reports/report.entity';
 import {
   Entity,
   Column,
@@ -71,4 +72,7 @@ export class Listing {
 
   @ManyToMany(() => User, (user) => user.bookmarks)
   bookmarks: User[];
+
+  @OneToMany(() => Report, (report) => report.listing)
+  listingReports: Report[];
 }
