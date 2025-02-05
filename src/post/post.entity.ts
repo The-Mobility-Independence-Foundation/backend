@@ -12,7 +12,7 @@ import { Forum } from '../forum/forum.entity';
 import { Comment } from '../comment/comment.entity';
 import { PostSubscription } from '../post-subscription/post-subscription.entity';
 import { PostRead } from '../post-read/post-read.entity';
-import { Report } from 'src/reports/report.entity';
+import { Report } from '../reports/report.entity';
 
 @Entity()
 export class Post {
