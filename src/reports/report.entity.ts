@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, ManyToOne } from 'typeorm';
 import { User } from '../user/user.entity';
 import { Listing } from '../listing/listing.entity';
 import { Post as PostEntity } from '../post/post.entity';
@@ -14,20 +14,20 @@ export class Report {
   @PrimaryGeneratedColumn()
   id: number;
 
-  // TODO: MANY TO ONE WITH USER
-  @Column()
+  @ManyToOne(() => User, (user) => user.reportsSent)
+  @JoinColumn({ name: 'reporterId' })
   reporter: User;
 
-  // TODO: MANY TO ONE WITH USER
-  @Column()
+  @ManyToOne(() => User, (user) => user.reportsSent)
+  @JoinColumn({ name: 'responderId' })
   respondent: User;
 
-  // TODO: MANY TO ONE WITH Listing
-  @Column()
+  @ManyToOne(() => Listing, (listing) => listing.listingReports)
+  @JoinColumn({ name: 'listingId' })
   listing: Listing;
 
-  // TODO: MANY TO ONE WITH Post
-  @Column()
+  @ManyToOne(() => PostEntity, (post) => post.postReports)
+  @JoinColumn({ name: 'postId' })
   post: PostEntity;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

@@ -12,6 +12,7 @@ import { Forum } from '../forum/forum.entity';
 import { Comment } from '../comment/comment.entity';
 import { PostSubscription } from '../post-subscription/post-subscription.entity';
 import { PostRead } from '../post-read/post-read.entity';
+import { Report } from 'src/reports/report.entity';
 
 @Entity()
 export class Post {
@@ -57,4 +58,7 @@ export class Post {
   // TODO: Think of a better name for column
   @OneToMany(() => PostRead, (postRead) => postRead.post)
   readPosts: PostRead[];
+
+  @OneToMany(() => Report, (report) => report.post)
+  postReports: Report[];
 }

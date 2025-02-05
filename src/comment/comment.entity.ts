@@ -49,6 +49,6 @@ export class Comment {
   @Column({ type: 'varchar', length: 4000 })
   content: string;
 
-  @Column({default: true})
+  @Column({ default: true })
   isVisible: boolean;
 }
