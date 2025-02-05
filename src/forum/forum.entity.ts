@@ -36,12 +36,14 @@ export class Forum {
   isLocked: boolean;
 
   @VirtualColumn({
-    query: (alias) => `(SELECT COUNT(*) FROM post WHERE post.forumId = ${alias}.id)`,
+    query: (alias) =>
+      `(SELECT COUNT(*) FROM post WHERE post.forumId = ${alias}.id)`,
   })
   numberOfPosts: number;
 
   @VirtualColumn({
-    query: (alias) => `(SELECT COUNT(*) FROM comment WHERE comment.forumId = ${alias}.id)`,
+    query: (alias) =>
+      `(SELECT COUNT(*) FROM comment WHERE comment.forumId = ${alias}.id)`,
   })
   numberOfComments: number;
 
