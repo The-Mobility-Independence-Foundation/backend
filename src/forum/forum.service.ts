@@ -24,7 +24,7 @@ export class ForumService {
     forum.order = 1;
     forum.isLocked = false;
     forum.numberOfPosts = 2;
-    forum.numberOfThreads = 1;
+    forum.numberOfComments = 1;
 
     return this.forumRepository.save(forum);
   }
