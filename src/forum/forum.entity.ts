@@ -5,6 +5,7 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  VirtualColumn,
 } from 'typeorm';
 import { Prefix } from '../prefix/prefix.entity';
 import { Post } from '../post/post.entity';
@@ -34,11 +35,15 @@ export class Forum {
   @Column({ default: false })
   isLocked: boolean;
 
-  @Column({ type: 'int', default: 0 })
+  @VirtualColumn({
+    query: (alias) => `(SELECT COUNT(*) FROM post WHERE post.forumId = ${alias}.id)`,
+  })
   numberOfPosts: number;
 
-  @Column({ type: 'int', default: 0 })
-  numberOfThreads: number;
+  @VirtualColumn({
+    query: (alias) => `(SELECT COUNT(*) FROM comment WHERE comment.forumId = ${alias}.id)`,
+  })
+  numberOfComments: number;
 
   @OneToMany(() => Forum, (forum) => forum.parentForum)
   childForums: Forum[];
