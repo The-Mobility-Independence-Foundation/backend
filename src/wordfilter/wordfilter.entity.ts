@@ -8,6 +8,6 @@ export class Wordfilter {
   @Column({ type: 'varchar', length: 32 })
   badWord: string;
 
-  @Column({ type: 'varchar', length: 32, default: () => 'fudge' })
+  @Column({ type: 'varchar', length: 32, default: 'fudge' })
   replacement: string;
 }
