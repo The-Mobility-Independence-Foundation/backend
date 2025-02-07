@@ -37,7 +37,7 @@ export class Inventory {
   state: string;
 
   @Column({ type: 'varchar', length: 10 })
-  zipcode: number;
+  zipcode: string;
 
   @OneToMany(() => InventoryItem, (item) => item.inventory)
   items: InventoryItem[];
