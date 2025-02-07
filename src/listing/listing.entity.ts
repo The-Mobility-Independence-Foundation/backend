@@ -38,6 +38,7 @@ export class Listing {
   @Column({ type: 'varchar', length: 4000 })
   description: string;
 
+  // Change to jsonB
   @Column({ type: 'varchar', length: 4000 })
   attributes: string;
 

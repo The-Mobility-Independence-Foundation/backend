@@ -33,6 +33,7 @@ export class InventoryItem {
   @Column({ type: 'varchar', length: 4000 })
   notes: string;
 
+  // Change to jsonB
   @Column({ type: 'varchar', length: 4000 })
   attributes: string;
 
