@@ -75,5 +75,5 @@ export class Listing {
   bookmarks: User[];
 
   @OneToMany(() => Report, (report) => report.listing)
-  listingReports: Report[];
+  reports: Report[];
 }
