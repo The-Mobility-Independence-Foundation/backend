@@ -51,8 +51,8 @@ export class Comment {
   content: string;
 
   @Column({ default: true })
-  isVisible: boolean;
+  hidden: boolean;
 
   @OneToMany(() => Report, (report) => report.comment)
-  commentReport: Report[];
+  report: Report[];
 }

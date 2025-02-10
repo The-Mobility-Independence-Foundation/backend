@@ -26,25 +26,25 @@ export class Report {
   @JoinColumn({ name: 'reporterId' })
   reporter: User;
 
-  @ManyToOne(() => User, (user) => user.reportsSent)
-  @JoinColumn({ name: 'responderId' })
-  reportedID: User;
+  @ManyToOne(() => User, (user) => user.receivedReports, { nullable: true })
+  @JoinColumn({ name: 'resportedId' })
+  reportedID: User | null;
 
   @ManyToOne(() => User, (user) => user.reportsHandled)
   @JoinColumn({ name: 'moderatorId' })
   moderatorID: User;
 
-  @ManyToOne(() => Listing, (listing) => listing.listingReports)
+  @ManyToOne(() => Listing, (listing) => listing.reports, { nullable: true })
   @JoinColumn({ name: 'listingId' })
-  listing: Listing;
+  listing: Listing | null;
 
-  @ManyToOne(() => PostEntity, (post) => post.postReports)
+  @ManyToOne(() => PostEntity, (post) => post.postReports, { nullable: true })
   @JoinColumn({ name: 'postId' })
-  post: PostEntity;
+  post: PostEntity | null;
 
-  @ManyToOne(() => Comment, (comment) => comment.commentReport)
+  @ManyToOne(() => Comment, (comment) => comment.report, { nullable: true })
   @JoinColumn({ name: 'commentId' })
-  comment: Comment;
+  comment: Comment | null;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   reportedOn: Date;

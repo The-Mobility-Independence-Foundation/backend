@@ -71,5 +71,5 @@ export class Listing {
   conversations: Conversation[];
 
   @OneToMany(() => Report, (report) => report.listing)
-  listingReports: Report[];
+  reports: Report[];
 }

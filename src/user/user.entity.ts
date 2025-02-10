@@ -123,7 +123,7 @@ export class User {
   reportsSent: Report[];
 
   @OneToMany(() => Report, (report) => report.reportedID)
-  respondedReports: Report[];
+  receivedReports: Report[];
 
   @OneToMany(() => Report, (report) => report.moderatorID)
   reportsHandled: Report[];
