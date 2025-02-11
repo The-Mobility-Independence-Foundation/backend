@@ -51,7 +51,7 @@ export class Organization {
   state: string;
 
   @Column({ type: 'varchar', length: 10 })
-  zipcode: number;
+  zipcode: string;
 
   @Column({ type: 'varchar', length: 20, nullable: true })
   phoneNumber: string;

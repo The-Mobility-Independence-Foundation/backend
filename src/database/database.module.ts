@@ -15,6 +15,14 @@ import { InventoryItemModule } from '../inventory-item/inventory-item.module';
 import { TagModule } from '../tag/tag.module';
 import { PartModule } from '../part/part.module';
 import { ModelModule } from '../model/model.module';
+import { WordfilterModule } from '../wordfilter/wordfilter.module';
+import { ForumModule } from '../forum/forum.module';
+import { PrefixModule } from '../prefix/prefix.module';
+import { PostModule } from '../post/post.module';
+import { CommentModule } from '../comment/comment.module';
+import { PostSubscriptionModule } from '../post-subscription/post-subscription.module';
+import { PostReadModule } from '../post-read/post-read.module';
+import { ReportsModule } from '../reports/reports.module';
 
 // When we set up the actual DB, we need to change this to read values from a file.
 // That way, we aren't leaking db credentials on our public git repo.
@@ -44,6 +52,14 @@ import { ModelModule } from '../model/model.module';
     TagModule,
     PartModule,
     ModelModule,
+    WordfilterModule,
+    ForumModule,
+    PrefixModule,
+    PostModule,
+    CommentModule,
+    PostSubscriptionModule,
+    PostReadModule,
+    ReportsModule,
   ],
 })
 export class DatabaseModule {}

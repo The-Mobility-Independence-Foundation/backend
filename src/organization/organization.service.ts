@@ -35,7 +35,7 @@ export class OrganizationService {
     organization.addressLine1 = '1789 State Highway 8';
     organization.city = 'Mount Upton';
     organization.state = 'New York';
-    organization.zipcode = 13809;
+    organization.zipcode = '13809';
     organization.ein = '92-0887459';
 
     return this.organizationRepository.save(organization);
