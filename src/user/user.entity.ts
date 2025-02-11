@@ -118,7 +118,7 @@ export class User {
   )
   conversations: Conversation[];
 
-  @OneToMany(() => Post, (post) => post.user) // One user can have many posts
+  @OneToMany(() => Post, (post) => post.user)
   posts: Post[];
 
   @OneToMany(() => Comment, (comment) => comment.author)
@@ -139,9 +139,9 @@ export class User {
   @OneToMany(() => Report, (report) => report.reporter)
   reportsSent: Report[];
 
-  @OneToMany(() => Report, (report) => report.reportedID)
+  @OneToMany(() => Report, (report) => report.reportedUser)
   receivedReports: Report[];
 
-  @OneToMany(() => Report, (report) => report.moderatorID)
+  @OneToMany(() => Report, (report) => report.moderator)
   reportsHandled: Report[];
 }

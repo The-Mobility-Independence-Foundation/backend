@@ -29,7 +29,7 @@ export class Invite {
   @Column({ type: 'varchar', length: 32 })
   inviteeEmail: string;
 
-  @Column({ type: 'varchar', length: 4000 })
+  @Column({ type: 'varchar', length: 500 })
   description: string;
 
   @Column({ type: 'enum', enum: InviteType, default: InviteType.ORGANIZATION })

@@ -28,11 +28,11 @@ export class Report {
 
   @ManyToOne(() => User, (user) => user.receivedReports, { nullable: true })
   @JoinColumn({ name: 'resportedId' })
-  reportedID: User | null;
+  reportedUser: User | null;
 
   @ManyToOne(() => User, (user) => user.reportsHandled)
   @JoinColumn({ name: 'moderatorId' })
-  moderatorID: User;
+  moderator: User;
 
   @ManyToOne(() => Listing, (listing) => listing.reports, { nullable: true })
   @JoinColumn({ name: 'listingId' })

@@ -37,7 +37,7 @@ export class ListingService {
     listing.attributes = 'These are my attributes.';
     listing.latitude = 0.0;
     listing.longitude = 0.0;
-    listing.zipcode = '12345-6789';
+    listing.zipCode = '12345-6789';
 
     return this.listingRepository.save(listing);
   }

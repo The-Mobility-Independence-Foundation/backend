@@ -36,7 +36,7 @@ export class Listing {
   @Column({ type: 'varchar', length: 40 })
   name: string;
 
-  @Column({ type: 'varchar', length: 4000 })
+  @Column({ type: 'varchar', length: 2000 })
   description: string;
 
   // Change to jsonB
@@ -46,7 +46,6 @@ export class Listing {
   @Column({ default: 1 })
   quantity: number;
 
-  // TODO: research to see if theres a better way to handle location
   @Column({ type: 'float', nullable: false })
   latitude: number;
 
@@ -57,7 +56,7 @@ export class Listing {
   inactive: boolean;
 
   @Column({ type: 'varchar', length: 10 })
-  zipcode: string;
+  zipCode: string;
 
   @Column({ type: 'enum', enum: ListingStatus, default: ListingStatus.ACTIVE })
   state: ListingStatus;

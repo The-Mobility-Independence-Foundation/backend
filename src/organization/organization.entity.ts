@@ -20,7 +20,7 @@ export class Organization {
   inventories: Inventory[];
 
   @JoinColumn()
-  @OneToOne(() => User, (owner) => owner.organization) // make unique eventually??
+  @OneToOne(() => User, (owner) => owner.organization)
   owner: User;
 
   @Column({ type: 'varchar', length: 50 })

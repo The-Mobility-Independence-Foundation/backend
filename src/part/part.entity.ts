@@ -15,7 +15,7 @@ export class PartType {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 20 })
+  @Column({ type: 'varchar', length: 50 })
   name: string;
 
   @ManyToMany(() => Part, (part) => part.types)

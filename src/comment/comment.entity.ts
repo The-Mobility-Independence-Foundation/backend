@@ -16,14 +16,14 @@ export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Comment, (comment) => comment.childComment, {
+  @ManyToOne(() => Comment, (comment) => comment.childComments, {
     nullable: true,
   })
   @JoinColumn({ name: 'parentCommentId' })
   parentComment: Comment | null;
 
   @OneToMany(() => Comment, (comment) => comment.parentComment)
-  childComment: Comment[];
+  childComments: Comment[];
 
   @ManyToOne(() => Post, (post) => post.comments)
   @JoinColumn({ name: 'postId' })
@@ -47,10 +47,10 @@ export class Comment {
   @JoinColumn({ name: 'editorId' })
   editedBy: User;
 
-  @Column({ type: 'varchar', length: 4000 })
+  @Column({ type: 'varchar', length: 2000 })
   content: string;
 
-  @Column({ default: true })
+  @Column({ default: false })
   hidden: boolean;
 
   @OneToMany(() => Report, (report) => report.comment)
