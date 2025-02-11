@@ -118,13 +118,13 @@ export class User {
   )
   conversations: Conversation[];
 
-  @OneToMany(() => Post, (post) => post.user)  // One user can have many posts
+  @OneToMany(() => Post, (post) => post.user) // One user can have many posts
   posts: Post[];
 
-  @OneToMany(() => Comment, (comment) => comment.author)  
+  @OneToMany(() => Comment, (comment) => comment.author)
   comments: Comment[];
 
-  @OneToMany(() => Comment, (comment) => comment.editedBy)  
+  @OneToMany(() => Comment, (comment) => comment.editedBy)
   editedComments: Comment[];
 
   @OneToMany(
