@@ -2,6 +2,7 @@ import { Conversation } from '../conversation/conversation.entity';
 import { InventoryItem } from '../inventory-item/inventory-item.entity';
 import { Order } from '../order/order.entity';
 import { User } from '../user/user.entity';
+import { Organization } from '../organization/organization.entity';
 import { Report } from '../reports/report.entity';
 import {
   Entity,
@@ -30,8 +31,8 @@ export class Listing {
   inventoryItem: InventoryItem;
 
   @JoinColumn()
-  @ManyToOne(() => User, (user) => user.listings)
-  owner: User;
+  @ManyToOne(() => Organization, (org) => org.listings)
+  owner: Organization;
 
   @Column({ type: 'varchar', length: 40 })
   name: string;

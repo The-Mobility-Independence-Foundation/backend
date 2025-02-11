@@ -98,9 +98,6 @@ export class User {
   @OneToMany(() => Message, (message) => message.author)
   sentMessages: Message[];
 
-  @OneToMany(() => Listing, (listing) => listing.owner)
-  listings: Listing[];
-
   @JoinTable({ name: 'bookmarks' })
   @ManyToMany(() => Listing, (listing) => listing.bookmarks)
   bookmarks: Listing[];

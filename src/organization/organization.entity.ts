@@ -1,3 +1,4 @@
+import { Listing } from '../listing/listing.entity';
 import { Inventory } from '../inventory/inventory.entity';
 import { Invite } from '../invite/invite.entity';
 import { Order } from '../order/order.entity';
@@ -70,4 +71,7 @@ export class Organization {
 
   @OneToMany(() => Invite, (invite) => invite.organization)
   sentInvites: Invite[];
+
+  @OneToMany(() => Listing, (listing) => listing.owner)
+  listings: Listing[];
 }

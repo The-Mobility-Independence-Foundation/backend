@@ -3,8 +3,8 @@ import { ListingController } from './listing.controller';
 import { ListingService } from './listing.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Listing } from './listing.entity';
-import { User } from '../user/user.entity';
 import { InventoryItem } from '../inventory-item/inventory-item.entity';
+import { Organization } from '../organization/organization.entity';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -26,7 +26,7 @@ describe('ListingController', () => {
           useClass: mockRepository,
         },
         {
-          provide: getRepositoryToken(User),
+          provide: getRepositoryToken(Organization),
           useClass: mockRepository,
         },
         {
