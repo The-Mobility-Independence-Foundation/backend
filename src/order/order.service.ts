@@ -26,9 +26,13 @@ export class OrderService {
     const order = new Order();
 
     const recipient = await this.userRepository.findOneBy({ id: 1 });
-    const recipientOrganization = await this.organizationRepository.findOneBy({ id: 2 });
+    const recipientOrganization = await this.organizationRepository.findOneBy({
+      id: 2,
+    });
     const owner = await this.userRepository.findOneBy({ id: 2 });
-    const ownerOrganization = await this.organizationRepository.findOneBy({ id: 1 });
+    const ownerOrganization = await this.organizationRepository.findOneBy({
+      id: 1,
+    });
     const listing = await this.listingRepository.findOneBy({ id: 1 });
 
     if (listing) {

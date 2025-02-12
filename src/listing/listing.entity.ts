@@ -40,9 +40,8 @@ export class Listing {
   @Column({ type: 'varchar', length: 2000 })
   description: string;
 
-  // Change to jsonB
-  @Column({ type: 'varchar', length: 4000 })
-  attributes: string;
+  @Column({ type: 'jsonb' })
+  attributes: object;
 
   @Column({ default: 1 })
   quantity: number;

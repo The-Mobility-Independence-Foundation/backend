@@ -34,7 +34,7 @@ export class ListingService {
 
     listing.name = 'My listing.';
     listing.description = 'This is my listing.';
-    listing.attributes = 'These are my attributes.';
+    listing.attributes = { size: 100 };
     listing.latitude = 0.0;
     listing.longitude = 0.0;
     listing.zipCode = '12345-6789';

@@ -39,7 +39,7 @@ export class InventoryItemService {
     }
 
     inventoryItem.notes = 'These are my notes!';
-    inventoryItem.attributes = 'These are my attributes!';
+    inventoryItem.attributes = { size: 100 };
 
     return this.inventoryItemRepository.save(inventoryItem);
   }
