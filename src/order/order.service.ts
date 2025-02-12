@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../user/user.entity';
 import { Listing } from '../listing/listing.entity';
+import { Organization } from '../organization/organization.entity';
 
 @Injectable()
 export class OrderService {
@@ -16,13 +17,18 @@ export class OrderService {
 
     @InjectRepository(Listing)
     private readonly listingRepository: Repository<Listing>,
+
+    @InjectRepository(Organization)
+    private readonly organizationRepository: Repository<Organization>,
   ) {}
 
   async create() {
     const order = new Order();
 
     const recipient = await this.userRepository.findOneBy({ id: 1 });
+    const recipientOrganization = await this.organizationRepository.findOneBy({ id: 2 });
     const owner = await this.userRepository.findOneBy({ id: 2 });
+    const ownerOrganization = await this.organizationRepository.findOneBy({ id: 1 });
     const listing = await this.listingRepository.findOneBy({ id: 1 });
 
     if (listing) {
@@ -33,6 +39,12 @@ export class OrderService {
     }
     if (recipient) {
       order.recipient = recipient;
+    }
+    if (recipientOrganization) {
+      order.recipientOrganization = recipientOrganization;
+    }
+    if (ownerOrganization) {
+      order.ownerOrganization = ownerOrganization;
     }
 
     order.addressLine1 = '1789 State Highway 8';

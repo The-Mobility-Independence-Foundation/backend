@@ -1,3 +1,4 @@
+import { Organization } from '../organization/organization.entity';
 import { Listing } from '../listing/listing.entity';
 import { Review } from '../review/review.entity';
 import { User } from '../user/user.entity';
@@ -31,8 +32,16 @@ export class Order {
   owner: User;
 
   @JoinColumn()
+  @ManyToOne(() => Organization, (org) => org.orders)
+  ownerOrganization: Organization;
+
+  @JoinColumn()
   @ManyToOne(() => User, (user) => user.orders)
   recipient: User;
+
+  @JoinColumn()
+  @ManyToOne(() => Organization, (org) => org.ordersMade)
+  recipientOrganization: Organization;
 
   @Column()
   quantity: number;
