@@ -29,11 +29,11 @@ export class Order {
 
   @JoinColumn()
   @ManyToOne(() => User, (user) => user.ordersManaged)
-  owner: User;
+  provider: User;
 
   @JoinColumn()
   @ManyToOne(() => Organization, (org) => org.orders)
-  ownerOrganization: Organization;
+  providerOrganization: Organization;
 
   @JoinColumn()
   @ManyToOne(() => User, (user) => user.orders)

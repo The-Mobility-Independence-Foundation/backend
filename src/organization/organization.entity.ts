@@ -66,7 +66,7 @@ export class Organization {
   @OneToMany(() => User, (user) => user.organization)
   members: User[];
 
-  @OneToMany(() => Order, (order) => order.ownerOrganization)
+  @OneToMany(() => Order, (order) => order.providerOrganization)
   orders: Order[];
 
   @OneToMany(() => Order, (order) => order.recipientOrganization)

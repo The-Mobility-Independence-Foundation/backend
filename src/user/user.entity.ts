@@ -80,7 +80,7 @@ export class User {
   @OneToMany(() => Order, (order) => order.recipient)
   orders: Order[];
 
-  @OneToMany(() => Order, (order) => order.owner)
+  @OneToMany(() => Order, (order) => order.provider)
   ordersManaged: Order[];
 
   @OneToMany(() => Invite, (invite) => invite.inviter)
@@ -136,8 +136,8 @@ export class User {
   @OneToMany(() => Report, (report) => report.reporter)
   reportsSent: Report[];
 
-  @OneToMany(() => Report, (report) => report.reportedUser)
-  receivedReports: Report[];
+  @OneToMany(() => Report, (report) => report.offender)
+  reportsRecieved: Report[];
 
   @OneToMany(() => Report, (report) => report.moderator)
   reportsHandled: Report[];

@@ -64,7 +64,7 @@ export class Listing {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @OneToMany(() => Order, (order) => order.owner)
+  @OneToMany(() => Order, (order) => order.provider)
   orders: Order[];
 
   @OneToMany(() => Conversation, (conversation) => conversation.listing)

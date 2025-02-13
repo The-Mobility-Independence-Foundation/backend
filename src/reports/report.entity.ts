@@ -26,9 +26,9 @@ export class Report {
   @JoinColumn({ name: 'reporterId' })
   reporter: User;
 
-  @ManyToOne(() => User, (user) => user.receivedReports, { nullable: true })
-  @JoinColumn({ name: 'resportedId' })
-  reportedUser: User | null;
+  @ManyToOne(() => User, (user) => user.reportsRecieved, { nullable: true })
+  @JoinColumn({ name: 'offenderId' })
+  offender: User | null;
 
   @ManyToOne(() => User, (user) => user.reportsHandled)
   @JoinColumn({ name: 'moderatorId' })

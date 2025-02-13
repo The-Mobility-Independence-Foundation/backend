@@ -29,8 +29,8 @@ export class OrderService {
     const recipientOrganization = await this.organizationRepository.findOneBy({
       id: 2,
     });
-    const owner = await this.userRepository.findOneBy({ id: 2 });
-    const ownerOrganization = await this.organizationRepository.findOneBy({
+    const provider = await this.userRepository.findOneBy({ id: 2 });
+    const providerOrganization = await this.organizationRepository.findOneBy({
       id: 1,
     });
     const listing = await this.listingRepository.findOneBy({ id: 1 });
@@ -38,8 +38,8 @@ export class OrderService {
     if (listing) {
       order.listing = listing;
     }
-    if (owner) {
-      order.owner = owner;
+    if (provider) {
+      order.provider = provider;
     }
     if (recipient) {
       order.recipient = recipient;
@@ -47,8 +47,8 @@ export class OrderService {
     if (recipientOrganization) {
       order.recipientOrganization = recipientOrganization;
     }
-    if (ownerOrganization) {
-      order.ownerOrganization = ownerOrganization;
+    if (providerOrganization) {
+      order.providerOrganization = providerOrganization;
     }
 
     order.addressLine1 = '1789 State Highway 8';
