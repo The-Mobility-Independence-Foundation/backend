@@ -15,7 +15,7 @@ export class ModelType {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 32 })
+  @Column({ type: 'varchar', length: 50 })
   name: string;
 
   @ManyToMany(() => Model, (model) => model.types)
@@ -27,7 +27,7 @@ export class Manufacturer {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 32 })
+  @Column({ type: 'varchar', length: 50 })
   name: string;
 
   @ManyToMany(() => Model, (model) => model.types)
@@ -42,7 +42,7 @@ export class Model {
   @ManyToOne(() => Manufacturer, (manufacturer) => manufacturer.models)
   manufacturer: Manufacturer;
 
-  @Column({ type: 'varchar', length: 32 })
+  @Column({ type: 'varchar', length: 50 })
   name: string;
 
   @Column()

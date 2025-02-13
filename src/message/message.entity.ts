@@ -21,9 +21,9 @@ export class Message {
   @ManyToOne(() => Conversation, (conv) => conv.messages)
   conversation: Conversation;
 
-  @Column({ type: 'varchar', length: 4000 })
+  @Column({ type: 'varchar', length: 2000 })
   messageContent: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  readStatus: Date;
+  @Column({ type: 'timestamp', nullable: true, default: null })
+  readStatus: Date | null;
 }

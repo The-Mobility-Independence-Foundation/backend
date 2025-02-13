@@ -1,3 +1,4 @@
+import { Listing } from '../listing/listing.entity';
 import { Inventory } from '../inventory/inventory.entity';
 import { Invite } from '../invite/invite.entity';
 import { Order } from '../order/order.entity';
@@ -20,7 +21,7 @@ export class Organization {
   inventories: Inventory[];
 
   @JoinColumn()
-  @OneToOne(() => User, (owner) => owner.organization) // make unique eventually??
+  @OneToOne(() => User, (owner) => owner.organization)
   owner: User;
 
   @Column({ type: 'varchar', length: 50 })
@@ -65,9 +66,15 @@ export class Organization {
   @OneToMany(() => User, (user) => user.organization)
   members: User[];
 
-  @OneToMany(() => Order, (order) => order.owner)
+  @OneToMany(() => Order, (order) => order.providerOrganization)
   orders: Order[];
+
+  @OneToMany(() => Order, (order) => order.recipientOrganization)
+  ordersMade: Order[];
 
   @OneToMany(() => Invite, (invite) => invite.organization)
   sentInvites: Invite[];
+
+  @OneToMany(() => Listing, (listing) => listing.owner)
+  listings: Listing[];
 }

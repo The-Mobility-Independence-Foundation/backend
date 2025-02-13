@@ -40,7 +40,7 @@ export class ReportsService {
       report.listing = listing;
     }
     if (moderator) {
-      report.moderatorID = moderator;
+      report.moderator = moderator;
     }
 
     report.reason = 'fake profile';
