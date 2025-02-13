@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Listing } from './listing.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../user/user.entity';
 import { InventoryItem } from '../inventory-item/inventory-item.entity';
+import { Organization } from '../organization/organization.entity';
 
 @Injectable()
 export class ListingService {
@@ -11,8 +11,8 @@ export class ListingService {
     @InjectRepository(Listing)
     private readonly listingRepository: Repository<Listing>,
 
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(Organization)
+    private readonly organizationRepository: Repository<Organization>,
 
     @InjectRepository(InventoryItem)
     private readonly inventoryItemRepository: Repository<InventoryItem>,
@@ -20,7 +20,7 @@ export class ListingService {
 
   async create() {
     const listing = new Listing();
-    const owner = await this.userRepository.findOneBy({ id: 1 });
+    const owner = await this.organizationRepository.findOneBy({ id: 1 });
     const inventoryItem = await this.inventoryItemRepository.findOneBy({
       id: 1,
     });
@@ -34,10 +34,10 @@ export class ListingService {
 
     listing.name = 'My listing.';
     listing.description = 'This is my listing.';
-    listing.attributes = 'These are my attributes.';
+    listing.attributes = { size: 100 };
     listing.latitude = 0.0;
     listing.longitude = 0.0;
-    listing.zipcode = '12345-6789';
+    listing.zipCode = '12345-6789';
 
     return this.listingRepository.save(listing);
   }

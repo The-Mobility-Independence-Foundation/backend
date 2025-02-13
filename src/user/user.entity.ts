@@ -81,7 +81,7 @@ export class User {
   @OneToMany(() => Order, (order) => order.recipient)
   orders: Order[];
 
-  @OneToMany(() => Order, (order) => order.owner)
+  @OneToMany(() => Order, (order) => order.provider)
   ordersManaged: Order[];
 
   @OneToMany(() => Invite, (invite) => invite.inviter)
@@ -98,9 +98,6 @@ export class User {
 
   @OneToMany(() => Message, (message) => message.author)
   sentMessages: Message[];
-
-  @OneToMany(() => Listing, (listing) => listing.owner)
-  listings: Listing[];
 
   @JoinTable({ name: 'bookmarks' })
   @ManyToMany(() => Listing, (listing) => listing.bookmarks)
@@ -119,7 +116,7 @@ export class User {
   )
   conversations: Conversation[];
 
-  @OneToMany(() => Post, (post) => post.user) // One user can have many posts
+  @OneToMany(() => Post, (post) => post.user)
   posts: Post[];
 
   @OneToMany(() => Comment, (comment) => comment.author)
@@ -140,10 +137,10 @@ export class User {
   @OneToMany(() => Report, (report) => report.reporter)
   reportsSent: Report[];
 
-  @OneToMany(() => Report, (report) => report.reportedID)
-  receivedReports: Report[];
+  @OneToMany(() => Report, (report) => report.offender)
+  reportsRecieved: Report[];
 
-  @OneToMany(() => Report, (report) => report.moderatorID)
+  @OneToMany(() => Report, (report) => report.moderator)
   reportsHandled: Report[];
 
   @OneToMany(() => Audit, (audit) => audit.user)

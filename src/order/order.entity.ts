@@ -1,3 +1,4 @@
+import { Organization } from '../organization/organization.entity';
 import { Listing } from '../listing/listing.entity';
 import { Review } from '../review/review.entity';
 import { User } from '../user/user.entity';
@@ -28,11 +29,19 @@ export class Order {
 
   @JoinColumn()
   @ManyToOne(() => User, (user) => user.ordersManaged)
-  owner: User;
+  provider: User;
+
+  @JoinColumn()
+  @ManyToOne(() => Organization, (org) => org.orders)
+  providerOrganization: Organization;
 
   @JoinColumn()
   @ManyToOne(() => User, (user) => user.orders)
   recipient: User;
+
+  @JoinColumn()
+  @ManyToOne(() => Organization, (org) => org.ordersMade)
+  recipientOrganization: Organization;
 
   @Column()
   quantity: number;
@@ -45,6 +54,21 @@ export class Order {
 
   @Column({ type: 'timestamp', nullable: true, default: null })
   dateCompleted: Date;
+
+  @Column({ type: 'varchar', length: 100 })
+  addressLine1: string;
+
+  @Column({ type: 'varchar', length: 100, default: '' })
+  addressLine2: string;
+
+  @Column({ type: 'varchar', length: 30 })
+  city: string;
+
+  @Column({ type: 'varchar', length: 15 })
+  state: string;
+
+  @Column({ type: 'varchar', length: 10 })
+  zipcode: string;
 
   @OneToMany(() => Review, (review) => review.order)
   receivedReviews: Review[];

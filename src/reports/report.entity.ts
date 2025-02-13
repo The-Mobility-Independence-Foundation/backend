@@ -26,13 +26,13 @@ export class Report {
   @JoinColumn({ name: 'reporterId' })
   reporter: User;
 
-  @ManyToOne(() => User, (user) => user.receivedReports, { nullable: true })
-  @JoinColumn({ name: 'resportedId' })
-  reportedID: User | null;
+  @ManyToOne(() => User, (user) => user.reportsRecieved, { nullable: true })
+  @JoinColumn({ name: 'offenderId' })
+  offender: User | null;
 
   @ManyToOne(() => User, (user) => user.reportsHandled)
   @JoinColumn({ name: 'moderatorId' })
-  moderatorID: User;
+  moderator: User;
 
   @ManyToOne(() => Listing, (listing) => listing.reports, { nullable: true })
   @JoinColumn({ name: 'listingId' })

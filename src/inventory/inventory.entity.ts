@@ -21,7 +21,7 @@ export class Inventory {
   @Column({ type: 'varchar', length: 40 })
   name: string;
 
-  @Column({ type: 'varchar', length: 4000 })
+  @Column({ type: 'varchar', length: 200 })
   description: string;
 
   @Column({ type: 'varchar', length: 100 })

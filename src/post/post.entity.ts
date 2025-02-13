@@ -43,7 +43,7 @@ export class Post {
   @Column({ default: false })
   isLocked: boolean;
 
-  @OneToMany(() => Comment, (comment) => comment.post) // One user can have many posts
+  @OneToMany(() => Comment, (comment) => comment.post)
   comments: Comment[];
 
   @Column({ type: 'varchar', length: 4000 })
@@ -55,7 +55,6 @@ export class Post {
   )
   subscriptions: PostSubscription[];
 
-  // TODO: Think of a better name for column
   @OneToMany(() => PostRead, (postRead) => postRead.post)
   readPosts: PostRead[];
 

@@ -37,12 +37,11 @@ export class InventoryItem {
   @Column({ default: 0 })
   publicCount: number;
 
-  @Column({ type: 'varchar', length: 4000 })
+  @Column({ type: 'varchar', length: 500 })
   notes: string;
 
-  // Change to jsonB
-  @Column({ type: 'varchar', length: 4000 })
-  attributes: string;
+  @Column({ type: 'jsonb' })
+  attributes: object;
 
   @OneToMany(() => Listing, (listing) => listing.inventoryItem)
   listings: Listing[];
