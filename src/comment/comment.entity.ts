@@ -10,6 +10,7 @@ import { Post } from '../post/post.entity';
 import { User } from '../user/user.entity';
 import { Forum } from '../forum/forum.entity';
 import { Report } from '../reports/report.entity';
+import { Attachment } from '../attachments/attachment.entity';
 
 @Entity()
 export class Comment {
@@ -55,4 +56,7 @@ export class Comment {
 
   @OneToMany(() => Report, (report) => report.comment)
   report: Report[];
+
+  @OneToMany(() => Attachment, (attachment) => attachment.comment)
+  attachments: Attachment[];
 }

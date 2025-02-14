@@ -22,6 +22,7 @@ import { PostSubscription } from '../post-subscription/post-subscription.entity'
 import { PostRead } from '../post-read/post-read.entity';
 import { Report } from '../reports/report.entity';
 import { Audit } from '../audit/audit.entity';
+import { Attachment } from '../attachments/attachment.entity';
 
 export enum UserRole {
   USER = 'user',
@@ -145,4 +146,7 @@ export class User {
 
   @OneToMany(() => Audit, (audit) => audit.user)
   audits: Audit[];
+  
+  @OneToMany(() => Attachment, (attachment) => attachment.author)
+  attachmentsCreated: Attachment[];
 }
