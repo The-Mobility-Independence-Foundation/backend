@@ -13,6 +13,7 @@ import { Comment } from '../comment/comment.entity';
 import { PostSubscription } from '../post-subscription/post-subscription.entity';
 import { PostRead } from '../post-read/post-read.entity';
 import { Report } from '../reports/report.entity';
+import { Attachment } from '../attachments/attachment.entity';
 
 @Entity()
 export class Post {
@@ -61,4 +62,7 @@ export class Post {
 
   @OneToMany(() => Report, (report) => report.post)
   postReports: Report[];
+
+  @OneToMany(() => Attachment, (attachment) => attachment.post)
+  attachments: Attachment[];
 }

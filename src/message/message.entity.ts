@@ -1,11 +1,13 @@
 import { Conversation } from '../conversation/conversation.entity';
 import { User } from '../user/user.entity';
+import { Attachment } from '../attachments/attachment.entity';
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
   JoinColumn,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -26,4 +28,7 @@ export class Message {
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   readStatus: Date;
+
+  @OneToMany(() => Attachment, (attachment) => attachment.message)
+  attachments: Attachment[];
 }

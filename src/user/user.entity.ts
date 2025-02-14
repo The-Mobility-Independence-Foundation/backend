@@ -21,6 +21,7 @@ import { Comment } from '../comment/comment.entity';
 import { PostSubscription } from '../post-subscription/post-subscription.entity';
 import { PostRead } from '../post-read/post-read.entity';
 import { Report } from '../reports/report.entity';
+import { Attachment } from '../attachments/attachment.entity';
 
 export enum UserRole {
   USER = 'user',
@@ -144,4 +145,7 @@ export class User {
 
   @OneToMany(() => Report, (report) => report.moderatorID)
   reportsHandled: Report[];
+
+  @OneToMany(() => Attachment, (attachment) => attachment.author)
+  attachmentsCreated: Attachment[];
 }

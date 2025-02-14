@@ -3,6 +3,7 @@ import { InventoryItem } from '../inventory-item/inventory-item.entity';
 import { Order } from '../order/order.entity';
 import { User } from '../user/user.entity';
 import { Report } from '../reports/report.entity';
+import { Attachment } from '../attachments/attachment.entity';
 import {
   Entity,
   Column,
@@ -76,4 +77,7 @@ export class Listing {
 
   @OneToMany(() => Report, (report) => report.listing)
   reports: Report[];
+
+  @OneToMany(() => Attachment, (attachment) => attachment.listing)
+  attachments: Attachment[];
 }
