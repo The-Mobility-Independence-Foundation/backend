@@ -9,6 +9,6 @@ import { Audit } from './audit.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Audit, User, Organization])],
   controllers: [AuditController],
-  providers: [AuditService]
+  providers: [AuditService],
 })
 export class AuditModule {}

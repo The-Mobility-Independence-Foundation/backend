@@ -146,7 +146,7 @@ export class User {
 
   @OneToMany(() => Audit, (audit) => audit.user)
   audits: Audit[];
-  
+
   @OneToMany(() => Attachment, (attachment) => attachment.author)
   attachmentsCreated: Attachment[];
 }

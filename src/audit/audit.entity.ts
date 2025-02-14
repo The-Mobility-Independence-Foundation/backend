@@ -1,19 +1,25 @@
-import { User } from "../user/user.entity";
-import { Organization } from "../organization/organization.entity";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { User } from '../user/user.entity';
+import { Organization } from '../organization/organization.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 export enum AuditAction {
-  CREATED = 'created', 
+  CREATED = 'created',
   MODIFIED = 'modified',
-  DELETED = 'deleted'
+  DELETED = 'deleted',
 }
 
 export enum AuditEntity {
   LISTING = 'listing',
-  INVENTORY = 'inventory', 
+  INVENTORY = 'inventory',
   ORDER = 'order',
-  TAG = 'tag', 
-  INVENTORY_ITEM = 'inventory-item'
+  TAG = 'tag',
+  INVENTORY_ITEM = 'inventory-item',
 }
 
 @Entity()
@@ -42,8 +48,8 @@ export class Audit {
   createdAt: Date;
 
   @Column({ type: 'jsonb', nullable: true })
-  before: Object | null;
+  before: object | null;
 
   @Column({ type: 'jsonb', nullable: true })
-  after: Object | null;
+  after: object | null;
 }
