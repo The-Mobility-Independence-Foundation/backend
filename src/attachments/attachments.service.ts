@@ -14,49 +14,20 @@ export class AttachmentsService {
     @InjectRepository(Attachment)
     private attachmentRepository: Repository<Attachment>,
 
-    @InjectRepository(PostEntity)
-    private postRepository: Repository<PostEntity>,
-
     @InjectRepository(User)
     private userRepository: Repository<User>,
-
-    @InjectRepository(Listing)
-    private listingRepository: Repository<Listing>,
-
-    @InjectRepository(Comment)
-    private commentRepository: Repository<Comment>,
-
-    @InjectRepository(Message)
-    private messageRepository: Repository<Message>,
   ) {}
 
   async create() {
     const attachment = new Attachment();
 
     const user = await this.userRepository.findOneBy({ id: 1 });
-    const listing = await this.listingRepository.findOneBy({ id: 1 });
-    const comment = await this.commentRepository.findOneBy({ id: 1 });
-    const message = await this.messageRepository.findOneBy({ id: 1 });
-    const post = await this.postRepository.findOneBy({ id: 1 });
 
     if (user) {
       attachment.author = user;
     }
-    if (comment) {
-      attachment.comment = comment;
-    }
-    if (listing) {
-      attachment.listing = listing;
-    }
-    if (message) {
-      attachment.message = message;
-    }
-    if (post) {
-      attachment.post = post;
-    }
 
-    attachment.entity_id = '2';
-    attachment.entity_type = 'diagram';
+    attachment.entity_id = 2;
     attachment.file_name = 'brake diagram';
     attachment.file_size = '10 MB';
     attachment.mime_type = '.avif';

@@ -1,8 +1,4 @@
 import { User } from '../user/user.entity';
-import { Listing } from '../listing/listing.entity';
-import { Message } from '../message/message.entity';
-import { Post as PostEntity } from '../post/post.entity';
-import { Comment } from '../comment/comment.entity';
 import {
   Entity,
   Column,
@@ -10,6 +6,13 @@ import {
   JoinColumn,
   ManyToOne,
 } from 'typeorm';
+
+export enum EntityType {
+    POST = 'post',
+    COMMENT = 'comment',
+    LISTING = 'listing',
+    MESSAGE = 'message',
+  }
 
 @Entity()
 export class Attachment {
@@ -20,11 +23,11 @@ export class Attachment {
   @ManyToOne(() => User, (user) => user.attachmentsCreated)
   author: User;
 
-  @Column({ type: 'varchar', length: 10 })
-  entity_id: string;
+  @Column()
+  entity_id: number;
 
-  @Column({ type: 'varchar', length: 20 })
-  entity_type: string;
+  @Column({ type: 'enum', enum: EntityType, default: EntityType.POST })
+  entity_type: EntityType;
 
   @Column({ type: 'varchar', length: 20 })
   file_name: string;
@@ -41,25 +44,4 @@ export class Attachment {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
-  @JoinColumn()
-  @ManyToOne(() => Listing, (listing) => listing.attachments, {
-    nullable: true,
-  })
-  listing: Listing | null;
-
-  @JoinColumn()
-  @ManyToOne(() => Message, (message) => message.attachments, {
-    nullable: true,
-  })
-  message: Message | null;
-
-  @JoinColumn()
-  @ManyToOne(() => PostEntity, (post) => post.attachments, { nullable: true })
-  post: PostEntity | null;
-
-  @JoinColumn()
-  @ManyToOne(() => Comment, (comment) => comment.attachments, {
-    nullable: true,
-  })
-  comment: Comment | null;
 }

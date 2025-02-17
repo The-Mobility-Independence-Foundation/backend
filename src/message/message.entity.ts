@@ -1,6 +1,5 @@
 import { Conversation } from '../conversation/conversation.entity';
 import { User } from '../user/user.entity';
-import { Attachment } from '../attachments/attachment.entity';
 import {
   Entity,
   Column,
@@ -29,6 +28,4 @@ export class Message {
   @Column({ type: 'timestamp', nullable: true, default: null })
   readStatus: Date | null;
 
-  @OneToMany(() => Attachment, (attachment) => attachment.message)
-  attachments: Attachment[];
 }
