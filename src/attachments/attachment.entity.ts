@@ -8,11 +8,11 @@ import {
 } from 'typeorm';
 
 export enum EntityType {
-    POST = 'post',
-    COMMENT = 'comment',
-    LISTING = 'listing',
-    MESSAGE = 'message',
-  }
+  POST = 'post',
+  COMMENT = 'comment',
+  LISTING = 'listing',
+  MESSAGE = 'message',
+}
 
 @Entity()
 export class Attachment {
@@ -43,5 +43,4 @@ export class Attachment {
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
-
 }

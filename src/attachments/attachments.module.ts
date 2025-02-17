@@ -6,12 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../user/user.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      Attachment,
-      User,
-    ]),
-  ],
+  imports: [TypeOrmModule.forFeature([Attachment, User])],
   controllers: [AttachmentsController],
   providers: [AttachmentsService],
 })

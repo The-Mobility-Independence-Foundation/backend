@@ -6,7 +6,6 @@ import {
   PrimaryGeneratedColumn,
   JoinColumn,
   ManyToOne,
-  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -27,5 +26,4 @@ export class Message {
 
   @Column({ type: 'timestamp', nullable: true, default: null })
   readStatus: Date | null;
-
 }

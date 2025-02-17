@@ -1,12 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Listing } from '../listing/listing.entity';
-import { Message } from '../message/message.entity';
-import { Post as PostEntity } from '../post/post.entity';
 import { User } from '../user/user.entity';
 import { Repository } from 'typeorm';
 import { Attachment } from './attachment.entity';
-import { Comment } from '../comment/comment.entity';
 
 @Injectable()
 export class AttachmentsService {
