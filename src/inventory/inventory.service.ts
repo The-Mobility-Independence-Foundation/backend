@@ -20,10 +20,7 @@ export class InventoryService {
 
     if (organization) {
       inventory.organization = organization;
-      inventory.addressLine1 = organization.addressLine1;
-      inventory.city = organization.city;
-      inventory.state = organization.state;
-      inventory.zipcode = organization.zipcode;
+      inventory.address = organization.address;
     }
 
     inventory.description = 'Test Description';

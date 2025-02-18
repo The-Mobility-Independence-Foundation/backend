@@ -34,7 +34,7 @@ export class AuditService {
     audit.action = AuditAction.CREATED;
     audit.entity = AuditEntity.INVENTORY_ITEM;
 
-    throw new Error('Method not implemented.');
+    return this.auditRepository.save(audit);
   }
 
   async findOne(id: number): Promise<Audit | null> {

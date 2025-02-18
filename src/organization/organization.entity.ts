@@ -4,6 +4,7 @@ import { Inventory } from '../inventory/inventory.entity';
 import { Invite } from '../invite/invite.entity';
 import { Order } from '../order/order.entity';
 import { User } from '../user/user.entity';
+import { Address } from '../address/address.entity';
 import {
   Entity,
   Column,
@@ -11,6 +12,7 @@ import {
   OneToMany,
   JoinColumn,
   OneToOne,
+  ManyToOne,
 } from 'typeorm';
 
 @Entity()
@@ -40,20 +42,9 @@ export class Organization {
   @Column({ type: 'decimal', default: 0.0 })
   rating: number;
 
-  @Column({ type: 'varchar', length: 100 })
-  addressLine1: string;
-
-  @Column({ type: 'varchar', length: 100, default: '' })
-  addressLine2: string;
-
-  @Column({ type: 'varchar', length: 30 })
-  city: string;
-
-  @Column({ type: 'varchar', length: 15 })
-  state: string;
-
-  @Column({ type: 'varchar', length: 10 })
-  zipcode: string;
+  @JoinColumn()
+  @ManyToOne(() => Address, (address) => address.organizations)
+  address: Address;
 
   @Column({ type: 'varchar', length: 20, nullable: true })
   phoneNumber: string;
