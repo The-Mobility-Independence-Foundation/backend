@@ -5,6 +5,7 @@ import {
   PrimaryGeneratedColumn,
   JoinColumn,
   ManyToOne,
+  Index,
 } from 'typeorm';
 
 export enum EntityType {
@@ -23,9 +24,11 @@ export class Attachment {
   @ManyToOne(() => User, (user) => user.attachmentsCreated)
   author: User;
 
+  @Index()
   @Column()
   entity_id: number;
 
+  @Index()
   @Column({ type: 'enum', enum: EntityType, default: EntityType.POST })
   entity_type: EntityType;
 
