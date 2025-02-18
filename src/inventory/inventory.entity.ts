@@ -1,3 +1,4 @@
+import { Address } from '../address/address.entity';
 import { InventoryItem } from '../inventory-item/inventory-item.entity';
 import { Organization } from '../organization/organization.entity';
 import {
@@ -24,20 +25,9 @@ export class Inventory {
   @Column({ type: 'varchar', length: 200 })
   description: string;
 
-  @Column({ type: 'varchar', length: 100 })
-  addressLine1: string;
-
-  @Column({ type: 'varchar', length: 100, default: '' })
-  addressLine2: string;
-
-  @Column({ type: 'varchar', length: 30 })
-  city: string;
-
-  @Column({ type: 'varchar', length: 15 })
-  state: string;
-
-  @Column({ type: 'varchar', length: 10 })
-  zipcode: string;
+  @JoinColumn()
+  @ManyToOne(() => Address, (address) => address.inventories)
+  address: Address;
 
   @OneToMany(() => InventoryItem, (item) => item.inventory)
   items: InventoryItem[];

@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Organization } from './organization.entity';
 import { User } from '../user/user.entity';
 import { Inventory } from '../inventory/inventory.entity';
+import { Address } from '../address/address.entity';
 
 @Injectable()
 export class OrganizationService {
@@ -16,6 +17,9 @@ export class OrganizationService {
 
     @InjectRepository(Inventory)
     private inventoryRepository: Repository<Inventory>,
+
+    @InjectRepository(Address)
+    private addressRepository: Repository<Address>,
   ) {}
 
   async create() {
@@ -23,6 +27,7 @@ export class OrganizationService {
 
     const owner = await this.userRepository.findOneBy({ id: 1 });
     const inventory = await this.inventoryRepository.findOneBy({ id: 1 });
+    const address = await this.addressRepository.findOneBy({ id: 1 });
 
     if (inventory) {
       organization.inventories = [inventory];
@@ -30,12 +35,11 @@ export class OrganizationService {
     if (owner) {
       organization.owner = owner;
     }
+    if (address) {
+      organization.address = address;
+    }
 
     organization.name = 'The Mobility Independence Foundation';
-    organization.addressLine1 = '1789 State Highway 8';
-    organization.city = 'Mount Upton';
-    organization.state = 'New York';
-    organization.zipcode = '13809';
     organization.ein = '92-0887459';
 
     return this.organizationRepository.save(organization);

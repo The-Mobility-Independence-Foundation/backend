@@ -5,6 +5,7 @@ import { Organization } from './organization.entity';
 import { User } from '../user/user.entity';
 import { Inventory } from '../inventory/inventory.entity';
 import { OrganizationService } from './organization.service';
+import { Address } from '../address/address.entity';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -31,6 +32,10 @@ describe('OrganizationController', () => {
         },
         {
           provide: getRepositoryToken(Inventory),
+          useClass: mockRepository,
+        },
+        {
+          provide: getRepositoryToken(Address),
           useClass: mockRepository,
         },
       ],
