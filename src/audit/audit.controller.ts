@@ -5,7 +5,7 @@ import { Audit } from './audit.entity';
 @Controller('audit')
 export class AuditController {
   constructor(private readonly commentService: AuditService) {}
-  
+
   @Post()
   create(): Promise<Audit> {
     return this.commentService.create();

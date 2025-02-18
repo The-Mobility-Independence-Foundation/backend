@@ -78,7 +78,7 @@ export class Organization {
 
   @OneToMany(() => Audit, (audit) => audit.organization)
   audits: Audit[];
-  
+
   @OneToMany(() => Listing, (listing) => listing.owner)
   listings: Listing[];
 }

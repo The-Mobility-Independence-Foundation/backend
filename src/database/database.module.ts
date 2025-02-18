@@ -24,6 +24,7 @@ import { CommentModule } from '../comment/comment.module';
 import { PostSubscriptionModule } from '../post-subscription/post-subscription.module';
 import { PostReadModule } from '../post-read/post-read.module';
 import { ReportsModule } from '../reports/reports.module';
+import { AttachmentsModule } from '../attachments/attachments.module';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { ReportsModule } from '../reports/reports.module';
     PostSubscriptionModule,
     PostReadModule,
     ReportsModule,
+    AttachmentsModule,
   ],
 })
 export class DatabaseModule {}
