@@ -4,7 +4,7 @@ import { ConversationService } from './conversation.service';
 import { Conversation } from './conversation.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Listing } from '../listing/listing.entity';
-import { User } from '../user/user.entity';
+import { User } from '../user/entities/user.entity';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {

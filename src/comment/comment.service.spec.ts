@@ -3,7 +3,7 @@ import { CommentService } from './comment.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Comment } from './comment.entity';
 import { Post } from '../post/post.entity';
-import { User } from '../user/user.entity';
+import { User } from '../user/entities/user.entity';
 import { Forum } from '../forum/forum.entity';
 
 export const mockRepository = jest.fn(() => ({

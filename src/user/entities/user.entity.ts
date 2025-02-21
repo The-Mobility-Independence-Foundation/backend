@@ -1,8 +1,8 @@
-import { Invite } from '../invite/invite.entity';
-import { Order } from '../order/order.entity';
-import { Organization } from '../organization/organization.entity';
-import { Review } from '../review/review.entity';
-import { Request } from '../request/request.entity';
+import { Invite } from '../../invite/invite.entity';
+import { Order } from '../../order/order.entity';
+import { Organization } from '../../organization/organization.entity';
+import { Review } from '../../review/review.entity';
+import { Request } from '../../request/request.entity';
 import {
   Entity,
   Column,
@@ -12,17 +12,19 @@ import {
   OneToMany,
   ManyToMany,
   JoinTable,
+  OneToOne,
 } from 'typeorm';
-import { Message } from '../message/message.entity';
-import { Listing } from '../listing/listing.entity';
-import { Conversation } from '../conversation/conversation.entity';
-import { Post } from '../post/post.entity';
-import { Comment } from '../comment/comment.entity';
-import { PostSubscription } from '../post-subscription/post-subscription.entity';
-import { PostRead } from '../post-read/post-read.entity';
-import { Report } from '../reports/report.entity';
-import { Audit } from '../audit/audit.entity';
-import { Attachment } from '../attachments/attachment.entity';
+import { Message } from '../../message/message.entity';
+import { Listing } from '../../listing/listing.entity';
+import { Conversation } from '../../conversation/conversation.entity';
+import { Post } from '../../post/post.entity';
+import { Comment } from '../../comment/comment.entity';
+import { PostSubscription } from '../../post-subscription/post-subscription.entity';
+import { PostRead } from '../../post-read/post-read.entity';
+import { Report } from '../../reports/report.entity';
+import { Audit } from '../../audit/audit.entity';
+import { Attachment } from '../../attachments/attachment.entity';
+import { UserAuth } from './user-auth.entity';
 
 export enum UserRole {
   USER = 'user',
@@ -48,9 +50,6 @@ export class User {
   @Column({ type: 'varchar', length: 30 })
   email: string;
 
-  @Column({ type: 'varchar', length: 50 }) // TODO: update with a salt and a hash
-  password: string;
-
   @Column({ type: 'varchar', length: 20 })
   displayName: string;
 
@@ -67,8 +66,8 @@ export class User {
   referralCode: string;
 
   @JoinColumn()
-  @ManyToOne(() => User, (user) => user.referrals)
-  referredBy: User;
+  @ManyToOne(() => User, (user) => user.referrals, { nullable: true })
+  referredBy: User | null;
 
   @Column({ type: 'decimal', default: 0.0 })
   rating: number;
@@ -149,4 +148,8 @@ export class User {
 
   @OneToMany(() => Attachment, (attachment) => attachment.author)
   attachmentsCreated: Attachment[];
+
+  @JoinColumn()
+  @OneToOne(() => UserAuth, (auth) => auth.user)
+  auth: UserAuth;
 }

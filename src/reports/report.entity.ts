@@ -5,7 +5,7 @@ import {
   JoinColumn,
   ManyToOne,
 } from 'typeorm';
-import { User } from '../user/user.entity';
+import { User } from '../user/entities/user.entity';
 import { Listing } from '../listing/listing.entity';
 import { Post as PostEntity } from '../post/post.entity';
 import { Comment } from '../comment/comment.entity';

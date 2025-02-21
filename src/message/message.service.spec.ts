@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MessageService } from './message.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Message } from './message.entity';
-import { User } from '../user/user.entity';
+import { User } from '../user/entities/user.entity';
 import { Conversation } from '../conversation/conversation.entity';
 
 export const mockRepository = jest.fn(() => ({

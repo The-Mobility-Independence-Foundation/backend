@@ -1,7 +1,6 @@
-import { Inventory } from "../inventory/inventory.entity";
-import { Organization } from "../organization/organization.entity";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-
+import { Inventory } from '../inventory/inventory.entity';
+import { Organization } from '../organization/organization.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Address {

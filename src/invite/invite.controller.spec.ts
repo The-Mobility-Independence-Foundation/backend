@@ -3,7 +3,7 @@ import { InviteController } from './invite.controller';
 import { InviteService } from './invite.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Invite } from './invite.entity';
-import { User } from '../user/user.entity';
+import { User } from '../user/entities/user.entity';
 import { Organization } from '../organization/organization.entity';
 
 export const mockRepository = jest.fn(() => ({

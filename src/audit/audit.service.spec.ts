@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuditService } from './audit.service';
 import { Organization } from '../organization/organization.entity';
-import { User } from '../user/user.entity';
+import { User } from '../user/entities/user.entity';
 import { Audit } from './audit.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 

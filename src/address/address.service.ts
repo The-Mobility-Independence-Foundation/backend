@@ -6,26 +6,26 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class AddressService {
   constructor(
-      @InjectRepository(Address)
-      private readonly addressRepository: Repository<Address>,
-    ) {}
-  
-    async create(): Promise<Address> {
-      const address = new Address();
-  
-      address.addressLine1 = "1789 State Highway 8";
-      address.city = "Mount Upton";
-      address.state = "New York";
-      address.zipCode = "13809";
-  
-      return this.addressRepository.save(address);
-    }
-  
-    async findOne(id: number): Promise<Address | null> {
-      return this.addressRepository.findOneBy({ id: id });
-    }
-  
-    async findAll(): Promise<Address[]> {
-      return this.addressRepository.find();
-    }
+    @InjectRepository(Address)
+    private readonly addressRepository: Repository<Address>,
+  ) {}
+
+  async create(): Promise<Address> {
+    const address = new Address();
+
+    address.addressLine1 = '1789 State Highway 8';
+    address.city = 'Mount Upton';
+    address.state = 'New York';
+    address.zipCode = '13809';
+
+    return this.addressRepository.save(address);
+  }
+
+  async findOne(id: number): Promise<Address | null> {
+    return this.addressRepository.findOneBy({ id: id });
+  }
+
+  async findAll(): Promise<Address[]> {
+    return this.addressRepository.find();
+  }
 }

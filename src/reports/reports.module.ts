@@ -5,7 +5,7 @@ import { Report } from './report.entity';
 import { Post as PostEntity } from '../post/post.entity';
 import { Listing } from '../listing/listing.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '../user/user.entity';
+import { User } from '../user/entities/user.entity';
 import { Comment } from '../comment/comment.entity';
 
 @Module({
