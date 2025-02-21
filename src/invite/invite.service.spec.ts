@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { InviteService } from './invite.service';
 import { Invite } from './invite.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from '../user/user.entity';
+import { User } from '../user/entities/user.entity';
 import { Organization } from '../organization/organization.entity';
 
 export const mockRepository = jest.fn(() => ({

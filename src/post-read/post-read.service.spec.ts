@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PostReadService } from './post-read.service';
 import { PostRead } from './post-read.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from '../user/user.entity';
+import { User } from '../user/entities/user.entity';
 import { Post } from '../post/post.entity';
 
 export const mockRepository = jest.fn(() => ({

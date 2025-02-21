@@ -3,7 +3,7 @@ import { AuditController } from './audit.controller';
 import { AuditService } from './audit.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Audit } from './audit.entity';
-import { User } from '../user/user.entity';
+import { User } from '../user/entities/user.entity';
 import { Organization } from '../organization/organization.entity';
 
 export const mockRepository = jest.fn(() => ({

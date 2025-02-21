@@ -1,14 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthService } from './auth.service';
-import { JwtService } from '@nestjs/jwt';
+import { AuthService } from '../auth.service';
+import { createMock } from '@golevelup/ts-jest';
 
 describe('AuthService', () => {
   let service: AuthService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AuthService, JwtService],
-    }).compile();
+      providers: [AuthService],
+    })
+      .useMocker(createMock)
+      .compile();
 
     service = module.get<AuthService>(AuthService);
   });

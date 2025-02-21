@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Audit, AuditAction, AuditEntity } from './audit.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '../user/user.entity';
+import { User } from '../user/entities/user.entity';
 import { Organization } from '../organization/organization.entity';
 
 @Injectable()

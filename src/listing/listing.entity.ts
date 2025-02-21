@@ -1,7 +1,7 @@
 import { Conversation } from '../conversation/conversation.entity';
 import { InventoryItem } from '../inventory-item/inventory-item.entity';
 import { Order } from '../order/order.entity';
-import { User } from '../user/user.entity';
+import { User } from '../user/entities/user.entity';
 import { Organization } from '../organization/organization.entity';
 import { Report } from '../reports/report.entity';
 import {
