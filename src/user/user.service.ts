@@ -114,4 +114,16 @@ export class UserService {
   async deleteConnection(userId: number, recipientId: number) {
     return this.connectionsService.delete(userId, recipientId);
   }
+  
+  async findAll() {
+    return this.userRepository.find();
+  }
+
+  async findOne(id: number) {
+    return this.userRepository.findOneBy({ id: id });
+  }
+
+  async update(id: number) {
+    return this.userRepository.findOneBy({ id: id });
+  }
 }

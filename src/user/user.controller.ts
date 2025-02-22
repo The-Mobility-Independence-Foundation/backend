@@ -1,14 +1,16 @@
 import {
   Controller,
   Get,
-  Query,
   Param,
+  Patch,
+  Query,
   ParseIntPipe,
   Req,
   UseGuards,
   Post,
   Delete,
 } from '@nestjs/common';
+import { getUsersDto } from './dto/get-users.dto';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -74,5 +76,30 @@ export class UserController {
     @Param('recipientId', ParseIntPipe) recipientId: number,
   ) {
     return this.userService.deleteConnection(userId, recipientId);
+  }
+
+  /*
+    Returns all users matching the given search criteria.
+  */
+  @Get()
+  findAll(@Query() query: getUsersDto): Promise<User[]> {
+    console.log(query);
+    return this.userService.findAll();
+  }
+
+  /*
+    Gets a single user based on their id
+  */
+  @Get(':id')
+  findOne(@Param('id') id: number): Promise<User | null> {
+    return this.userService.findOne(id);
+  }
+
+  /* 
+    Updates a user based on their id
+  */
+  @Patch(':id')
+  update(@Param('id') id: number): Promise<User | null> {
+    return this.userService.update(id);
   }
 }
