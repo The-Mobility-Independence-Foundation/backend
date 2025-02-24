@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { User, UserRole } from './entities/user.entity';
-import { Repository, FindOptionsWhere, FindOptionsRelations } from 'typeorm';
+import { Repository, FindOptionsWhere, FindOptionsRelations, LessThanOrEqual, MoreThanOrEqual, Between } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserAuth } from './entities/user-auth.entity';
 import { RegisterDto } from '../auth/dto/register.dto';
@@ -9,6 +9,8 @@ import { UserAuthService } from './user-auth.service';
 import { validateDto } from '../common/utils/validate-dto';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { ConnectionsService } from '../connections/connections.service';
+import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
+import { GetUsersDto } from './dto/get-users.dto';
 
 @Injectable()
 export class UserService {
@@ -117,6 +119,41 @@ export class UserService {
   
   async findAll() {
     return this.userRepository.find();
+  }
+
+  async findAllFiltered(query: GetUsersDto) {
+    const findOptions: any = {};
+    const findWhere: any = {};
+
+    if (query.nextToken) {
+      findOptions.skip = query.nextToken - 1;
+    }
+
+    if (query.count) {
+      findOptions.take = query.count;
+    }
+
+    if (query.username) {
+      findWhere.displayName = query.username;
+    }
+
+    if (query.accountType) {
+      findWhere.type = query.accountType;
+    }
+
+    if (query.maxRating && query.minRating) {
+      findWhere.rating = Between(query.minRating, query.maxRating);
+    } else if (query.maxRating) {
+      findWhere.rating = LessThanOrEqual(query.maxRating);
+    } else if (query.minRating) {
+      findWhere.rating = MoreThanOrEqual(query.minRating);
+    }
+
+    findOptions.where = findWhere;
+
+    console.log(findOptions);
+
+    return this.userRepository.find(findOptions);
   }
 
   async findOne(id: number) {
