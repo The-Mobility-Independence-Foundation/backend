@@ -1,52 +1,88 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { Repository, FindOneOptions } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { validate } from 'class-validator';
 import { ValidationException } from '../common/exceptions/validation.exception';
+import { UserAuth } from './entities/user-auth.entity';
+import { RegisterDto } from '../auth/dto/register.dto';
+import { ProviderProfile } from '../auth/entities/provider-profile.entity';
+import { UserAuthService } from './user-auth.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private userAuthService: UserAuthService,
   ) {}
 
   /**
-   * Create a new user
+   * Find a user by their email address
+   * @param email - The email address of the user
+   * @param where - The where options
+   * @returns The user record or null if not found
    */
-  async create(data: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    displayName: string;
-  }): Promise<User> {
-    // If a user with this email address already exists, throw an error
-    const existingUser = await this.userRepository.findOne({
-      where: { email: data.email.toLowerCase() },
+  async findByEmail(
+    email: string,
+    where: Exclude<FindOneOptions<User>['where'], 'email'> = {},
+  ) {
+    return this.userRepository.findOne({
+      where: { email: email.toLowerCase(), ...where },
     });
-    if (existingUser) {
+  }
+
+  /**
+   * Create a new user
+   * @param registerDto - The register dto
+   * @param providerProfile - The provider profile
+   * @returns The user record
+   */
+  async create(data: RegisterDto | ProviderProfile): Promise<User> {
+    // Check if the user already exists
+    const existingUser = await this.findByEmail(data.email);
+    const existingUserAuth = await this.userAuthService.findByEmail(data.email);
+    if (existingUser || existingUserAuth) {
       throw new BadRequestException(
         'A user with this email address already exists',
       );
     }
 
+    // Initialize the user
     const user = new User();
-    user.firstName = data.firstName.trim();
-    user.lastName = data.lastName.trim();
-    user.email = data.email.toLowerCase();
-    user.displayName = data.displayName.trim();
+    user.email = data.email;
+    user.firstName = data.firstName;
+    user.lastName = data.lastName;
+    user.displayName = data.displayName;
 
-    // TODO: Update this once we have a proper signup flow
-    user.signupComplete = true;
-
-    // Validate the user object
-    const errors = await validate(user);
-    if (errors.length > 0) {
-      console.log(errors);
-      throw new ValidationException(errors);
+    // Initialize the user auth
+    let userAuth: UserAuth;
+    if (data instanceof RegisterDto) {
+      userAuth = await this.userAuthService.initializeLocalAuth(
+        data.email,
+        data.password,
+      );
+    } else {
+      userAuth = await this.userAuthService.initializeProviderAuth(data);
     }
 
+    // Establish the relationship
+    user.auth = userAuth;
+    userAuth.user = user;
+
+    // Validate the user auth
+    const userAuthErrors = await validate(userAuth);
+    if (userAuthErrors.length > 0) {
+      throw new ValidationException(userAuthErrors);
+    }
+
+    // Validate the user
+    const userErrors = await validate(user);
+    if (userErrors.length > 0) {
+      throw new ValidationException(userErrors);
+    }
+
+    // Save the user
     return this.userRepository.save(user);
   }
 }

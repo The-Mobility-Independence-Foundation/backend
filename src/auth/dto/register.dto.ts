@@ -8,7 +8,7 @@ import {
   IsPassword,
 } from '../../common/decorators/user.decorators';
 
-export class UserRegisterDto {
+export class RegisterDto {
   @IsFirstName()
   @ApiProperty({
     example: 'John',

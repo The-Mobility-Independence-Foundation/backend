@@ -4,7 +4,8 @@ import { UserAuthService } from '../user/user-auth.service';
 import { ProviderProfile } from './entities/provider-profile.entity';
 import { UserService } from '../user/user.service';
 import { User } from '../user/entities/user.entity';
-import { UserRegisterDto } from './dto/register.dto';
+import { RegisterDto } from './dto/register.dto';
+
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
@@ -18,8 +19,8 @@ export class AuthService {
   /**
    * Register a new user
    */
-  async register(userRegisterDto: UserRegisterDto): Promise<User> {
-    const existingAuth = await this.userAuthService.getUserByEmail(
+  async register(userRegisterDto: RegisterDto): Promise<User> {
+    const existingAuth = await this.userAuthService.findByEmail(
       userRegisterDto.email,
     );
 
@@ -31,28 +32,31 @@ export class AuthService {
     }
 
     // Create new user
-    const user = await this.userService.create({
-      email: userRegisterDto.email,
-      displayName: userRegisterDto.displayName,
-      firstName: userRegisterDto.firstName,
-      lastName: userRegisterDto.lastName,
-    });
+    // const user = await this.userService.create({
+    //   email: userRegisterDto.email,
+    //   displayName: userRegisterDto.displayName,
+    //   firstName: userRegisterDto.firstName,
+    //   lastName: userRegisterDto.lastName,
+    // });
 
-    // Create email/password auth for the user
-    const userAuth = await this.userAuthService.createEmailAuth(
-      user,
-      userRegisterDto.email,
-      userRegisterDto.password,
-    );
+    // // Create email/password auth for the user
+    // const userAuth = await this.userAuthService.createEmailAuth(
+    //   user,
+    //   userRegisterDto.email,
+    //   userRegisterDto.password,
+    // );
 
-    return userAuth.user;
+    // return userAuth.user;
+    return new User();
   }
 
   /**
    * Handle provider login
    */
-  async handleProviderLogin(providerProfile: ProviderProfile): Promise<User> {
-    const userAuth = await this.userAuthService.getUserByEmail(
+  async handleProviderLogin(
+    providerProfile: ProviderProfile,
+  ): Promise<User | null> {
+    const userAuth = await this.userAuthService.findByEmail(
       providerProfile.email,
     );
 
@@ -68,37 +72,38 @@ export class AuthService {
       }
 
       // Update existing user auth
-      const updatedUserAuth = await this.userAuthService.updateUserAuth({
-        ...userAuth,
-        accessToken: providerProfile.accessToken,
-        refreshToken: providerProfile.refreshToken,
-      });
+      // const updatedUserAuth = await this.userAuthService.updateUserAuth({
+      //   ...userAuth,
+      //   accessToken: providerProfile.accessToken,
+      //   refreshToken: providerProfile.refreshToken,
+      // });
 
-      return updatedUserAuth.user;
+      // return updatedUserAuth.user;
     }
+    return null;
 
-    // Create new user and auth
-    try {
-      const user = await this.userService.create({
-        firstName: providerProfile.firstName,
-        lastName: providerProfile.lastName,
-        email: providerProfile.email,
-        displayName: providerProfile.displayName,
-      });
+    // // Create new user and auth
+    // try {
+    //   const user = await this.userService.create({
+    //     firstName: providerProfile.firstName,
+    //     lastName: providerProfile.lastName,
+    //     email: providerProfile.email,
+    //     displayName: providerProfile.displayName,
+    //   });
 
-      const newUserAuth = await this.userAuthService.createProviderAuth(
-        user,
-        providerProfile,
-      );
+    //   const newUserAuth = await this.userAuthService.createProviderAuth(
+    //     user,
+    //     providerProfile,
+    //   );
 
-      return newUserAuth.user;
-    } catch (error) {
-      this.logger.error(
-        `Failed to create user for provider ${providerProfile.provider}`,
-        error,
-      );
-      throw new UnauthorizedException('Failed to create user account');
-    }
+    //   return newUserAuth.user;
+    // } catch (error) {
+    //   this.logger.error(
+    //     `Failed to create user for provider ${providerProfile.provider}`,
+    //     error,
+    //   );
+    //   throw new UnauthorizedException('Failed to create user account');
+    // }
   }
 
   generateToken(email: string): string {

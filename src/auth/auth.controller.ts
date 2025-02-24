@@ -1,14 +1,22 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  UseGuards,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { GoogleOAuthGuard } from './guards/google-oauth.guard';
 import { ProviderProfile } from './entities/provider-profile.entity';
-import { UserRegisterDto } from './dto/register.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { LoginDto } from './dto/login.dto';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
 import { Request } from 'express';
 import { AuthResponse } from './responses/auth.response';
+import { RegisterDto } from './dto/register.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -21,7 +29,7 @@ export class AuthController {
   @Post('register')
   @ResponseMessage('User successfully registered')
   @ApiOperation({ summary: 'Register a new user with email and password' })
-  async register(@Body() userRegisterDto: UserRegisterDto): Promise<void> {
+  async register(@Body() userRegisterDto: RegisterDto): Promise<void> {
     await this.authService.register(userRegisterDto);
   }
 
@@ -54,6 +62,10 @@ export class AuthController {
   async googleCallback(@Req() req: Request): Promise<AuthResponse> {
     const providerProfile = req.user as ProviderProfile;
     const user = await this.authService.handleProviderLogin(providerProfile);
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
 
     return {
       accessToken: this.authService.generateToken(user.email),
