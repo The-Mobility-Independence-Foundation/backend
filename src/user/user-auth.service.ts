@@ -11,8 +11,6 @@ export class UserAuthService {
   constructor(
     @InjectRepository(UserAuth)
     private userAuthRepository: Repository<UserAuth>,
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
   ) {}
 
   async getUserByEmail(email: string) {

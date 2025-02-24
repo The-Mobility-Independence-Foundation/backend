@@ -25,6 +25,19 @@ import { Report } from '../../reports/report.entity';
 import { Audit } from '../../audit/audit.entity';
 import { Attachment } from '../../attachments/attachment.entity';
 import { UserAuth } from './user-auth.entity';
+import {
+  IsNotEmpty,
+  Length,
+  IsEmail,
+  IsEnum,
+  IsBoolean,
+  IsNumber,
+  IsOptional,
+  IsDate,
+  Matches,
+  Min,
+  Max,
+} from 'class-validator';
 
 export enum UserRole {
   USER = 'user',
@@ -37,41 +50,73 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @JoinColumn()
+  @IsOptional()
   @ManyToOne(() => Organization, (org) => org.members)
+  @JoinColumn()
   organization: Organization | null;
 
-  @Column({ type: 'varchar', length: 20 })
+  @IsNotEmpty()
+  @Length(2, 50)
+  @Matches(/^[a-zA-Z\s\-']+$/, {
+    message:
+      'First name can only contain letters, spaces, hyphens and apostrophes',
+  })
+  @Column({ type: 'varchar', length: 50 })
   firstName: string;
 
-  @Column({ type: 'varchar', length: 20 })
+  @IsNotEmpty()
+  @Length(2, 50)
+  @Matches(/^[a-zA-Z\s\-']+$/, {
+    message:
+      'Last name can only contain letters, spaces, hyphens and apostrophes',
+  })
+  @Column({ type: 'varchar', length: 50 })
   lastName: string;
 
-  @Column({ type: 'varchar', length: 30 })
+  @IsNotEmpty()
+  @IsEmail()
+  @Length(5, 255)
+  @Column({ type: 'varchar', length: 255 })
   email: string;
 
-  @Column({ type: 'varchar', length: 20 })
+  @IsNotEmpty()
+  @Length(3, 50)
+  @Matches(/^[a-zA-Z0-9\s\-_]+$/, {
+    message:
+      'Display name can only contain letters, numbers, spaces, hyphens and underscores',
+  })
+  @Column({ type: 'varchar', length: 50 })
   displayName: string;
 
+  @IsEnum(UserRole)
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
   type: UserRole;
 
+  @IsDate()
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   lastActivity: Date;
 
+  @IsBoolean()
   @Column({ default: false })
   inactive: boolean;
 
+  @Length(10, 10)
+  @Matches(/^[0-9]+$/, { message: 'Referral code must be numeric' })
   @Column({ type: 'varchar', default: '0000000000', length: 10 })
   referralCode: string;
 
-  @JoinColumn()
+  @IsOptional()
   @ManyToOne(() => User, (user) => user.referrals, { nullable: true })
+  @JoinColumn()
   referredBy: User | null;
 
+  @IsNumber()
+  @Min(0)
+  @Max(5)
   @Column({ type: 'decimal', default: 0.0 })
   rating: number;
 
+  @IsBoolean()
   @Column({ default: false })
   signupComplete: boolean;
 

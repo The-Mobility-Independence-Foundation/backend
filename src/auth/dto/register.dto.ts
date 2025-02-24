@@ -1,30 +1,51 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { UserValidation } from '../../common/validation/user.validation';
+import {
+  IsFirstName,
+  IsLastName,
+  IsDisplayName,
+  IsEmail,
+  IsPassword,
+} from '../../common/decorators/user.decorators';
 
 export class UserRegisterDto {
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
+  @IsFirstName()
+  @ApiProperty({
+    example: 'John',
+    minLength: UserValidation.firstName.min,
+    maxLength: UserValidation.firstName.max,
+  })
   firstName: string;
 
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
+  @IsLastName()
+  @ApiProperty({
+    example: 'Doe',
+    minLength: UserValidation.lastName.min,
+    maxLength: UserValidation.lastName.max,
+  })
   lastName: string;
 
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
+  @IsDisplayName()
+  @ApiProperty({
+    example: 'john_doe',
+    minLength: UserValidation.displayName.min,
+    maxLength: UserValidation.displayName.max,
+  })
   displayName: string;
 
   @IsEmail()
-  @IsNotEmpty()
-  @ApiProperty()
+  @ApiProperty({
+    example: 'john.doe@example.com',
+    minLength: UserValidation.email.min,
+    maxLength: UserValidation.email.max,
+  })
   email: string;
 
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(12)
-  @ApiProperty()
+  @IsPassword()
+  @ApiProperty({
+    example: 'StrongP@ssw0rd',
+    minLength: UserValidation.password.min,
+    maxLength: UserValidation.password.max,
+  })
   password: string;
 }
