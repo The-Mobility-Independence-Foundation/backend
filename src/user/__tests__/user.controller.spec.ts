@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserService } from './user.service';
+import { UserController } from '../user.controller';
+import { UserService } from '../user.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
-import { Organization } from '../organization/organization.entity';
+import { User } from '../entities/user.entity';
+import { Organization } from '../../organization/organization.entity';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -11,11 +12,12 @@ export const mockRepository = jest.fn(() => ({
   },
 }));
 
-describe('UserService', () => {
-  let service: UserService;
+describe('UserController', () => {
+  let controller: UserController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      controllers: [UserController],
       providers: [
         UserService,
         {
@@ -29,10 +31,10 @@ describe('UserService', () => {
       ],
     }).compile();
 
-    service = module.get<UserService>(UserService);
+    controller = module.get<UserController>(UserController);
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(controller).toBeDefined();
   });
 });

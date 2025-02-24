@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 import { BaseApiResponse } from '../responses/base-api.response';
+import { ValidationException } from '../exceptions/validation.exception';
 
 @Catch()
 export class ApiExceptionFilter implements ExceptionFilter {
@@ -21,15 +22,32 @@ export class ApiExceptionFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const message =
-      exception instanceof HttpException
-        ? exception.message
-        : 'Internal server error';
+    let message = 'Internal server error';
+    let data = null;
 
-    const responseBody: BaseApiResponse<null> = {
+    if (exception instanceof HttpException) {
+      const response = exception.getResponse() as any;
+
+      // Handle validation exceptions
+      if (exception instanceof ValidationException) {
+        message = 'Validation failed';
+        data = {
+          code: response.code,
+          errors: response.errors,
+        };
+      } else {
+        message = response.message || exception.message;
+        // Include any additional error data
+        if (response.errors) {
+          data = { errors: response.errors };
+        }
+      }
+    }
+
+    const responseBody: BaseApiResponse = {
       success: false,
-      message: message,
-      data: null,
+      message,
+      data,
     };
 
     httpAdapter.reply(ctx.getResponse(), responseBody, status);
