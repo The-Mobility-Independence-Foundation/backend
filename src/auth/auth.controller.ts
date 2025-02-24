@@ -1,60 +1,38 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Get,
-  Logger,
-  Post,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { GoogleOAuthGuard } from './guards/google-oauth.guard';
 import { ProviderProfile } from './entities/provider-profile.entity';
 import { UserRegisterDto } from './dto/register.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { LoginDto } from './dto/login.dto';
+import { ResponseMessage } from '../common/decorators/response-message.decorator';
+import { Request } from 'express';
+import { AuthResponse } from './responses/auth.response';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  private readonly logger = new Logger(AuthController.name);
-
   constructor(private readonly authService: AuthService) {}
-
-  @Get('test')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  test() {
-    return 'nice';
-  }
-
-  @Post('logout')
-  logout() {
-    // TODO: Implement logout
-    // return this.authService.logout();
-  }
 
   /**
    * Register a new user
    */
   @Post('register')
-  register(@Body() userRegisterDto: UserRegisterDto) {
-    return this.authService.register(userRegisterDto);
+  @ResponseMessage('User successfully registered')
+  @ApiOperation({ summary: 'Register a new user with email and password' })
+  async register(@Body() userRegisterDto: UserRegisterDto): Promise<void> {
+    await this.authService.register(userRegisterDto);
   }
 
   /**
    * Login a user
    */
-  @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Body() loginDto: LoginDto) {
-    if (!loginDto.email || !loginDto.password) {
-      throw new BadRequestException('No email or password provided');
-    }
-
+  @UseGuards(LocalAuthGuard)
+  @ResponseMessage('Successfully logged in')
+  @ApiOperation({ summary: 'Login with email and password' })
+  async login(@Body() loginDto: LoginDto): Promise<AuthResponse> {
     return { accessToken: this.authService.generateToken(loginDto.email) };
   }
 
@@ -63,18 +41,17 @@ export class AuthController {
    */
   @Get('google')
   @UseGuards(GoogleOAuthGuard)
-  googleLogin() {}
+  @ApiOperation({ summary: 'Initiate Google OAuth2 login flow' })
+  googleLogin(): void {}
 
   /**
    * Google OAuth 2.0 callback
    */
   @Get('google/callback')
   @UseGuards(GoogleOAuthGuard)
-  async googleCallback(@Req() req: any) {
-    if (!req.user) {
-      return 'No user from google';
-    }
-
+  @ResponseMessage('Successfully logged in with Google')
+  @ApiOperation({ summary: 'Handle Google OAuth2 callback' })
+  async googleCallback(@Req() req: Request): Promise<AuthResponse> {
     const providerProfile = req.user as ProviderProfile;
     const user = await this.authService.handleProviderLogin(providerProfile);
 

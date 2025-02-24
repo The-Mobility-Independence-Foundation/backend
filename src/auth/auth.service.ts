@@ -18,14 +18,15 @@ export class AuthService {
   /**
    * Register a new user
    */
-  async register(userRegisterDto: UserRegisterDto) {
+  async register(userRegisterDto: UserRegisterDto): Promise<User> {
     const existingAuth = await this.userAuthService.getUserByEmail(
       userRegisterDto.email,
     );
 
+    // If user already exists, throw an unauthorized exception
     if (existingAuth) {
       throw new UnauthorizedException(
-        'An account already exists with this email.',
+        'An account already exists with this email',
       );
     }
 
@@ -38,13 +39,13 @@ export class AuthService {
     });
 
     // Create email/password auth for the user
-    await this.userAuthService.createEmailAuth(
+    const userAuth = await this.userAuthService.createEmailAuth(
       user,
       userRegisterDto.email,
       userRegisterDto.password,
     );
 
-    return user;
+    return userAuth.user;
   }
 
   /**
@@ -62,7 +63,7 @@ export class AuthService {
           `User ${providerProfile.email} attempted to login with different provider`,
         );
         throw new UnauthorizedException(
-          'An account already exists with this email using a different login method.',
+          'An account already exists with this email using a different login method',
         );
       }
 
@@ -96,7 +97,7 @@ export class AuthService {
         `Failed to create user for provider ${providerProfile.provider}`,
         error,
       );
-      throw new UnauthorizedException('Failed to create user account.');
+      throw new UnauthorizedException('Failed to create user account');
     }
   }
 
