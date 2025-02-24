@@ -1,0 +1,23 @@
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
+import { ValidationException } from '../exceptions/validation.exception';
+
+/**
+ * Validate a DTO by transforming it to an instance of the DTO class.
+ * @param dto - The DTO to validate
+ * @param DtoClass - The class of the DTO
+ * @returns The validated DTO
+ */
+export async function validateDto<T extends object>(
+  dto: any,
+  DtoClass: new () => T,
+): Promise<T> {
+  const transformed = plainToInstance(DtoClass, dto);
+  const errors = await validate(transformed);
+
+  if (errors.length > 0) {
+    throw new ValidationException(errors);
+  }
+
+  return transformed as T;
+}

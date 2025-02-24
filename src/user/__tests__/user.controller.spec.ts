@@ -4,7 +4,7 @@ import { UserService } from '../user.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
 import { Organization } from '../../organization/organization.entity';
-
+import { createMock } from '@golevelup/ts-jest';
 export const mockRepository = jest.fn(() => ({
   metadata: {
     columns: [],
@@ -29,7 +29,9 @@ describe('UserController', () => {
           useClass: mockRepository,
         },
       ],
-    }).compile();
+    })
+      .useMocker(createMock)
+      .compile();
 
     controller = module.get<UserController>(UserController);
   });

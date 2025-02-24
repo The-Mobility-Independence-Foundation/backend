@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from '../auth.controller';
 import { AuthService } from '../auth.service';
 import { createMock } from '@golevelup/ts-jest';
-import { UserRegisterDto } from '../dto/register.dto';
+import { RegisterDto } from '../dto/register.dto';
 import { when } from 'jest-when';
 import { User } from '../../user/entities/user.entity';
 import { LoginDto } from '../dto/login.dto';
@@ -26,7 +26,7 @@ describe('AuthController', () => {
 
   describe('register', () => {
     it('should successfully register a user', async () => {
-      const userRegisterDto: UserRegisterDto = {
+      const userRegisterDto: RegisterDto = {
         firstName: 'John',
         lastName: 'Doe',
         displayName: 'John Doe',
