@@ -1,0 +1,12 @@
+import { ApiProperty } from '@nestjs/swagger';
+
+export class BaseApiResponse<T = any> {
+  @ApiProperty({ example: true })
+  success: boolean;
+
+  @ApiProperty({ example: 'Operation successful', nullable: true })
+  message: string | null;
+
+  @ApiProperty({ nullable: true })
+  data: T | null;
+}
