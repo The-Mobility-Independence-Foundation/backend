@@ -10,7 +10,6 @@ import {
   Post,
   Delete,
 } from '@nestjs/common';
-import { getUsersDto } from './dto/get-users.dto';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -23,6 +22,8 @@ import {
 } from '@nestjs/swagger';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
+import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
+import { GetUsersDto } from './dto/get-users.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -82,9 +83,12 @@ export class UserController {
     Returns all users matching the given search criteria.
   */
   @Get()
-  findAll(@Query() query: getUsersDto): Promise<User[]> {
-    console.log(query);
-    return this.userService.findAll();
+  findAll(@Query() query: GetUsersDto): Promise<User[]> {
+    if (Object.keys(query).length == 0) {
+      return this.userService.findAll();
+    } else {
+      return this.userService.findAllFiltered(query);
+    }
   }
 
   /*
