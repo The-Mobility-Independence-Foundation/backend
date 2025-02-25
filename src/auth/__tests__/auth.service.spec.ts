@@ -56,14 +56,14 @@ describe('AuthService', () => {
 
       const existingAuth = new UserAuth();
 
-      when(authService.findByEmail)
+      when(authService.findByIdentifier)
         .calledWith(userRegisterDto.email)
         .mockResolvedValue(existingAuth);
 
       await expect(service.register(userRegisterDto)).rejects.toThrow(
         UnauthorizedException,
       );
-      expect(authService.findByEmail).toHaveBeenCalledWith(
+      expect(authService.findByIdentifier).toHaveBeenCalledWith(
         userRegisterDto.email,
       );
     });

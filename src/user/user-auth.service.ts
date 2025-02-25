@@ -15,17 +15,17 @@ export class UserAuthService {
   ) {}
 
   /**
-   * Find a user auth by email
-   * @param email - The email address of the user
+   * Find a user auth by identifier
+   * @param identifier - The identifier of the user auth
    * @param where - The where options
    * @returns The user auth record or null if not found
    */
-  async findByEmail(
-    email: string,
+  async findByIdentifier(
+    identifier: string,
     where: Exclude<FindOneOptions<UserAuth>['where'], 'identifier'> = {},
   ): Promise<UserAuth | null> {
     return this.userAuthRepository.findOne({
-      where: { identifier: email.toLowerCase(), ...where },
+      where: { identifier: identifier.toLowerCase(), ...where },
       relations: ['user'],
     });
   }
@@ -72,17 +72,22 @@ export class UserAuthService {
 
   /**
    * Validate the credentials of a local auth record
-   * @param email - The email address of the user
-   * @param password - The password of the user
+   * @param identifier - The identifier of the user
+   * @param credentials - The credentials of the user
    * @returns The user record or null if the credentials are invalid
    */
-  async validateCredentials(email: string, password: string): Promise<User> {
-    const userAuth = await this.findByEmail(email, { type: AuthType.LOCAL });
+  async validateCredentials(
+    identifier: string,
+    credentials: string,
+  ): Promise<User> {
+    const userAuth = await this.findByIdentifier(identifier, {
+      type: AuthType.LOCAL,
+    });
     if (!userAuth || !userAuth.credentials) {
       throw new BadRequestException('Credentials not found');
     }
 
-    const isValid = await bcrypt.compare(password, userAuth.credentials);
+    const isValid = await bcrypt.compare(credentials, userAuth.credentials);
     if (!isValid) {
       throw new BadRequestException('Invalid credentials');
     }
