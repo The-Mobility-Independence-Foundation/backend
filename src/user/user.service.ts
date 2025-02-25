@@ -11,6 +11,7 @@ import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { ConnectionsService } from '../connections/connections.service';
 import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
 import { GetUsersDto } from './dto/get-users.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -124,6 +125,16 @@ export class UserService {
   async findAllFiltered(query: GetUsersDto) {
     const findOptions: any = {};
     const findWhere: any = {};
+    const findOrder: any = {
+      id: 'ASC',
+    };
+    const findSelect: any = {
+      id: true,
+      firstName: true,
+      lastName: true,
+      displayName: true,
+      type: true,
+    };
 
     if (query.nextToken) {
       findOptions.skip = query.nextToken - 1;
@@ -150,8 +161,8 @@ export class UserService {
     }
 
     findOptions.where = findWhere;
-
-    console.log(findOptions);
+    findOptions.order = findOrder;
+    findOptions.select = findSelect;
 
     return this.userRepository.find(findOptions);
   }
@@ -160,7 +171,30 @@ export class UserService {
     return this.userRepository.findOneBy({ id: id });
   }
 
-  async update(id: number) {
-    return this.userRepository.findOneBy({ id: id });
+  async update(id: number, dto: UpdateUserDto) {
+    const user = await this.userRepository.findOneBy({ id: id });
+
+    if (!user) {
+      // throw error for invalid user here
+      return user;
+    }
+
+    if (dto.firstName) {
+      user.firstName = dto.firstName;
+    }
+    if (dto.lastName) {
+      user.lastName = dto.lastName;
+    }
+    if (dto.displayName) {
+      user.displayName = dto.displayName;
+    }
+    if (dto.accountType) {
+      user.type = dto.accountType;
+    }
+    if (dto.signupComplete) {
+      user.signupComplete = dto.signupComplete;
+    }
+
+    return this.userRepository.save(user);
   }
 }
