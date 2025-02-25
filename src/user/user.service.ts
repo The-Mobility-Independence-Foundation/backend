@@ -1,13 +1,12 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { User } from './entities/user.entity';
-import { Repository, FindOneOptions } from 'typeorm';
+import { User, UserRole } from './entities/user.entity';
+import { Repository, FindOptionsWhere, FindOptionsRelations } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { validate } from 'class-validator';
-import { ValidationException } from '../common/exceptions/validation.exception';
 import { UserAuth } from './entities/user-auth.entity';
 import { RegisterDto } from '../auth/dto/register.dto';
 import { ProviderProfile } from '../auth/entities/provider-profile.entity';
 import { UserAuthService } from './user-auth.service';
+import { validateDto } from '../common/utils/validate-dto';
 
 @Injectable()
 export class UserService {
@@ -20,44 +19,53 @@ export class UserService {
   /**
    * Find a user by email
    * @param email - The email address of the user
-   * @param where - The where options
+   * @param options - Optional query options
    * @returns The user record or null if not found
    */
   async findByEmail(
     email: string,
-    where: Exclude<FindOneOptions<User>['where'], 'email'> = {},
-  ) {
+    options: Partial<{
+      where: FindOptionsWhere<Omit<User, 'email'>>;
+      relations: FindOptionsRelations<User>;
+    }> = {},
+  ): Promise<User | null> {
+    const { where = {}, relations } = options;
+
     return this.userRepository.findOne({
-      where: { email: email.toLowerCase(), ...where },
+      where: {
+        ...where,
+        email: email.toLowerCase(),
+      },
+      relations,
     });
   }
 
   /**
    * Create a new user
-   * @param registerDto - The register dto
-   * @param providerProfile - The provider profile
+   * @param data - The data to create the user with
    * @returns The user record
    */
   async create(data: RegisterDto | ProviderProfile): Promise<User> {
-    // Check if the user already exists
     const existingUser = await this.findByEmail(data.email);
     const existingUserAuth = await this.userAuthService.findByIdentifier(
       data.email,
     );
+
     if (existingUser || existingUserAuth) {
       throw new BadRequestException(
         'A user with this email address already exists',
       );
     }
 
-    // Initialize the user
-    const user = new User();
+    let user = new User();
     user.email = data.email;
     user.firstName = data.firstName;
     user.lastName = data.lastName;
     user.displayName = data.displayName;
+    user.type = UserRole.GUEST;
+    user.inactive = false;
+    user.rating = 0;
 
-    // Initialize the user auth
     let userAuth: UserAuth;
     if (data instanceof RegisterDto) {
       userAuth = await this.userAuthService.initializeLocalAuth(
@@ -68,23 +76,9 @@ export class UserService {
       userAuth = await this.userAuthService.initializeProviderAuth(data);
     }
 
-    // Establish the relationship
     user.auth = userAuth;
-    userAuth.user = user;
+    user = await validateDto(user, User);
 
-    // Validate the user auth
-    const userAuthErrors = await validate(userAuth);
-    if (userAuthErrors.length > 0) {
-      throw new ValidationException(userAuthErrors);
-    }
-
-    // Validate the user
-    const userErrors = await validate(user);
-    if (userErrors.length > 0) {
-      throw new ValidationException(userErrors);
-    }
-
-    // Save the user
     return this.userRepository.save(user);
   }
 }

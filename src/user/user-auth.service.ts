@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOneOptions, Repository } from 'typeorm';
+import { Repository, FindOptionsWhere } from 'typeorm';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { ProviderProfile } from '../auth/entities/provider-profile.entity';
@@ -15,18 +15,25 @@ export class UserAuthService {
   ) {}
 
   /**
-   * Find a user auth by identifier
-   * @param identifier - The identifier of the user auth
-   * @param where - The where options
+   * Find a user auth by identifier (email)
+   * @param identifier - The identifier (email) to search for
+   * @param options - Optional query options
    * @returns The user auth record or null if not found
    */
   async findByIdentifier(
     identifier: string,
-    where: Exclude<FindOneOptions<UserAuth>['where'], 'identifier'> = {},
+    options: Partial<{
+      where: FindOptionsWhere<Omit<UserAuth, 'identifier'>>;
+    }> = {},
   ): Promise<UserAuth | null> {
+    const { where = {} } = options;
+
     return this.userAuthRepository.findOne({
-      where: { identifier: identifier.toLowerCase(), ...where },
-      relations: ['user'],
+      where: {
+        ...where,
+        identifier: identifier.toLowerCase(),
+      },
+      relations: { user: true },
     });
   }
 
@@ -81,7 +88,7 @@ export class UserAuthService {
     credentials: string,
   ): Promise<User> {
     const userAuth = await this.findByIdentifier(identifier, {
-      type: AuthType.LOCAL,
+      where: { type: AuthType.LOCAL },
     });
     if (!userAuth || !userAuth.credentials) {
       throw new BadRequestException('Credentials not found');

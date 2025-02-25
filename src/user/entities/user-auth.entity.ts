@@ -2,10 +2,10 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
   Index,
+  OneToOne,
 } from 'typeorm';
 import { IsEmail, IsPassword } from '../../common/decorators/user.decorators';
 import { UserValidation } from '../../common/validation/user.validation';
@@ -23,7 +23,7 @@ export class UserAuth {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.auth, { nullable: false })
+  @OneToOne(() => User, (user) => user.auth)
   user: User;
 
   @IsEnum(AuthType)

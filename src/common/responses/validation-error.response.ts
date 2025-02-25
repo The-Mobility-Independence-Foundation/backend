@@ -7,7 +7,7 @@ export class ValidationErrorDetail {
   @ApiProperty({ example: ['isNotEmpty'] })
   constraints: string[];
 
-  @ApiProperty({ example: '' })
+  @ApiProperty({ example: 'John' })
   value: any;
 }
 

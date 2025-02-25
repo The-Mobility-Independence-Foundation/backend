@@ -40,7 +40,7 @@ describe('UserAuthService', () => {
       when(userAuthRepository.findOne)
         .calledWith({
           where: { identifier: userAuth.identifier },
-          relations: ['user'],
+          relations: { user: true },
         })
         .mockResolvedValue(userAuth);
 
@@ -58,13 +58,32 @@ describe('UserAuthService', () => {
       when(userAuthRepository.findOne)
         .calledWith({
           where: { identifier: userAuth.identifier, type: userAuth.type },
-          relations: ['user'],
+          relations: { user: true },
         })
         .mockResolvedValue(userAuth);
 
       const result = await service.findByIdentifier(userAuth.identifier, {
-        type: userAuth.type,
+        where: { type: userAuth.type },
       });
+
+      expect(result).toBeDefined();
+      expect(result).toBe(userAuth);
+    });
+
+    it('should find a user auth by email regardless of the case of the email', async () => {
+      const userAuth = new UserAuth();
+      userAuth.identifier = 'test@test.com';
+
+      when(userAuthRepository.findOne)
+        .calledWith({
+          where: { identifier: userAuth.identifier },
+          relations: { user: true },
+        })
+        .mockResolvedValue(userAuth);
+
+      const result = await service.findByIdentifier(
+        userAuth.identifier.toUpperCase(),
+      );
 
       expect(result).toBeDefined();
       expect(result).toBe(userAuth);
@@ -76,32 +95,13 @@ describe('UserAuthService', () => {
       when(userAuthRepository.findOne)
         .calledWith({
           where: { identifier },
-          relations: ['user'],
+          relations: { user: true },
         })
         .mockResolvedValue(null);
 
       const result = await service.findByIdentifier(identifier);
 
       expect(result).toBeNull();
-    });
-
-    it('should return a user auth, regardless of the case of the email', async () => {
-      const userAuth = new UserAuth();
-      userAuth.identifier = 'test@test.com';
-
-      when(userAuthRepository.findOne)
-        .calledWith({
-          where: { identifier: userAuth.identifier },
-          relations: ['user'],
-        })
-        .mockResolvedValue(userAuth);
-
-      const result = await service.findByIdentifier(
-        userAuth.identifier.toUpperCase(),
-      );
-
-      expect(result).toBeDefined();
-      expect(result).toBe(userAuth);
     });
   });
 
@@ -192,7 +192,7 @@ describe('UserAuthService', () => {
       when(userAuthRepository.findOne)
         .calledWith({
           where: { identifier: userAuth.identifier, type: userAuth.type },
-          relations: ['user'],
+          relations: { user: true },
         })
         .mockResolvedValue(userAuth);
 
@@ -212,7 +212,7 @@ describe('UserAuthService', () => {
       when(userAuthRepository.findOne)
         .calledWith({
           where: { identifier, type: AuthType.LOCAL },
-          relations: ['user'],
+          relations: { user: true },
         })
         .mockResolvedValue(null);
 
@@ -232,7 +232,7 @@ describe('UserAuthService', () => {
       when(userAuthRepository.findOne)
         .calledWith({
           where: { identifier: userAuth.identifier, type: userAuth.type },
-          relations: ['user'],
+          relations: { user: true },
         })
         .mockResolvedValue(userAuth);
 
