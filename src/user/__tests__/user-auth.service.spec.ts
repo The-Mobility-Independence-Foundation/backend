@@ -7,6 +7,10 @@ import { createMock } from '@golevelup/ts-jest';
 import { when } from 'jest-when';
 import { ValidationException } from '../../common/exceptions/validation.exception';
 import { ProviderProfile } from 'src/auth/entities/provider-profile.entity';
+import * as bcrypt from 'bcrypt';
+import { User } from '../entities/user.entity';
+import { BadRequestException } from '@nestjs/common';
+
 describe('UserAuthService', () => {
   let service: UserAuthService;
   let userAuthRepository: Repository<UserAuth>;
@@ -28,7 +32,7 @@ describe('UserAuthService', () => {
     userAuthRepository = module.get(getRepositoryToken(UserAuth));
   });
 
-  describe('findByEmail', () => {
+  describe('findByIdentifier', () => {
     it('should find a user auth by email', async () => {
       const userAuth = new UserAuth();
       userAuth.identifier = 'test@test.com';
@@ -40,7 +44,7 @@ describe('UserAuthService', () => {
         })
         .mockResolvedValue(userAuth);
 
-      const result = await service.findByEmail(userAuth.identifier);
+      const result = await service.findByIdentifier(userAuth.identifier);
 
       expect(result).toBeDefined();
       expect(result).toBe(userAuth);
@@ -53,13 +57,13 @@ describe('UserAuthService', () => {
 
       when(userAuthRepository.findOne)
         .calledWith({
-          where: { identifier: 'test@test.com', type: AuthType.LOCAL },
+          where: { identifier: userAuth.identifier, type: userAuth.type },
           relations: ['user'],
         })
         .mockResolvedValue(userAuth);
 
-      const result = await service.findByEmail('test@test.com', {
-        type: AuthType.LOCAL,
+      const result = await service.findByIdentifier(userAuth.identifier, {
+        type: userAuth.type,
       });
 
       expect(result).toBeDefined();
@@ -67,16 +71,37 @@ describe('UserAuthService', () => {
     });
 
     it('should return null if the user auth is not found', async () => {
+      const identifier = 'test@test.com';
+
       when(userAuthRepository.findOne)
         .calledWith({
-          where: { identifier: 'test@test.com' },
+          where: { identifier },
           relations: ['user'],
         })
         .mockResolvedValue(null);
 
-      const result = await service.findByEmail('test@test.com');
+      const result = await service.findByIdentifier(identifier);
 
       expect(result).toBeNull();
+    });
+
+    it('should return a user auth, regardless of the case of the email', async () => {
+      const userAuth = new UserAuth();
+      userAuth.identifier = 'test@test.com';
+
+      when(userAuthRepository.findOne)
+        .calledWith({
+          where: { identifier: userAuth.identifier },
+          relations: ['user'],
+        })
+        .mockResolvedValue(userAuth);
+
+      const result = await service.findByIdentifier(
+        userAuth.identifier.toUpperCase(),
+      );
+
+      expect(result).toBeDefined();
+      expect(result).toBe(userAuth);
     });
   });
 
@@ -92,11 +117,20 @@ describe('UserAuthService', () => {
       expect(userAuth.type).toBe(AuthType.LOCAL);
       expect(userAuth.credentials).toBeDefined();
       expect(userAuth.credentials).not.toBe('Password123!');
+      expect(userAuth.providerAccountId).not.toBeDefined();
+      expect(userAuth.refreshToken).not.toBeDefined();
+      expect(userAuth.accessToken).not.toBeDefined();
     });
 
     it('should throw a validation exception if the email is invalid', async () => {
       await expect(
-        service.initializeLocalAuth('invalid-email', 'password'),
+        service.initializeLocalAuth('invalid-email', 'Password123!'),
+      ).rejects.toThrow(ValidationException);
+    });
+
+    it('should throw a validation exception if the password is invalid', async () => {
+      await expect(
+        service.initializeLocalAuth('test@test.com', 'invalid-password'),
       ).rejects.toThrow(ValidationException);
     });
   });
@@ -105,7 +139,7 @@ describe('UserAuthService', () => {
     it('should initialize a provider auth record', async () => {
       const providerProfile: ProviderProfile = {
         id: '123',
-        email: 'test@test.com',
+        email: 'TEST@TEST.COM',
         provider: AuthType.GOOGLE,
         accessToken: 'accessToken',
         refreshToken: 'refreshToken',
@@ -121,7 +155,9 @@ describe('UserAuthService', () => {
       expect(userAuth.identifier).toBe('test@test.com');
       expect(userAuth.type).toBe(AuthType.GOOGLE);
       expect(userAuth.providerAccountId).toBe('123');
+      expect(userAuth.refreshToken).toBe('refreshToken');
       expect(userAuth.accessToken).toBe('accessToken');
+      expect(userAuth.credentials).not.toBeDefined();
     });
 
     it('should throw a validation exception if the email is invalid ', async () => {
@@ -143,14 +179,87 @@ describe('UserAuthService', () => {
     });
   });
 
-  //   describe('validateCredentials', () => {
-  //     it('should validate the credentials of a local auth record', async () => {
-  //       const userAuth = await service.initializeLocalAuth('test@test.com', 'Password123!');
+  describe('validateCredentials', () => {
+    it('should validate the credentials of a local auth record', async () => {
+      const credentials = 'Password123!';
 
-  //       const result = await service.validateCredentials('test@test.com', 'Password123!');
+      const userAuth = new UserAuth();
+      userAuth.identifier = 'test@test.com';
+      userAuth.credentials = await bcrypt.hash(credentials, 10);
+      userAuth.type = AuthType.LOCAL;
+      userAuth.user = new User();
 
-  //       expect(result).toBeDefined();
-  //       expect(result).toBe(userAuth);
-  //     });
-  //   });
+      when(userAuthRepository.findOne)
+        .calledWith({
+          where: { identifier: userAuth.identifier, type: userAuth.type },
+          relations: ['user'],
+        })
+        .mockResolvedValue(userAuth);
+
+      const result = await service.validateCredentials(
+        userAuth.identifier,
+        credentials,
+      );
+
+      expect(result).toBeDefined();
+      expect(result).toBe(userAuth.user);
+    });
+
+    it('should throw a bad request exception if the user auth is not found', async () => {
+      const identifier = 'test@test.com';
+      const credentials = 'Password123!';
+
+      when(userAuthRepository.findOne)
+        .calledWith({
+          where: { identifier, type: AuthType.LOCAL },
+          relations: ['user'],
+        })
+        .mockResolvedValue(null);
+
+      await expect(
+        service.validateCredentials(identifier, credentials),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw a bad request exception if the credentials are not set', async () => {
+      const credentials = 'Password123!';
+
+      const userAuth = new UserAuth();
+      userAuth.identifier = 'test@test.com';
+      userAuth.type = AuthType.LOCAL;
+      userAuth.user = new User();
+
+      when(userAuthRepository.findOne)
+        .calledWith({
+          where: { identifier: userAuth.identifier, type: userAuth.type },
+          relations: ['user'],
+        })
+        .mockResolvedValue(userAuth);
+
+      await expect(
+        service.validateCredentials(userAuth.identifier, credentials),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw a bad request exception if the credentials are invalid', async () => {
+      const credentials = 'Password123!';
+
+      const userAuth = new UserAuth();
+      userAuth.identifier = 'test@test.com';
+      userAuth.credentials = await bcrypt.hash(credentials, 10);
+      userAuth.type = AuthType.LOCAL;
+      userAuth.user = new User();
+
+      when(userAuthRepository.findOne)
+        .calledWith({
+          where: { identifier: userAuth.identifier, type: userAuth.type },
+          relations: ['user'],
+        })
+        .mockResolvedValue(userAuth);
+
+      await expect(
+        service.validateCredentials(userAuth.identifier, 'invalid-password'),
+      ).rejects.toThrow(BadRequestException);
+    });
+  });
 });

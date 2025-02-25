@@ -18,7 +18,7 @@ export class UserService {
   ) {}
 
   /**
-   * Find a user by their email address
+   * Find a user by email
    * @param email - The email address of the user
    * @param where - The where options
    * @returns The user record or null if not found
@@ -41,7 +41,9 @@ export class UserService {
   async create(data: RegisterDto | ProviderProfile): Promise<User> {
     // Check if the user already exists
     const existingUser = await this.findByEmail(data.email);
-    const existingUserAuth = await this.userAuthService.findByEmail(data.email);
+    const existingUserAuth = await this.userAuthService.findByIdentifier(
+      data.email,
+    );
     if (existingUser || existingUserAuth) {
       throw new BadRequestException(
         'A user with this email address already exists',

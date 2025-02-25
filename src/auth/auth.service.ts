@@ -20,7 +20,7 @@ export class AuthService {
    * Register a new user
    */
   async register(userRegisterDto: RegisterDto): Promise<User> {
-    const existingAuth = await this.userAuthService.findByEmail(
+    const existingAuth = await this.userAuthService.findByIdentifier(
       userRegisterDto.email,
     );
 
@@ -56,7 +56,7 @@ export class AuthService {
   async handleProviderLogin(
     providerProfile: ProviderProfile,
   ): Promise<User | null> {
-    const userAuth = await this.userAuthService.findByEmail(
+    const userAuth = await this.userAuthService.findByIdentifier(
       providerProfile.email,
     );
 

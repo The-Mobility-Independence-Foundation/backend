@@ -21,8 +21,7 @@ export class TransformInterceptor<T>
     next: CallHandler,
   ): Observable<BaseApiResponse<T>> {
     const message =
-      this.reflector.get<string>(RESPONSE_MESSAGE, context.getHandler()) ??
-      null;
+      this.reflector.get(RESPONSE_MESSAGE, context.getHandler()) ?? null;
 
     return next.handle().pipe(
       map((data) => ({
