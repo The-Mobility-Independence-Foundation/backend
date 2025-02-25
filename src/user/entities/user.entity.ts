@@ -43,6 +43,7 @@ import { UserValidation } from '../../common/validation/user.validation';
 import { UserAuth } from './user-auth.entity';
 
 export enum UserRole {
+  GUEST = 'guest',
   USER = 'user',
   ADMIN = 'admin',
   MODERATOR = 'moderator',
@@ -83,104 +84,100 @@ export class User {
 
   @IsBoolean()
   @Column({ default: false })
-  inactive: boolean = false;
+  inactive: boolean;
 
-  @Column({ type: 'varchar', default: '0000000000', length: 10 })
-  referralCode: string = '0000000000';
+  @Column({ type: 'varchar', length: 10, nullable: true })
+  referralCode?: string | null;
 
   @IsOptional()
   @ManyToOne(() => User, (user) => user.referrals, { nullable: true })
   @JoinColumn()
-  referredBy: User | null = null;
+  referredBy?: User | null;
 
   @IsNumber()
   @Min(0)
   @Max(5)
   @Column({ type: 'decimal', default: 0.0 })
-  rating: number = 0.0;
-
-  @IsBoolean()
-  @Column({ default: false })
-  signupComplete: boolean = false;
+  rating: number;
 
   @OneToMany(() => User, (user) => user.referredBy)
-  referrals: User[] = [];
+  referrals: User[];
 
   @OneToMany(() => Order, (order) => order.recipient)
-  orders: Order[] = [];
+  orders: Order[];
 
   @OneToMany(() => Order, (order) => order.provider)
-  ordersManaged: Order[] = [];
+  ordersManaged: Order[];
 
   @OneToMany(() => Invite, (invite) => invite.inviter)
-  sentInvites: Invite[] = [];
+  sentInvites: Invite[];
 
   @OneToMany(() => Review, (review) => review.reviewer)
-  sentReviews: Review[] = [];
+  sentReviews: Review[];
 
   @OneToMany(() => Review, (review) => review.reviewedUser)
-  receivedReviews: Review[] = [];
+  receivedReviews: Review[];
 
   @OneToMany(() => Request, (request) => request.approver)
-  approvedRequests: Request[] = [];
+  approvedRequests: Request[];
 
   @OneToMany(() => Message, (message) => message.author)
-  sentMessages: Message[] = [];
+  sentMessages: Message[];
 
   @JoinTable({ name: 'bookmarks' })
   @ManyToMany(() => Listing, (listing) => listing.bookmarks)
-  bookmarks: Listing[] = [];
+  bookmarks: Listing[];
 
   @JoinTable({ name: 'connections' })
   @ManyToMany(() => User, (user) => user.connectionsRecieved)
-  connectionsSent: User[] = [];
+  connectionsSent: User[];
 
   @ManyToMany(() => User, (user) => user.connectionsSent)
-  connectionsRecieved: User[] = [];
+  connectionsRecieved: User[];
 
   @OneToMany(
     () => Conversation,
     (conversation) => conversation.participant1 && conversation.participant2,
   )
-  conversations: Conversation[] = [];
+  conversations: Conversation[];
 
   @OneToMany(() => Post, (post) => post.user)
-  posts: Post[] = [];
+  posts: Post[];
 
   @OneToMany(() => Comment, (comment) => comment.author)
-  comments: Comment[] = [];
+  comments: Comment[];
 
   @OneToMany(() => Comment, (comment) => comment.editedBy)
-  editedComments: Comment[] = [];
+  editedComments: Comment[];
 
   @OneToMany(
     () => PostSubscription,
     (postSubscription) => postSubscription.subscriber,
   )
-  subscriptions: PostSubscription[] = [];
+  subscriptions: PostSubscription[];
 
   @OneToMany(() => PostRead, (postRead) => postRead.user)
-  postsRead: PostRead[] = [];
+  postsRead: PostRead[];
 
   @OneToMany(() => Report, (report) => report.reporter)
-  reportsSent: Report[] = [];
+  reportsSent: Report[];
 
   @OneToMany(() => Report, (report) => report.offender)
-  reportsRecieved: Report[] = [];
+  reportsRecieved: Report[];
 
   @OneToMany(() => Report, (report) => report.moderator)
-  reportsHandled: Report[] = [];
+  reportsHandled: Report[];
 
   @OneToMany(() => Audit, (audit) => audit.user)
-  audits: Audit[] = [];
+  audits: Audit[];
 
   @OneToMany(() => Attachment, (attachment) => attachment.author)
-  attachmentsCreated: Attachment[] = [];
+  attachmentsCreated: Attachment[];
 
-  @JoinColumn()
   @OneToOne(() => UserAuth, (auth) => auth.user, {
-    nullable: false,
     cascade: true,
+    nullable: false,
   })
+  @JoinColumn()
   auth: UserAuth;
 }

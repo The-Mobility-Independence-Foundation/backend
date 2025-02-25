@@ -3,7 +3,7 @@ import { validate } from 'class-validator';
 import { ValidationException } from '../exceptions/validation.exception';
 
 /**
- * Validate a DTO by transforming it to an instance of the DTO class.
+ * Validate a DTO by transforming it to an instance of the DTO class and validating it against the class-validator decorators.
  * @param dto - The DTO to validate
  * @param DtoClass - The class of the DTO
  * @returns The validated DTO
