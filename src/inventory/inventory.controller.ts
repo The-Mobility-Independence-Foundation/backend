@@ -1,23 +1,25 @@
-import { Controller, Get, Post, Param } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
 import { Inventory } from './inventory.entity';
+import { getInventoryDto } from './dto/get-inventory.dto';
+import { CreateInventoryDto } from './dto/create-inventory.dto';
 
 @Controller('inventory')
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
 
   @Post()
-  create(): Promise<Inventory> {
-    return this.inventoryService.create();
+  create(@Body() dto: CreateInventoryDto): Promise<Inventory> {
+    return this.inventoryService.create(dto);
   }
 
-  @Get()
-  findAll(): Promise<Inventory[]> {
-    return this.inventoryService.findAll();
+  @Get('organization/:organizationId/Inventory/')
+  findAll(@Param('organizationId') organizationId: string): Promise<Inventory[]> {
+    return this.inventoryService.findAll(Number(organizationId));
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: number): Promise<Inventory | null> {
-    return this.inventoryService.findOne(id);
+  @Get('organization/:organizationId/inventory/:id')
+  findOne(@Param('id') id: string,@Param('organizationId') organizationId: string): Promise<Inventory | null> {
+    return this.inventoryService.findOne(Number(id), Number(organizationId));
   }
 }
