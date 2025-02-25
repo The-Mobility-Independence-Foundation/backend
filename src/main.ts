@@ -29,6 +29,7 @@ async function bootstrap() {
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
 
+<<<<<<< HEAD
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -37,6 +38,9 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+=======
+  app.useGlobalPipes(new ValidationPipe());
+>>>>>>> feat: progress on inventory api
 
   await app.listen(configService.getOrThrow('PORT'));
 }
