@@ -3,7 +3,7 @@ import { IsNotEmpty, MaxLength } from 'class-validator';
 
 export class UpdateInventoryDto {
   @ApiProperty()
-  @IsNotEmpty({ message: 'Organization cannot be blank'})
+  @IsNotEmpty({ message: 'Organization cannot be blank' })
   organizationId: number;
 
   @ApiProperty()

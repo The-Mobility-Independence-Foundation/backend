@@ -20,13 +20,13 @@ export class InventoryService {
   ) {}
 
   /**
-   * Create a new inventory instance in the database 
+   * Create a new inventory instance in the database
    * @param dto : Relevant information needed to create the inventory
    * @returns The save of the inventory
    */
   async create(dto: CreateInventoryDto): Promise<Inventory> {
     const inventory = new Inventory();
-  
+
     const organization = await this.organizationRepository.findOneBy({
       id: dto.organizationId,
     });
@@ -34,7 +34,7 @@ export class InventoryService {
       throw new Error('Organization not found');
     }
     inventory.organization = organization;
-  
+
     const address = await this.addressRepository.findOneBy({
       id: dto.address,
     });
@@ -42,13 +42,13 @@ export class InventoryService {
       throw new Error('Address not found');
     }
     inventory.address = address;
-  
+
     inventory.name = dto.name;
     inventory.description = dto.description;
-  
+
     return this.inventoryRepository.save(inventory);
   }
-  
+
   /**
    * Find all the inventories owned by a specific organization
    * @param organizationId : The id of the organization
@@ -74,13 +74,13 @@ export class InventoryService {
     });
   }
 
- /**
-  * 
-  * @param organizationId 
-  * @param id 
-  * @param dto 
-  */
- /*
+  /**
+   *
+   * @param organizationId
+   * @param id
+   * @param dto
+   */
+  /*
   async update(organizationId: number, id: number, dto: UpdateInventoryDto){
     const inventory = await this.inventoryRepository.findOneBy({ id: id});
 
