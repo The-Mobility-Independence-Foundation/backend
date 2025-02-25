@@ -9,6 +9,7 @@ import {
   UseGuards,
   Post,
   Delete,
+  Body,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
@@ -24,6 +25,7 @@ import { ResponseMessage } from '../common/decorators/response-message.decorator
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
 import { GetUsersDto } from './dto/get-users.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -84,26 +86,19 @@ export class UserController {
   */
   @Get()
   findAll(@Query() query: GetUsersDto): Promise<User[]> {
-    if (Object.keys(query).length == 0) {
-      return this.userService.findAll();
-    } else {
-      return this.userService.findAllFiltered(query);
-    }
+    return this.userService.findAllFiltered(query);
   }
 
-  /*
-    Gets a single user based on their id
-  */
   @Get(':id')
   findOne(@Param('id') id: number): Promise<User | null> {
     return this.userService.findOne(id);
   }
 
-  /* 
-    Updates a user based on their id
-  */
   @Patch(':id')
-  update(@Param('id') id: number): Promise<User | null> {
-    return this.userService.update(id);
+  update(
+    @Param('id') id: number,
+    @Body() dto: UpdateUserDto,
+  ): Promise<User | null> {
+    return this.userService.update(id, dto);
   }
 }
