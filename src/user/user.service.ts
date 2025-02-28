@@ -175,8 +175,7 @@ export class UserService {
     const user = await this.userRepository.findOneBy({ id: id });
 
     if (!user) {
-      // throw error for invalid user here
-      return user;
+      throw new BadRequestException;
     }
 
     if (dto.firstName) {
@@ -190,9 +189,6 @@ export class UserService {
     }
     if (dto.accountType) {
       user.type = dto.accountType;
-    }
-    if (dto.signupComplete) {
-      user.signupComplete = dto.signupComplete;
     }
 
     return this.userRepository.save(user);

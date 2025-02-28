@@ -6,7 +6,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
-import { UserRole } from '../user.entity';
+import { UserRole } from '../entities/user.entity';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateUserDto {
