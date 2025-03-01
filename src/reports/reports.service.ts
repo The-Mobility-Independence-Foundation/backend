@@ -56,7 +56,6 @@ export class ReportsService {
       throw new BadRequestException('You cannot report yourself.');
     }
 
-    // TODO: once user is merged, update with findById
     const reporter = await this.userRepository.findOneBy({
       id: dto.reporterId,
     });
