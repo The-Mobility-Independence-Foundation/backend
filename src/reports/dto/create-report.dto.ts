@@ -27,7 +27,7 @@ export class CreateReportDto {
   })
   @IsPositive()
   @IsInt()
-  postId?: number | null;
+  postId?: number;
 
   @IsOptional()
   @ApiProperty({
@@ -36,7 +36,7 @@ export class CreateReportDto {
   })
   @IsPositive()
   @IsInt()
-  listingId?: number | null;
+  listingId?: number;
 
   @IsOptional()
   @ApiProperty({
@@ -45,7 +45,7 @@ export class CreateReportDto {
   })
   @IsPositive()
   @IsInt()
-  commentId?: number | null;
+  commentId?: number;
 
   @ApiProperty({ description: "The user's reason for creating the report." })
   @IsNotEmpty()
@@ -54,6 +54,7 @@ export class CreateReportDto {
 
   @ApiProperty({
     description: 'An enum that determines what type of report this is.',
+    default: ReportType.PROFILE,
   })
   @IsEnum(ReportType)
   reportType: ReportType;

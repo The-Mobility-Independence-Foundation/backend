@@ -1,7 +1,16 @@
-import { Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { Report } from './report.entity';
 import { ReportsService } from './reports.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CreateReportDto } from './dto/create-report.dto';
 
 @ApiTags('reports')
 @Controller('reports')
@@ -24,8 +33,8 @@ export class ReportsController {
    */
   @Post()
   @ApiOperation({ summary: 'Create a new report.' })
-  create(): Promise<Report> {
-    return this.reportService.create();
+  create(@Body() dto: CreateReportDto): Promise<Report | BadRequestException> {
+    return this.reportService.create(dto);
   }
 
   /**
