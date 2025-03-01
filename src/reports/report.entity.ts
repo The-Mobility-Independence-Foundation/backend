@@ -4,6 +4,7 @@ import {
   PrimaryGeneratedColumn,
   JoinColumn,
   ManyToOne,
+  CreateDateColumn,
 } from 'typeorm';
 import { User } from '../user/entities/user.entity';
 import { Listing } from '../listing/listing.entity';
@@ -47,10 +48,10 @@ export class Report {
   @JoinColumn({ name: 'commentId' })
   comment?: Comment | null;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn()
   reportedOn: Date;
 
-  @Column({ type: 'varchar', length: 3000 })
+  @Column({ type: 'varchar', length: 200 })
   reason: string;
 
   @IsEnum(ReportType)
