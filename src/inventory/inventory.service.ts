@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { Organization } from '../organization/organization.entity';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { Address } from '../address/address.entity';
+import { UpdateInventoryDto } from './dto/update-inventory.dto';
 
 @Injectable()
 export class InventoryService {
@@ -80,7 +81,6 @@ export class InventoryService {
    * @param id
    * @param dto
    */
-  /*
   async update(organizationId: number, id: number, dto: UpdateInventoryDto){
     const inventory = await this.inventoryRepository.findOneBy({ id: id});
 
@@ -104,6 +104,6 @@ export class InventoryService {
       inventory.name = dto.name;
     }
 
+    return await this.inventoryRepository.save(inventory);
   }
-  */
 }
