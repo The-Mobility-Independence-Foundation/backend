@@ -5,12 +5,8 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
 import { Organization } from '../../organization/organization.entity';
 import { createMock } from '@golevelup/ts-jest';
-export const mockRepository = jest.fn(() => ({
-  metadata: {
-    columns: [],
-    relations: [],
-  },
-}));
+import { Repository } from 'typeorm';
+import { Request } from 'express';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -22,11 +18,11 @@ describe('UserController', () => {
         UserService,
         {
           provide: getRepositoryToken(User),
-          useClass: mockRepository,
+          useValue: createMock<Repository<User>>(),
         },
         {
           provide: getRepositoryToken(Organization),
-          useClass: mockRepository,
+          useValue: createMock<Repository<Organization>>(),
         },
       ],
     })
@@ -38,5 +34,26 @@ describe('UserController', () => {
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
+  });
+
+  describe('getUser', () => {
+    it('should return the user from the request', async () => {
+      const user = new User();
+      Object.assign(user, {
+        email: 'test@test.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        displayName: 'John Doe',
+      });
+
+      const req = {
+        user,
+      } as Partial<Request> as Request;
+
+      const result = await controller.getUser(req);
+
+      expect(result).toBeDefined();
+      expect(result).toBe(user);
+    });
   });
 });

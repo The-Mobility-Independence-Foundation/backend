@@ -8,6 +8,9 @@ import {
   IsPassword,
 } from '../../common/decorators/user.decorators';
 
+/**
+ * The registration data (through local auth)
+ */
 export class RegisterDto {
   @IsFirstName()
   @ApiProperty({

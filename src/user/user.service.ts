@@ -4,7 +4,7 @@ import { Repository, FindOptionsWhere, FindOptionsRelations } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserAuth } from './entities/user-auth.entity';
 import { RegisterDto } from '../auth/dto/register.dto';
-import { ProviderProfile } from '../auth/entities/provider-profile.entity';
+import { AuthProviderProfile } from '../auth/entities/auth-provider-profile.entity';
 import { UserAuthService } from './user-auth.service';
 import { validateDto } from '../common/utils/validate-dto';
 
@@ -45,7 +45,7 @@ export class UserService {
    * @param data - The data to create the user with
    * @returns The user record
    */
-  async create(data: RegisterDto | ProviderProfile): Promise<User> {
+  async create(data: RegisterDto | AuthProviderProfile): Promise<User> {
     const existingUser = await this.findByEmail(data.email);
     const existingUserAuth = await this.userAuthService.findByIdentifier(
       data.email,

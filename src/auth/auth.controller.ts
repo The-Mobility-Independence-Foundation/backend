@@ -1,16 +1,8 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Req,
-  UseGuards,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { GoogleOAuthGuard } from './guards/google-oauth.guard';
-import { ProviderProfile } from './entities/provider-profile.entity';
+import { AuthProviderProfile } from './entities/auth-provider-profile.entity';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { LoginDto } from './dto/login.dto';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
@@ -24,7 +16,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   /**
-   * Register a new user
+   * Register a new user with email and password
    */
   @Post('register')
   @ResponseMessage('User successfully registered')
@@ -34,7 +26,7 @@ export class AuthController {
   }
 
   /**
-   * Login a user
+   * Login a user with email and password
    */
   @Post('login')
   @UseGuards(LocalAuthGuard)
@@ -60,12 +52,9 @@ export class AuthController {
   @ResponseMessage('Successfully logged in with Google')
   @ApiOperation({ summary: 'Handle Google OAuth2 callback' })
   async googleCallback(@Req() req: Request): Promise<AuthResponse> {
-    const providerProfile = req.user as ProviderProfile;
-    const user = await this.authService.handleProviderLogin(providerProfile);
-
-    if (!user) {
-      throw new UnauthorizedException('User not found');
-    }
+    const authProviderProfile = req.user as AuthProviderProfile;
+    const user =
+      await this.authService.handleProviderLogin(authProviderProfile);
 
     return {
       accessToken: this.authService.generateToken(user.email),
