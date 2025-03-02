@@ -81,10 +81,10 @@ export class InventoryService {
    * @param id
    * @param dto
    */
-  async update(organizationId: number, id: number, dto: UpdateInventoryDto){
-    const inventory = await this.inventoryRepository.findOneBy({ id: id});
+  async update(organizationId: number, id: number, dto: UpdateInventoryDto) {
+    const inventory = await this.inventoryRepository.findOneBy({ id: id });
 
-    if (!inventory){
+    if (!inventory) {
       throw new Error('Inventory not found');
     }
 
@@ -96,7 +96,7 @@ export class InventoryService {
     }
     inventory.address = address;
 
-    if (dto.description){
+    if (dto.description) {
       inventory.description = dto.description;
     }
 
