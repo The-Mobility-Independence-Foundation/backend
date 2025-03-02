@@ -1,4 +1,4 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { ConfigService } from '@nestjs/config';
@@ -7,8 +7,6 @@ import { AuthType } from '../../user/entities/user-auth.entity';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
-  private readonly logger = new Logger(GoogleStrategy.name);
-
   constructor(private readonly configService: ConfigService) {
     super({
       clientID: configService.getOrThrow('GOOGLE_CLIENT_ID'),
@@ -18,29 +16,49 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     });
   }
 
+  /**
+   * Validates the Google OAuth profile and creates an AuthProviderProfile
+   * @param accessToken - The OAuth access token
+   * @param refreshToken - The OAuth refresh token
+   * @param profile - The Google profile information
+   * @param cb - The verification callback
+   */
   async validate(
     accessToken: string,
     refreshToken: string,
     profile: Profile,
     cb: VerifyCallback,
-  ) {
-    // Validate and extract user profile
-    const userProfile = this.extractUserProfile(profile);
+  ): Promise<void> {
+    try {
+      const userProfile = this.extractUserProfile(profile);
 
-    // Create provider profile
-    const user: AuthProviderProfile = {
-      id: profile.id,
-      provider: AuthType.GOOGLE,
-      accessToken,
-      refreshToken,
-      ...userProfile,
-    };
+      const user: AuthProviderProfile = {
+        id: profile.id,
+        provider: AuthType.GOOGLE,
+        accessToken,
+        refreshToken,
+        ...userProfile,
+      };
 
-    // Return the provider profile
-    cb(null, user);
+      cb(null, user);
+    } catch (error) {
+      cb(error);
+    }
   }
 
-  private extractUserProfile(profile: Profile) {
+  /**
+   * Extracts and validates user profile information from Google profile
+   * @param profile - The Google profile
+   * @returns The extracted user profile information
+   * @throws UnauthorizedException if required fields are missing
+   */
+  private extractUserProfile(profile: Profile): {
+    displayName: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    image: string;
+  } {
     if (!profile.name?.givenName || !profile.name?.familyName) {
       throw new UnauthorizedException(
         'Google profile is missing name information',

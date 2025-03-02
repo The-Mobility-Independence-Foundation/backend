@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UserService } from '../../user/user.service';
+import { User } from '../../user/entities/user.entity';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -16,7 +17,13 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  async validate(payload: { email: string }) {
+  /**
+   * Validates the JWT payload and retrieves the associated user
+   * @param payload - The decoded JWT payload containing user information
+   * @returns The user associated with the JWT
+   * @throws UnauthorizedException if user not found
+   */
+  async validate(payload: { email: string }): Promise<User> {
     const user = await this.userService.findByEmail(payload.email);
 
     if (!user) {
