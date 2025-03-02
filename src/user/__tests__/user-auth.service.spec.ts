@@ -6,10 +6,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { createMock } from '@golevelup/ts-jest';
 import { when } from 'jest-when';
 import { ValidationException } from '../../common/exceptions/validation.exception';
-import { ProviderProfile } from 'src/auth/entities/provider-profile.entity';
-import * as bcrypt from 'bcrypt';
-import { User } from '../entities/user.entity';
-import { BadRequestException } from '@nestjs/common';
+import { AuthProviderProfile } from 'src/auth/entities/auth-provider-profile.entity';
 
 describe('UserAuthService', () => {
   let service: UserAuthService;
@@ -137,7 +134,7 @@ describe('UserAuthService', () => {
 
   describe('initializeProviderAuth', () => {
     it('should initialize a provider auth record', async () => {
-      const providerProfile: ProviderProfile = {
+      const authProviderProfile: AuthProviderProfile = {
         id: '123',
         email: 'TEST@TEST.COM',
         provider: AuthType.GOOGLE,
@@ -149,7 +146,8 @@ describe('UserAuthService', () => {
         image: 'https://example.com/image.png',
       };
 
-      const userAuth = await service.initializeProviderAuth(providerProfile);
+      const userAuth =
+        await service.initializeProviderAuth(authProviderProfile);
 
       expect(userAuth).toBeDefined();
       expect(userAuth.identifier).toBe('test@test.com');
@@ -161,7 +159,7 @@ describe('UserAuthService', () => {
     });
 
     it('should throw a validation exception if the email is invalid ', async () => {
-      const providerProfile: ProviderProfile = {
+      const authProviderProfile: AuthProviderProfile = {
         id: '123',
         email: 'invalid-email',
         provider: AuthType.GOOGLE,
@@ -174,92 +172,8 @@ describe('UserAuthService', () => {
       };
 
       await expect(
-        service.initializeProviderAuth(providerProfile),
+        service.initializeProviderAuth(authProviderProfile),
       ).rejects.toThrow(ValidationException);
-    });
-  });
-
-  describe('validateCredentials', () => {
-    it('should validate the credentials of a local auth record', async () => {
-      const credentials = 'Password123!';
-
-      const userAuth = new UserAuth();
-      userAuth.identifier = 'test@test.com';
-      userAuth.credentials = await bcrypt.hash(credentials, 10);
-      userAuth.type = AuthType.LOCAL;
-      userAuth.user = new User();
-
-      when(userAuthRepository.findOne)
-        .calledWith({
-          where: { identifier: userAuth.identifier, type: userAuth.type },
-          relations: { user: true },
-        })
-        .mockResolvedValue(userAuth);
-
-      const result = await service.validateCredentials(
-        userAuth.identifier,
-        credentials,
-      );
-
-      expect(result).toBeDefined();
-      expect(result).toBe(userAuth.user);
-    });
-
-    it('should throw a bad request exception if the user auth is not found', async () => {
-      const identifier = 'test@test.com';
-      const credentials = 'Password123!';
-
-      when(userAuthRepository.findOne)
-        .calledWith({
-          where: { identifier, type: AuthType.LOCAL },
-          relations: { user: true },
-        })
-        .mockResolvedValue(null);
-
-      await expect(
-        service.validateCredentials(identifier, credentials),
-      ).rejects.toThrow(BadRequestException);
-    });
-
-    it('should throw a bad request exception if the credentials are not set', async () => {
-      const credentials = 'Password123!';
-
-      const userAuth = new UserAuth();
-      userAuth.identifier = 'test@test.com';
-      userAuth.type = AuthType.LOCAL;
-      userAuth.user = new User();
-
-      when(userAuthRepository.findOne)
-        .calledWith({
-          where: { identifier: userAuth.identifier, type: userAuth.type },
-          relations: { user: true },
-        })
-        .mockResolvedValue(userAuth);
-
-      await expect(
-        service.validateCredentials(userAuth.identifier, credentials),
-      ).rejects.toThrow(BadRequestException);
-    });
-
-    it('should throw a bad request exception if the credentials are invalid', async () => {
-      const credentials = 'Password123!';
-
-      const userAuth = new UserAuth();
-      userAuth.identifier = 'test@test.com';
-      userAuth.credentials = await bcrypt.hash(credentials, 10);
-      userAuth.type = AuthType.LOCAL;
-      userAuth.user = new User();
-
-      when(userAuthRepository.findOne)
-        .calledWith({
-          where: { identifier: userAuth.identifier, type: userAuth.type },
-          relations: ['user'],
-        })
-        .mockResolvedValue(userAuth);
-
-      await expect(
-        service.validateCredentials(userAuth.identifier, 'invalid-password'),
-      ).rejects.toThrow(BadRequestException);
     });
   });
 });

@@ -1,15 +1,19 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserAuthService } from '../user/user-auth.service';
-import { ProviderProfile } from './entities/provider-profile.entity';
+import { AuthProviderProfile } from './entities/auth-provider-profile.entity';
 import { UserService } from '../user/user.service';
 import { User } from '../user/entities/user.entity';
 import { RegisterDto } from './dto/register.dto';
+import * as bcrypt from 'bcrypt';
+import { AuthType } from '../user/entities/user-auth.entity';
 
 @Injectable()
 export class AuthService {
-  private readonly logger = new Logger(AuthService.name);
-
   constructor(
     private readonly jwtService: JwtService,
     private readonly userAuthService: UserAuthService,
@@ -17,95 +21,69 @@ export class AuthService {
   ) {}
 
   /**
-   * Register a new user
+   * Register a new user through the local auth method
+   * @param registerDto - The user registration data
+   * @returns The newly registered user
    */
-  async register(userRegisterDto: RegisterDto): Promise<User> {
-    const existingAuth = await this.userAuthService.findByIdentifier(
-      userRegisterDto.email,
-    );
-
-    // If user already exists, throw an unauthorized exception
-    if (existingAuth) {
-      throw new UnauthorizedException(
-        'An account already exists with this email',
-      );
-    }
-
-    // Create new user
-    // const user = await this.userService.create({
-    //   email: userRegisterDto.email,
-    //   displayName: userRegisterDto.displayName,
-    //   firstName: userRegisterDto.firstName,
-    //   lastName: userRegisterDto.lastName,
-    // });
-
-    // // Create email/password auth for the user
-    // const userAuth = await this.userAuthService.createEmailAuth(
-    //   user,
-    //   userRegisterDto.email,
-    //   userRegisterDto.password,
-    // );
-
-    // return userAuth.user;
-    return new User();
+  async register(registerDto: RegisterDto): Promise<User> {
+    return await this.userService.create(registerDto);
   }
 
   /**
    * Handle provider login
+   * @param authProviderProfile - The auth provider profile
+   * @returns The user or null if the user does not exist
    */
   async handleProviderLogin(
-    providerProfile: ProviderProfile,
-  ): Promise<User | null> {
-    const userAuth = await this.userAuthService.findByIdentifier(
-      providerProfile.email,
+    authProviderProfile: AuthProviderProfile,
+  ): Promise<User> {
+    const existingUserAuth = await this.userAuthService.findByIdentifier(
+      authProviderProfile.email,
     );
 
-    if (userAuth) {
-      // Check if user exists but with different provider (prevent account hijacking)
-      if (userAuth.type !== providerProfile.provider) {
-        this.logger.warn(
-          `User ${providerProfile.email} attempted to login with different provider`,
-        );
+    if (existingUserAuth) {
+      if (existingUserAuth.type !== authProviderProfile.provider) {
         throw new UnauthorizedException(
-          'An account already exists with this email using a different login method',
+          'A user with this email address already exists with a different login method',
         );
       }
 
-      // Update existing user auth
-      // const updatedUserAuth = await this.userAuthService.updateUserAuth({
-      //   ...userAuth,
-      //   accessToken: providerProfile.accessToken,
-      //   refreshToken: providerProfile.refreshToken,
-      // });
-
-      // return updatedUserAuth.user;
+      return existingUserAuth.user;
     }
-    return null;
 
-    // // Create new user and auth
-    // try {
-    //   const user = await this.userService.create({
-    //     firstName: providerProfile.firstName,
-    //     lastName: providerProfile.lastName,
-    //     email: providerProfile.email,
-    //     displayName: providerProfile.displayName,
-    //   });
-
-    //   const newUserAuth = await this.userAuthService.createProviderAuth(
-    //     user,
-    //     providerProfile,
-    //   );
-
-    //   return newUserAuth.user;
-    // } catch (error) {
-    //   this.logger.error(
-    //     `Failed to create user for provider ${providerProfile.provider}`,
-    //     error,
-    //   );
-    //   throw new UnauthorizedException('Failed to create user account');
-    // }
+    return await this.userService.create(authProviderProfile);
   }
 
+  /**
+   * Validate the credentials of a local auth record
+   * @param identifier - The identifier of the user
+   * @param credentials - The credentials of the user
+   * @returns The user record or null if the credentials are invalid
+   */
+  async validateCredentials(
+    identifier: string,
+    credentials: string,
+  ): Promise<User> {
+    const userAuth = await this.userAuthService.findByIdentifier(identifier, {
+      where: { type: AuthType.LOCAL },
+    });
+    if (!userAuth || !userAuth.credentials) {
+      throw new BadRequestException('Credentials not found');
+    }
+
+    const isValid = await bcrypt.compare(credentials, userAuth.credentials);
+    if (!isValid) {
+      throw new BadRequestException('Invalid credentials');
+    }
+
+    return userAuth.user;
+  }
+
+  /**
+   * Generate a JWT token for a user
+   * @param email - The email of the user
+   * @returns The JWT token
+   */
   generateToken(email: string): string {
     return this.jwtService.sign({ email });
   }

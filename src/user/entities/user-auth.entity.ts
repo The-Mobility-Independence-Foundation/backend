@@ -18,6 +18,9 @@ export enum AuthType {
   OUTLOOK = 'outlook',
 }
 
+/**
+ * A user authentication
+ */
 @Entity()
 export class UserAuth {
   @PrimaryGeneratedColumn()

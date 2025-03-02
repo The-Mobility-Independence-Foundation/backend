@@ -7,7 +7,7 @@ import { when } from 'jest-when';
 import { User } from '../../user/entities/user.entity';
 import { LoginDto } from '../dto/login.dto';
 import { AuthType } from '../../user/entities/user-auth.entity';
-import { ProviderProfile } from '../entities/provider-profile.entity';
+import { AuthProviderProfile } from '../entities/auth-provider-profile.entity';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -26,27 +26,28 @@ describe('AuthController', () => {
 
   describe('register', () => {
     it('should successfully register a user', async () => {
-      const userRegisterDto: RegisterDto = {
+      const registerDto: RegisterDto = {
         firstName: 'John',
         lastName: 'Doe',
         displayName: 'John Doe',
         email: 'test@test.com',
-        password: 'password',
+        password: 'Password123!',
       };
 
-      const mockUser = new User();
-      mockUser.firstName = userRegisterDto.firstName;
-      mockUser.lastName = userRegisterDto.lastName;
-      mockUser.email = userRegisterDto.email;
+      const user = new User();
+      Object.assign(user, {
+        firstName: registerDto.firstName,
+        lastName: registerDto.lastName,
+        email: registerDto.email,
+        displayName: registerDto.displayName,
+      });
 
-      when(service.register)
-        .calledWith(userRegisterDto)
-        .mockResolvedValue(mockUser);
+      when(service.register).calledWith(registerDto).mockResolvedValue(user);
 
-      const result = await controller.register(userRegisterDto);
+      const result = await controller.register(registerDto);
 
-      expect(service.register).toHaveBeenCalledWith(userRegisterDto);
       expect(result).toBeUndefined();
+      expect(service.register).toHaveBeenCalledWith(registerDto);
     });
   });
 
@@ -54,61 +55,70 @@ describe('AuthController', () => {
     it('should successfully login a user', async () => {
       const loginDto: LoginDto = {
         email: 'test@test.com',
-        password: 'password',
+        password: 'Password123!',
       };
+
+      const token = 'jwt.token.here';
 
       when(service.generateToken)
         .calledWith(loginDto.email)
-        .mockReturnValue('mock-token');
+        .mockReturnValue(token);
 
       const result = await controller.login(loginDto);
 
-      expect(service.generateToken).toHaveBeenCalledWith(loginDto.email);
       expect(result).toBeDefined();
-      expect(result.accessToken).toBe('mock-token');
+      expect(result.accessToken).toBe(token);
+      expect(service.generateToken).toHaveBeenCalledWith(loginDto.email);
     });
   });
 
   describe('googleLogin', () => {
-    it('should exist but return void', () => {
+    it('should exist but return void (handled by GoogleOAuthGuard)', () => {
       expect(controller.googleLogin()).toBeUndefined();
     });
   });
 
   describe('googleCallback', () => {
     it('should successfully handle Google OAuth callback', async () => {
-      const providerProfile: ProviderProfile = {
+      const authProviderProfile = new AuthProviderProfile();
+      Object.assign(authProviderProfile, {
         id: '123',
-        provider: AuthType.GOOGLE,
-        accessToken: 'mock-access-token',
-        refreshToken: 'mock-refresh-token',
-        displayName: 'John Doe',
-        firstName: 'John',
-        lastName: 'Doe',
         email: 'test@test.com',
-        image: 'https://example.com/image.jpg',
-      };
+        provider: AuthType.GOOGLE,
+        accessToken: 'access.token.here',
+        refreshToken: 'refresh.token.here',
+        displayName: 'Test User',
+        firstName: 'Test',
+        lastName: 'User',
+        image: 'https://example.com/image.png',
+      });
 
-      const mockUser = new User();
-      mockUser.firstName = providerProfile.firstName;
-      mockUser.lastName = providerProfile.lastName;
-      mockUser.email = providerProfile.email;
+      const user = new User();
+      Object.assign(user, {
+        firstName: authProviderProfile.firstName,
+        lastName: authProviderProfile.lastName,
+        displayName: authProviderProfile.displayName,
+        email: authProviderProfile.email,
+      });
+
+      const token = 'jwt.token.here';
 
       when(service.handleProviderLogin)
-        .calledWith(providerProfile)
-        .mockResolvedValue(mockUser);
+        .calledWith(authProviderProfile)
+        .mockResolvedValue(user);
 
-      when(service.generateToken)
-        .calledWith(providerProfile.email)
-        .mockReturnValue('mock-token');
+      when(service.generateToken).calledWith(user.email).mockReturnValue(token);
 
       const result = await controller.googleCallback({
-        user: providerProfile,
+        user: authProviderProfile,
       } as any);
 
-      expect(service.handleProviderLogin).toHaveBeenCalledWith(providerProfile);
       expect(result).toBeDefined();
-      expect(result.accessToken).toBe('mock-token');
+      expect(result.accessToken).toBe(token);
+      expect(service.handleProviderLogin).toHaveBeenCalledWith(
+        authProviderProfile,
+      );
+      expect(service.generateToken).toHaveBeenCalledWith(user.email);
     });
   });
 });

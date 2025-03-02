@@ -2,7 +2,7 @@ import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { ConfigService } from '@nestjs/config';
-import { ProviderProfile } from '../entities/provider-profile.entity';
+import { AuthProviderProfile } from '../entities/auth-provider-profile.entity';
 import { AuthType } from '../../user/entities/user-auth.entity';
 
 @Injectable()
@@ -28,7 +28,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     const userProfile = this.extractUserProfile(profile);
 
     // Create provider profile
-    const user: ProviderProfile = {
+    const user: AuthProviderProfile = {
       id: profile.id,
       provider: AuthType.GOOGLE,
       accessToken,

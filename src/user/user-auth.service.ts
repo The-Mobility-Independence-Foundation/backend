@@ -1,9 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere } from 'typeorm';
-import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
-import { ProviderProfile } from '../auth/entities/provider-profile.entity';
+import { AuthProviderProfile } from '../auth/entities/auth-provider-profile.entity';
 import { UserAuth, AuthType } from './entities/user-auth.entity';
 import { validateDto } from '../common/utils/validate-dto';
 
@@ -60,45 +59,20 @@ export class UserAuthService {
 
   /**
    * Initialize a provider auth record
-   * @param providerProfile - The provider profile
+   * @param authProviderProfile - The auth provider profile
    * @returns The user auth record
    */
   async initializeProviderAuth(
-    providerProfile: ProviderProfile,
+    authProviderProfile: AuthProviderProfile,
   ): Promise<UserAuth> {
     let userAuth = new UserAuth();
-    userAuth.type = providerProfile.provider;
-    userAuth.identifier = providerProfile.email;
-    userAuth.providerAccountId = providerProfile.id;
-    userAuth.refreshToken = providerProfile.refreshToken;
-    userAuth.accessToken = providerProfile.accessToken;
+    userAuth.type = authProviderProfile.provider;
+    userAuth.identifier = authProviderProfile.email;
+    userAuth.providerAccountId = authProviderProfile.id;
+    userAuth.refreshToken = authProviderProfile.refreshToken;
+    userAuth.accessToken = authProviderProfile.accessToken;
     userAuth = await validateDto(userAuth, UserAuth);
 
     return userAuth;
-  }
-
-  /**
-   * Validate the credentials of a local auth record
-   * @param identifier - The identifier of the user
-   * @param credentials - The credentials of the user
-   * @returns The user record or null if the credentials are invalid
-   */
-  async validateCredentials(
-    identifier: string,
-    credentials: string,
-  ): Promise<User> {
-    const userAuth = await this.findByIdentifier(identifier, {
-      where: { type: AuthType.LOCAL },
-    });
-    if (!userAuth || !userAuth.credentials) {
-      throw new BadRequestException('Credentials not found');
-    }
-
-    const isValid = await bcrypt.compare(credentials, userAuth.credentials);
-    if (!isValid) {
-      throw new BadRequestException('Invalid credentials');
-    }
-
-    return userAuth.user;
   }
 }

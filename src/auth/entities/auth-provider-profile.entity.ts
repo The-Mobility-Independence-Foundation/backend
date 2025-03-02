@@ -1,6 +1,9 @@
 import { AuthType } from 'src/user/entities/user-auth.entity';
 
-export class ProviderProfile {
+/**
+ * The auth provider profile
+ */
+export class AuthProviderProfile {
   id: string;
   provider: Exclude<AuthType, AuthType.LOCAL>;
   accessToken: string;

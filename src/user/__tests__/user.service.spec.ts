@@ -9,12 +9,12 @@ import { UserAuth } from '../entities/user-auth.entity';
 import { AuthType } from '../entities/user-auth.entity';
 import { when } from 'jest-when';
 import { RegisterDto } from '../../auth/dto/register.dto';
-import { ProviderProfile } from '../../auth/entities/provider-profile.entity';
+import { AuthProviderProfile } from '../../auth/entities/auth-provider-profile.entity';
 import { BadRequestException } from '@nestjs/common';
 
 describe('UserService', () => {
   let service: UserService;
-  let authService: UserAuthService;
+  let userAuthService: UserAuthService;
   let userRepository: Repository<User>;
 
   beforeEach(async () => {
@@ -31,17 +31,19 @@ describe('UserService', () => {
       .compile();
 
     service = module.get(UserService);
-    authService = module.get(UserAuthService);
+    userAuthService = module.get(UserAuthService);
     userRepository = module.get(getRepositoryToken(User));
   });
 
   describe('findByEmail', () => {
     it('should find a user auth by email', async () => {
       const user = new User();
-      user.email = 'test@test.com';
-      user.firstName = 'John';
-      user.lastName = 'Doe';
-      user.displayName = 'John Doe';
+      Object.assign(user, {
+        email: 'test@test.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        displayName: 'John Doe',
+      });
 
       when(userRepository.findOne)
         .calledWith({ where: { email: user.email } })
@@ -55,10 +57,12 @@ describe('UserService', () => {
 
     it('should find a user auth by email with additional where conditions', async () => {
       const user = new User();
-      user.email = 'test@test.com';
-      user.firstName = 'John';
-      user.lastName = 'Doe';
-      user.displayName = 'John Doe';
+      Object.assign(user, {
+        email: 'test@test.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        displayName: 'John Doe',
+      });
 
       when(userRepository.findOne)
         .calledWith({
@@ -76,13 +80,14 @@ describe('UserService', () => {
 
     it('should find a user auth by email with additional relations', async () => {
       const user = new User();
-      user.email = 'test@test.com';
-      user.firstName = 'John';
-      user.lastName = 'Doe';
-      user.displayName = 'John Doe';
+      Object.assign(user, {
+        email: 'test@test.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        displayName: 'John Doe',
+      });
 
       const userAuth = new UserAuth();
-
       user.auth = userAuth;
       userAuth.user = user;
 
@@ -101,10 +106,12 @@ describe('UserService', () => {
 
     it('should find a user auth by email regardless of the case of the email', async () => {
       const user = new User();
-      user.email = 'test@test.com';
-      user.firstName = 'John';
-      user.lastName = 'Doe';
-      user.displayName = 'John Doe';
+      Object.assign(user, {
+        email: 'test@test.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        displayName: 'John Doe',
+      });
 
       when(userRepository.findOne)
         .calledWith({ where: { email: user.email } })
@@ -127,11 +134,13 @@ describe('UserService', () => {
   describe('create', () => {
     it('should create a user record with a register dto', async () => {
       const registerDto = new RegisterDto();
-      registerDto.email = 'test@test.com';
-      registerDto.password = 'password';
-      registerDto.firstName = 'John';
-      registerDto.lastName = 'Doe';
-      registerDto.displayName = 'John Doe';
+      Object.assign(registerDto, {
+        email: 'test@test.com',
+        password: 'password',
+        firstName: 'John',
+        lastName: 'Doe',
+        displayName: 'John Doe',
+      });
 
       const userAuth = new UserAuth();
       userAuth.type = AuthType.LOCAL;
@@ -139,8 +148,8 @@ describe('UserService', () => {
       userAuth.credentials = registerDto.password;
 
       when(userRepository.findOne).mockResolvedValue(null);
-      when(authService.findByIdentifier).mockResolvedValue(null);
-      when(authService.initializeLocalAuth).mockResolvedValue(userAuth);
+      when(userAuthService.findByIdentifier).mockResolvedValue(null);
+      when(userAuthService.initializeLocalAuth).mockResolvedValue(userAuth);
       when(userRepository.save).mockImplementation((user: User) => {
         return Promise.resolve(user);
       });
@@ -157,38 +166,38 @@ describe('UserService', () => {
     });
 
     it('should create a user record with a provider profile', async () => {
-      const providerProfile = new ProviderProfile();
-      providerProfile.id = '1234567890';
-      providerProfile.provider = AuthType.GOOGLE;
-      providerProfile.accessToken = 'accessToken';
-      providerProfile.refreshToken = 'refreshToken';
-      providerProfile.displayName = 'John Doe';
-      providerProfile.firstName = 'John';
-      providerProfile.lastName = 'Doe';
-      providerProfile.email = 'test@test.com';
-      providerProfile.image = 'image';
+      const authProviderProfile = new AuthProviderProfile();
+      authProviderProfile.id = '1234567890';
+      authProviderProfile.provider = AuthType.GOOGLE;
+      authProviderProfile.accessToken = 'accessToken';
+      authProviderProfile.refreshToken = 'refreshToken';
+      authProviderProfile.displayName = 'John Doe';
+      authProviderProfile.firstName = 'John';
+      authProviderProfile.lastName = 'Doe';
+      authProviderProfile.email = 'test@test.com';
+      authProviderProfile.image = 'image';
 
       const userAuth = new UserAuth();
-      userAuth.type = providerProfile.provider;
-      userAuth.identifier = providerProfile.email;
-      userAuth.providerAccountId = providerProfile.id;
-      userAuth.accessToken = providerProfile.accessToken;
-      userAuth.refreshToken = providerProfile.refreshToken;
+      userAuth.type = authProviderProfile.provider;
+      userAuth.identifier = authProviderProfile.email;
+      userAuth.providerAccountId = authProviderProfile.id;
+      userAuth.accessToken = authProviderProfile.accessToken;
+      userAuth.refreshToken = authProviderProfile.refreshToken;
 
       when(userRepository.findOne).mockResolvedValue(null);
-      when(authService.findByIdentifier).mockResolvedValue(null);
-      when(authService.initializeProviderAuth).mockResolvedValue(userAuth);
+      when(userAuthService.findByIdentifier).mockResolvedValue(null);
+      when(userAuthService.initializeProviderAuth).mockResolvedValue(userAuth);
       when(userRepository.save).mockImplementation((user: User) => {
         return Promise.resolve(user);
       });
 
-      const result = await service.create(providerProfile);
+      const result = await service.create(authProviderProfile);
 
       expect(result).toBeDefined();
-      expect(result.email).toBe(providerProfile.email);
-      expect(result.firstName).toBe(providerProfile.firstName);
-      expect(result.lastName).toBe(providerProfile.lastName);
-      expect(result.displayName).toBe(providerProfile.displayName);
+      expect(result.email).toBe(authProviderProfile.email);
+      expect(result.firstName).toBe(authProviderProfile.firstName);
+      expect(result.lastName).toBe(authProviderProfile.lastName);
+      expect(result.displayName).toBe(authProviderProfile.displayName);
 
       expect(result.auth).toStrictEqual(userAuth);
     });
@@ -202,7 +211,7 @@ describe('UserService', () => {
       registerDto.displayName = 'John Doe';
 
       when(userRepository.findOne).mockResolvedValue(new User());
-      when(authService.findByIdentifier).mockResolvedValue(new UserAuth());
+      when(userAuthService.findByIdentifier).mockResolvedValue(new UserAuth());
 
       await expect(service.create(registerDto)).rejects.toThrow(
         BadRequestException,

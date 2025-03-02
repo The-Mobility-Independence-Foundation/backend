@@ -1,125 +1,250 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from '../auth.service';
-import { createMock } from '@golevelup/ts-jest';
-import { ConfigService } from '@nestjs/config';
-import { when } from 'jest-when';
+import { JwtService } from '@nestjs/jwt';
 import { UserAuthService } from '../../user/user-auth.service';
-import { UnauthorizedException } from '@nestjs/common';
-import { UserAuth } from '../../user/entities/user-auth.entity';
+import { UserService } from '../../user/user.service';
+import { createMock } from '@golevelup/ts-jest';
+import { when } from 'jest-when';
+import { User } from '../../user/entities/user.entity';
+import { UserAuth, AuthType } from '../../user/entities/user-auth.entity';
 import { RegisterDto } from '../dto/register.dto';
+import { AuthProviderProfile } from '../entities/auth-provider-profile.entity';
+import { UnauthorizedException, BadRequestException } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 
 describe('AuthService', () => {
   let service: AuthService;
-  let authService: jest.Mocked<UserAuthService>;
+  let jwtService: JwtService;
+  let userAuthService: UserAuthService;
+  let userService: UserService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        AuthService,
-        {
-          provide: ConfigService,
-          useValue: {
-            getOrThrow: jest.fn().mockImplementation((key: string) => {
-              switch (key) {
-                case 'GOOGLE_CLIENT_ID':
-                  return 'dummy-google-client-id';
-                case 'GOOGLE_CLIENT_SECRET':
-                  return 'dummy-google-client-secret';
-                case 'GOOGLE_CALLBACK_URL':
-                  return 'http://localhost:3000/auth/google/callback';
-                case 'JWT_SECRET':
-                  return 'dummy-jwt-secret';
-                default:
-                  return null;
-              }
-            }),
-          },
-        },
-      ],
+      providers: [AuthService],
     })
       .useMocker(createMock)
       .compile();
 
     service = module.get(AuthService);
-    authService = module.get(UserAuthService);
+    jwtService = module.get(JwtService);
+    userAuthService = module.get(UserAuthService);
+    userService = module.get(UserService);
   });
 
   describe('register', () => {
-    it('should throw an error if the user already exists', async () => {
-      const userRegisterDto: RegisterDto = {
+    it('should register a new user successfully', async () => {
+      const registerDto: RegisterDto = {
         firstName: 'John',
         lastName: 'Doe',
         displayName: 'John Doe',
         email: 'test@test.com',
-        password: 'password',
+        password: 'Password123!',
       };
 
-      const existingAuth = new UserAuth();
+      const user = new User();
+      Object.assign(user, {
+        firstName: registerDto.firstName,
+        lastName: registerDto.lastName,
+        displayName: registerDto.displayName,
+        email: registerDto.email,
+      });
 
-      when(authService.findByIdentifier)
-        .calledWith(userRegisterDto.email)
-        .mockResolvedValue(existingAuth);
+      when(userService.create).calledWith(registerDto).mockResolvedValue(user);
 
-      await expect(service.register(userRegisterDto)).rejects.toThrow(
-        UnauthorizedException,
-      );
-      expect(authService.findByIdentifier).toHaveBeenCalledWith(
-        userRegisterDto.email,
-      );
+      const result = await service.register(registerDto);
+
+      expect(result).toBeDefined();
+      expect(result).toBe(user);
+      expect(userService.create).toHaveBeenCalledWith(registerDto);
+    });
+  });
+
+  describe('handleProviderLogin', () => {
+    it('should return existing user if auth exists with same provider', async () => {
+      const authProviderProfile = new AuthProviderProfile();
+      Object.assign(authProviderProfile, {
+        id: '123',
+        email: 'test@test.com',
+        provider: AuthType.GOOGLE,
+        accessToken: 'access.token.here',
+        refreshToken: 'refresh.token.here',
+        displayName: 'Test User',
+        firstName: 'Test',
+        lastName: 'User',
+        image: 'https://example.com/image.png',
+      });
+
+      const user = new User();
+      const userAuth = new UserAuth();
+      Object.assign(userAuth, {
+        type: AuthType.GOOGLE,
+        user: user,
+      });
+
+      when(userAuthService.findByIdentifier)
+        .calledWith(authProviderProfile.email)
+        .mockResolvedValue(userAuth);
+
+      const result = await service.handleProviderLogin(authProviderProfile);
+
+      expect(result).toBeDefined();
+      expect(result).toBe(user);
     });
 
-    // it('should create a new user', async () => {
-    //   const userRegisterDto: UserRegisterDto = {
-    //     firstName: 'John',
-    //     lastName: 'Doe',
-    //     displayName: 'John Doe',
-    //     email: 'test@test.com',
-    //     password: 'password',
-    //   };
+    it('should throw UnauthorizedException if user exists with different provider', async () => {
+      const authProviderProfile = new AuthProviderProfile();
+      Object.assign(authProviderProfile, {
+        id: '123',
+        email: 'test@test.com',
+        provider: AuthType.GOOGLE,
+        accessToken: 'access.token.here',
+        refreshToken: 'refresh.token.here',
+        displayName: 'Test User',
+        firstName: 'Test',
+        lastName: 'User',
+        image: 'https://example.com/image.png',
+      });
 
-    //   when(authService.findByEmail)
-    //     .calledWith(userRegisterDto.email)
-    //     .mockResolvedValue(null);
+      const userAuth = new UserAuth();
+      Object.assign(userAuth, {
+        type: AuthType.LOCAL,
+      });
 
-    //   const mockUser = new User();
-    //   mockUser.firstName = userRegisterDto.firstName;
-    //   mockUser.lastName = userRegisterDto.lastName;
-    //   mockUser.email = userRegisterDto.email;
-    //   mockUser.displayName = userRegisterDto.displayName;
+      when(userAuthService.findByIdentifier)
+        .calledWith(authProviderProfile.email)
+        .mockResolvedValue(userAuth);
 
-    //   when(userService.create)
-    //     .calledWith({
-    //       firstName: userRegisterDto.firstName,
-    //       lastName: userRegisterDto.lastName,
-    //       email: userRegisterDto.email,
-    //       displayName: userRegisterDto.displayName,
-    //     })
-    //     .mockResolvedValue(mockUser);
+      await expect(
+        service.handleProviderLogin(authProviderProfile),
+      ).rejects.toThrow(UnauthorizedException);
+    });
 
-    //   const mockUserAuth = new UserAuth();
-    //   mockUserAuth.user = mockUser;
+    it('should create new user if auth does not exist', async () => {
+      const authProviderProfile = new AuthProviderProfile();
+      Object.assign(authProviderProfile, {
+        id: '123',
+        email: 'test@test.com',
+        provider: AuthType.GOOGLE,
+        accessToken: 'access.token.here',
+        refreshToken: 'refresh.token.here',
+        displayName: 'Test User',
+        firstName: 'Test',
+        lastName: 'User',
+        image: 'https://example.com/image.png',
+      });
 
-    //   when(authService.createEmailAuth)
-    //     .calledWith(mockUser, userRegisterDto.email, userRegisterDto.password)
-    //     .mockResolvedValue(mockUserAuth);
+      const user = new User();
+      Object.assign(user, {
+        firstName: authProviderProfile.firstName,
+        lastName: authProviderProfile.lastName,
+        displayName: authProviderProfile.displayName,
+        email: authProviderProfile.email,
+      });
 
-    //   const result = await service.register(userRegisterDto);
+      when(userAuthService.findByIdentifier)
+        .calledWith(authProviderProfile.email)
+        .mockResolvedValue(null);
 
-    //   expect(authService.findByEmail).toHaveBeenCalledWith(
-    //     userRegisterDto.email,
-    //   );
-    //   expect(userService.create).toHaveBeenCalledWith({
-    //     firstName: userRegisterDto.firstName,
-    //     lastName: userRegisterDto.lastName,
-    //     email: userRegisterDto.email,
-    //     displayName: userRegisterDto.displayName,
-    //   });
-    //   expect(authService.createEmailAuth).toHaveBeenCalledWith(
-    //     mockUser,
-    //     userRegisterDto.email,
-    //     userRegisterDto.password,
-    //   );
-    //   expect(result).toEqual(mockUser);
-    // });
+      when(userService.create)
+        .calledWith(authProviderProfile)
+        .mockResolvedValue(user);
+
+      const result = await service.handleProviderLogin(authProviderProfile);
+
+      expect(result).toBeDefined();
+      expect(result).toBe(user);
+      expect(userService.create).toHaveBeenCalledWith(authProviderProfile);
+    });
+  });
+
+  describe('validateCredentials', () => {
+    it('should validate credentials successfully', async () => {
+      const identifier = 'test@test.com';
+      const credentials = 'Password123!';
+      const hashedPassword = await bcrypt.hash(credentials, 10);
+
+      const user = new User();
+      const userAuth = new UserAuth();
+      Object.assign(userAuth, {
+        type: AuthType.LOCAL,
+        credentials: hashedPassword,
+        user: user,
+      });
+
+      when(userAuthService.findByIdentifier)
+        .calledWith(identifier, { where: { type: AuthType.LOCAL } })
+        .mockResolvedValue(userAuth);
+
+      const result = await service.validateCredentials(identifier, credentials);
+
+      expect(result).toBeDefined();
+      expect(result).toBe(user);
+    });
+
+    it('should throw BadRequestException if user auth not found', async () => {
+      const identifier = 'test@test.com';
+      const credentials = 'Password123!';
+
+      when(userAuthService.findByIdentifier)
+        .calledWith(identifier, { where: { type: AuthType.LOCAL } })
+        .mockResolvedValue(null);
+
+      await expect(
+        service.validateCredentials(identifier, credentials),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw BadRequestException if credentials not set', async () => {
+      const identifier = 'test@test.com';
+      const credentials = 'Password123!';
+
+      const userAuth = new UserAuth();
+      Object.assign(userAuth, {
+        type: AuthType.LOCAL,
+        credentials: null,
+      });
+
+      when(userAuthService.findByIdentifier)
+        .calledWith(identifier, { where: { type: AuthType.LOCAL } })
+        .mockResolvedValue(userAuth);
+
+      await expect(
+        service.validateCredentials(identifier, credentials),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw BadRequestException if credentials are invalid', async () => {
+      const identifier = 'test@test.com';
+      const credentials = 'Password123!';
+      const hashedPassword = await bcrypt.hash('different-password', 10);
+
+      const userAuth = new UserAuth();
+      Object.assign(userAuth, {
+        type: AuthType.LOCAL,
+        credentials: hashedPassword,
+      });
+
+      when(userAuthService.findByIdentifier)
+        .calledWith(identifier, { where: { type: AuthType.LOCAL } })
+        .mockResolvedValue(userAuth);
+
+      await expect(
+        service.validateCredentials(identifier, credentials),
+      ).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('generateToken', () => {
+    it('should generate a JWT token', () => {
+      const email = 'test@test.com';
+      const token = 'jwt.token.here';
+
+      when(jwtService.sign).calledWith({ email }).mockReturnValue(token);
+
+      const result = service.generateToken(email);
+
+      expect(result).toBe(token);
+      expect(jwtService.sign).toHaveBeenCalledWith({ email });
+    });
   });
 });

@@ -1,5 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+/**
+ * The response for the auth controller
+ */
 export class AuthResponse {
   @ApiProperty({
     description: 'JWT access token',

@@ -42,6 +42,9 @@ import {
 import { UserValidation } from '../../common/validation/user.validation';
 import { UserAuth } from './user-auth.entity';
 
+/**
+ * The role of a user
+ */
 export enum UserRole {
   GUEST = 'guest',
   USER = 'user',
@@ -49,6 +52,9 @@ export enum UserRole {
   MODERATOR = 'moderator',
 }
 
+/**
+ * A user
+ */
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
