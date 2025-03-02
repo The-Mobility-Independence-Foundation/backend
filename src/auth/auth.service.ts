@@ -30,7 +30,7 @@ export class AuthService {
   }
 
   /**
-   * Handle provider login
+   * Handle provider login and create a new user if they don't exist
    * @param authProviderProfile - The auth provider profile
    * @returns The user or null if the user does not exist
    */
