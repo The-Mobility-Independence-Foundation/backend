@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Inventory } from './inventory.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -32,7 +32,7 @@ export class InventoryService {
       id: dto.organizationId,
     });
     if (!organization) {
-      throw new Error('Organization not found');
+      throw new NotFoundException('Organization not found');
     }
     inventory.organization = organization;
 
@@ -40,7 +40,7 @@ export class InventoryService {
       id: dto.address,
     });
     if (!address) {
-      throw new Error('Address not found');
+      throw new NotFoundException('Address not found');
     }
     inventory.address = address;
 
@@ -76,23 +76,23 @@ export class InventoryService {
   }
 
   /**
-   *
-   * @param organizationId
-   * @param id
-   * @param dto
+   * Update a pre-existing invenotry
+   * @param organizationId : The id of the organization
+   * @param id : The id of the inventory that wants to change
+   * @param dto : The updated information
    */
   async update(organizationId: number, id: number, dto: UpdateInventoryDto) {
     const inventory = await this.inventoryRepository.findOneBy({ id: id });
 
     if (!inventory) {
-      throw new Error('Inventory not found');
+      throw new NotFoundException('Inventory not found');
     }
 
     const address = await this.addressRepository.findOneBy({
       id: dto.address,
     });
     if (!address) {
-      throw new Error('Address not found');
+      throw new NotFoundException('Address not found');
     }
     inventory.address = address;
 
