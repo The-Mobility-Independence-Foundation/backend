@@ -1,3 +1,0 @@
-export const enum AUTH {
-  EMAIL_ALREADY_SENT = 'AUTH.EMAIL_ALREADY_SENT',
-}

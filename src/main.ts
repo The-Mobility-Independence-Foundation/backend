@@ -11,6 +11,7 @@ async function bootstrap() {
       transform: true,
       whitelist: true,
       transformOptions: { enableImplicitConversion: true },
+      forbidNonWhitelisted: true,
       exceptionFactory: (errors) => {
         return new ValidationException(errors);
       },

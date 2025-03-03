@@ -5,14 +5,14 @@ import { ValidationException } from '../exceptions/validation.exception';
 /**
  * Validate a DTO by transforming it to an instance of the DTO class and validating it against the class-validator decorators.
  * @param dto - The DTO to validate
- * @param DtoClass - The class of the DTO
+ * @param dtoClass - The class of the DTO
  * @returns The validated DTO
  */
 export async function validateDto<T extends object>(
   dto: any,
-  DtoClass: new () => T,
+  dtoClass: new () => T,
 ): Promise<T> {
-  const transformed = plainToInstance(DtoClass, dto);
+  const transformed = plainToInstance(dtoClass, dto);
   const errors = await validate(transformed);
 
   if (errors.length > 0) {

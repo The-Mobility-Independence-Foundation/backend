@@ -11,7 +11,7 @@ import { AuthProviderProfile } from '../entities/auth-provider-profile.entity';
 
 describe('AuthController', () => {
   let controller: AuthController;
-  let service: jest.Mocked<AuthService>;
+  let service: AuthService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({

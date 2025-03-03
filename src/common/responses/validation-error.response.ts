@@ -1,17 +1,26 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+/**
+ * Validation error detail response
+ */
 export class ValidationErrorDetail {
-  @ApiProperty({ example: "First name can't be empty" })
-  message: string;
+  @ApiProperty({ example: ['email must be a valid email'] })
+  message: string[];
 
-  @ApiProperty({ example: ['isNotEmpty'] })
+  @ApiProperty({ example: ['isEmail'] })
   constraints: string[];
 
-  @ApiProperty({ example: 'John' })
+  @ApiProperty({ example: 'not-valid-email' })
   value: any;
 }
 
+/**
+ * Validation error response
+ */
 export class ValidationErrorResponse {
+  @ApiProperty({ example: 'VALIDATION_FAILED' })
+  code: string;
+
   @ApiProperty({ type: () => Object })
   errors: Record<string, ValidationErrorDetail>;
 }

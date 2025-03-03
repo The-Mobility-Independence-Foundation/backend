@@ -5,10 +5,15 @@ import {
   Matches,
   IsString,
   IsEmail as IsEmailDecorator,
+  IsStrongPassword,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { UserValidation } from '../validation/user.validation';
 
+/**
+ * Decorator to validate the first name of a user
+ * @returns A decorator function
+ */
 export function IsFirstName() {
   return applyDecorators(
     IsString(),
@@ -21,6 +26,10 @@ export function IsFirstName() {
   );
 }
 
+/**
+ * Decorator to validate the last name of a user
+ * @returns A decorator function
+ */
 export function IsLastName() {
   return applyDecorators(
     IsString(),
@@ -33,6 +42,10 @@ export function IsLastName() {
   );
 }
 
+/**
+ * Decorator to validate the display name of a user
+ * @returns A decorator function
+ */
 export function IsDisplayName() {
   return applyDecorators(
     IsString(),
@@ -45,23 +58,34 @@ export function IsDisplayName() {
   );
 }
 
+/**
+ * Decorator to validate the email of a user
+ * @returns A decorator function
+ */
 export function IsEmail() {
   return applyDecorators(
-    Transform(({ value }) => value.trim().toLowerCase()),
-    IsEmailDecorator(),
+    IsString(),
     IsNotEmpty(),
+    IsEmailDecorator(),
+    Transform(({ value }) => value.trim().toLowerCase()),
     Length(UserValidation.email.min, UserValidation.email.max),
   );
 }
 
+/**
+ * Decorator to validate the password of a user
+ * @returns A decorator function
+ */
 export function IsPassword() {
   return applyDecorators(
     IsString(),
     IsNotEmpty(),
-    Transform(({ value }) => value.trim()),
-    Length(UserValidation.password.min, UserValidation.password.max),
-    Matches(UserValidation.password.pattern, {
-      message: UserValidation.password.message,
+    IsStrongPassword({
+      minLength: UserValidation.password.min,
+      minLowercase: UserValidation.password.minLowercase,
+      minUppercase: UserValidation.password.minUppercase,
+      minNumbers: UserValidation.password.minNumbers,
+      minSymbols: UserValidation.password.minSymbols,
     }),
   );
 }
