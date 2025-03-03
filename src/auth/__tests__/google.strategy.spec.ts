@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GoogleStrategy } from '../strategies/google.strategy';
 import { createMock } from '@golevelup/ts-jest';
-import { UnauthorizedException } from '@nestjs/common';
-import { Profile } from 'passport-google-oauth20';
+import { BadRequestException } from '@nestjs/common';
 import { AuthType } from '../../user/entities/user-auth.entity';
+import { Profile } from 'passport';
 
 describe('GoogleStrategy', () => {
   let strategy: GoogleStrategy;
@@ -27,7 +27,7 @@ describe('GoogleStrategy', () => {
           givenName: 'John',
           familyName: 'Doe',
         },
-        emails: [{ value: 'test@test.com', verified: true }],
+        emails: [{ value: 'test@test.com' }],
         photos: [{ value: 'https://example.com/photo.jpg' }],
       };
 
@@ -43,23 +43,58 @@ describe('GoogleStrategy', () => {
       );
 
       expect(cb).toHaveBeenCalledWith(null, {
-        id: profile.id,
+        id: '123',
         provider: AuthType.GOOGLE,
         accessToken,
         refreshToken,
         displayName: profile.displayName,
         firstName: profile.name?.givenName,
         lastName: profile.name?.familyName,
-        email: profile.emails?.[0].value,
-        image: profile.photos?.[0].value,
+        email: profile.emails?.[0]?.value,
+        image: profile.photos?.[0]?.value,
       });
     });
 
-    it('should call callback with error if name information is missing', async () => {
+    it('should handle missing optional fields', async () => {
       const profile: Partial<Profile> = {
         id: '123',
         displayName: 'John Doe',
-        emails: [{ value: 'test@test.com', verified: true }],
+        name: {
+          givenName: 'John',
+          familyName: 'Doe',
+        },
+        emails: [{ value: 'test@test.com' }],
+      };
+
+      const accessToken = 'access.token.here';
+      const refreshToken = 'refresh.token.here';
+      const cb = jest.fn();
+
+      await strategy.validate(
+        accessToken,
+        refreshToken,
+        profile as Profile,
+        cb,
+      );
+
+      expect(cb).toHaveBeenCalledWith(null, {
+        id: '123',
+        provider: AuthType.GOOGLE,
+        accessToken,
+        refreshToken,
+        displayName: profile.displayName,
+        firstName: profile.name?.givenName,
+        lastName: profile.name?.familyName,
+        email: profile.emails?.[0]?.value,
+        image: undefined,
+      });
+    });
+
+    it('should throw BadRequestException if name information is missing', async () => {
+      const profile: Partial<Profile> = {
+        id: '123',
+        displayName: 'John Doe',
+        emails: [{ value: 'test@test.com' }],
         photos: [{ value: 'https://example.com/photo.jpg' }],
       };
 
@@ -74,10 +109,10 @@ describe('GoogleStrategy', () => {
         cb,
       );
 
-      expect(cb).toHaveBeenCalledWith(expect.any(UnauthorizedException));
+      expect(cb).toHaveBeenCalledWith(expect.any(BadRequestException));
     });
 
-    it('should call callback with error if email is missing', async () => {
+    it('should throw BadRequestException if email is missing', async () => {
       const profile: Partial<Profile> = {
         id: '123',
         displayName: 'John Doe',
@@ -85,7 +120,6 @@ describe('GoogleStrategy', () => {
           givenName: 'John',
           familyName: 'Doe',
         },
-        photos: [{ value: 'https://example.com/photo.jpg' }],
       };
 
       const accessToken = 'access.token.here';
@@ -99,10 +133,10 @@ describe('GoogleStrategy', () => {
         cb,
       );
 
-      expect(cb).toHaveBeenCalledWith(expect.any(UnauthorizedException));
+      expect(cb).toHaveBeenCalledWith(expect.any(BadRequestException));
     });
 
-    it('should call callback with error if profile photo is missing', async () => {
+    it('should throw BadRequestException if emails array is empty', async () => {
       const profile: Partial<Profile> = {
         id: '123',
         displayName: 'John Doe',
@@ -110,7 +144,7 @@ describe('GoogleStrategy', () => {
           givenName: 'John',
           familyName: 'Doe',
         },
-        emails: [{ value: 'test@test.com', verified: true }],
+        emails: [],
       };
 
       const accessToken = 'access.token.here';
@@ -124,7 +158,7 @@ describe('GoogleStrategy', () => {
         cb,
       );
 
-      expect(cb).toHaveBeenCalledWith(expect.any(UnauthorizedException));
+      expect(cb).toHaveBeenCalledWith(expect.any(BadRequestException));
     });
   });
 });

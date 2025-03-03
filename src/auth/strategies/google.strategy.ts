@@ -1,9 +1,10 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20';
+import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { ConfigService } from '@nestjs/config';
 import { AuthProviderProfile } from '../entities/auth-provider-profile.entity';
 import { AuthType } from '../../user/entities/user-auth.entity';
+import { Profile } from 'passport';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -47,40 +48,36 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   }
 
   /**
-   * Extracts and validates user profile information from Google profile
+   * Extracts user profile information from Google profile
    * @param profile - The Google profile
    * @returns The extracted user profile information
-   * @throws UnauthorizedException if required fields are missing
+   * @throws BadRequestException if email or names are missing
    */
   private extractUserProfile(profile: Profile): {
     displayName: string;
     firstName: string;
     lastName: string;
     email: string;
-    image: string;
+    image?: string;
   } {
-    if (!profile.name?.givenName || !profile.name?.familyName) {
-      throw new UnauthorizedException(
+    if (!profile.name || !profile.name.givenName || !profile.name.familyName) {
+      throw new BadRequestException(
         'Google profile is missing name information',
       );
     }
 
-    if (!profile.emails?.[0]?.value) {
-      throw new UnauthorizedException('Google profile is missing email');
-    }
-
-    if (!profile.photos?.[0]?.value) {
-      throw new UnauthorizedException(
-        'Google profile is missing profile photo',
+    if (!profile.emails || !profile.emails[0]?.value) {
+      throw new BadRequestException(
+        'Google profile is missing email information',
       );
     }
 
     return {
       displayName: profile.displayName,
-      firstName: profile.name.givenName,
-      lastName: profile.name.familyName,
+      firstName: profile.name?.givenName,
+      lastName: profile.name?.familyName,
       email: profile.emails[0].value,
-      image: profile.photos[0].value,
+      image: profile.photos?.[0]?.value,
     };
   }
 }
