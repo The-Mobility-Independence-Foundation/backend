@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { GoogleOAuthGuard } from './guards/google-oauth.guard';
 import { AuthProviderProfile } from './entities/auth-provider-profile.entity';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -20,6 +20,10 @@ export class AuthController {
    */
   @Post('register')
   @ResponseMessage('User successfully registered')
+  @ApiResponse({
+    status: 201,
+    description: 'User successfully registered',
+  })
   @ApiOperation({ summary: 'Register a new user with email and password' })
   async register(@Body() userRegisterDto: RegisterDto): Promise<void> {
     await this.authService.register(userRegisterDto);
@@ -31,6 +35,11 @@ export class AuthController {
   @Post('login')
   @UseGuards(LocalAuthGuard)
   @ResponseMessage('Successfully logged in')
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully logged in',
+    type: AuthResponse,
+  })
   @ApiOperation({ summary: 'Login with email and password' })
   async login(@Body() loginDto: LoginDto): Promise<AuthResponse> {
     return { accessToken: this.authService.generateToken(loginDto.email) };
