@@ -9,13 +9,20 @@ import { HttpAdapterHost } from '@nestjs/core';
 import { BaseApiResponse } from '../responses/base-api.response';
 import { ValidationException } from '../exceptions/validation.exception';
 
+/**
+ * Exception filter for handling API exceptions
+ */
 @Catch()
 export class ApiExceptionFilter implements ExceptionFilter {
   constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
 
+  /**
+   * Catch an exception and transform it into a BaseApiResponse
+   * @param exception - The exception to catch
+   * @param host - The host arguments
+   */
   catch(exception: unknown, host: ArgumentsHost): void {
     const { httpAdapter } = this.httpAdapterHost;
-    const ctx = host.switchToHttp();
 
     const status =
       exception instanceof HttpException
@@ -28,16 +35,11 @@ export class ApiExceptionFilter implements ExceptionFilter {
     if (exception instanceof HttpException) {
       const response = exception.getResponse() as any;
 
-      // Handle validation exceptions
       if (exception instanceof ValidationException) {
         message = 'Validation failed';
-        data = {
-          code: response.code,
-          errors: response.errors,
-        };
+        data = response;
       } else {
         message = response.message || exception.message;
-        // Include any additional error data
         if (response.errors) {
           data = { errors: response.errors };
         }
@@ -50,6 +52,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
       data,
     };
 
+    const ctx = host.switchToHttp();
     httpAdapter.reply(ctx.getResponse(), responseBody, status);
   }
 }
