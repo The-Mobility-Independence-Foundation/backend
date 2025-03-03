@@ -7,6 +7,9 @@ import { RegisterDto } from '../auth/dto/register.dto';
 import { AuthProviderProfile } from '../auth/entities/auth-provider-profile.entity';
 import { UserAuthService } from './user-auth.service';
 import { validateDto } from '../common/utils/validate-dto';
+import { PaginationService } from '../common/services/pagination.service';
+import { PaginationDto } from '../common/dto/pagination.dto';
+import { BaseApiPaginationResponse } from '../common/responses/base-api-pagination.response';
 
 @Injectable()
 export class UserService {
@@ -14,6 +17,7 @@ export class UserService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private userAuthService: UserAuthService,
+    private paginationService: PaginationService,
   ) {}
 
   /**
@@ -80,5 +84,17 @@ export class UserService {
     user = await validateDto(user, User);
 
     return this.userRepository.save(user);
+  }
+
+  async getUserConnections(
+    id: number,
+    paginationDto: PaginationDto,
+  ): Promise<BaseApiPaginationResponse<User>> {
+    return this.paginationService.paginate(this.userRepository, paginationDto, {
+      where: { id },
+      relations: {
+        connectionsSent: true,
+      },
+    });
   }
 }
