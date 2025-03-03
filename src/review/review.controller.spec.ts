@@ -3,7 +3,7 @@ import { ReviewController } from './review.controller';
 import { ReviewService } from './review.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Review } from './review.entity';
-import { User } from '../user/user.entity';
+import { User } from '../user/entities/user.entity';
 import { Order } from '../order/order.entity';
 
 export const mockRepository = jest.fn(() => ({

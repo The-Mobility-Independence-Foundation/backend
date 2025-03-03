@@ -1,43 +1,84 @@
-import { Injectable } from '@nestjs/common';
-import { User } from './user.entity';
-import { Organization } from '../organization/organization.entity';
-import { Repository } from 'typeorm';
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { User, UserRole } from './entities/user.entity';
+import { Repository, FindOptionsWhere, FindOptionsRelations } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UserAuth } from './entities/user-auth.entity';
+import { RegisterDto } from '../auth/dto/register.dto';
+import { AuthProviderProfile } from '../auth/entities/auth-provider-profile.entity';
+import { UserAuthService } from './user-auth.service';
+import { validateDto } from '../common/utils/validate-dto';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
-
-    @InjectRepository(Organization)
-    private organizationRepository: Repository<Organization>,
+    private userAuthService: UserAuthService,
   ) {}
 
-  async create() {
-    const user = new User();
+  /**
+   * Find a user by email
+   * @param email - The email address of the user
+   * @param options - Optional query options
+   * @returns The user record or null if not found
+   */
+  async findByEmail(
+    email: string,
+    options: Partial<{
+      where: FindOptionsWhere<Omit<User, 'email'>>;
+      relations: FindOptionsRelations<User>;
+    }> = {},
+  ): Promise<User | null> {
+    const { where = {}, relations } = options;
 
-    const organization = await this.organizationRepository.findOneBy({ id: 1 });
-    user.organization = organization;
-    user.firstName = 'John';
-    user.lastName = 'Test';
-    user.email = 'johntest@gmail.com';
-    user.password = 'BadPassword123';
-    user.displayName = 'UniqueUsername1';
+    return this.userRepository.findOne({
+      where: {
+        ...where,
+        email: email.toLowerCase(),
+      },
+      relations,
+    });
+  }
 
-    const referredBy = await this.userRepository.findOneBy({ id: 2 });
-    if (referredBy) {
-      user.referredBy = referredBy;
+  /**
+   * Create a new user
+   * @param data - The data to create the user with
+   * @returns The user record
+   */
+  async create(data: RegisterDto | AuthProviderProfile): Promise<User> {
+    const existingUser = await this.findByEmail(data.email);
+    const existingUserAuth = await this.userAuthService.findByIdentifier(
+      data.email,
+    );
+
+    if (existingUser || existingUserAuth) {
+      throw new BadRequestException(
+        'A user with this email address already exists',
+      );
     }
 
+    let user = new User();
+    user.email = data.email;
+    user.firstName = data.firstName;
+    user.lastName = data.lastName;
+    user.displayName = data.displayName;
+    user.type = UserRole.GUEST;
+    user.inactive = false;
+    user.rating = 0;
+
+    let userAuth: UserAuth;
+    if (data instanceof RegisterDto) {
+      userAuth = await this.userAuthService.initializeLocalAuth(
+        data.email,
+        data.password,
+      );
+    } else {
+      userAuth = await this.userAuthService.initializeProviderAuth(data);
+    }
+
+    user.auth = userAuth;
+    user = await validateDto(user, User);
+
     return this.userRepository.save(user);
-  }
-
-  async findAll() {
-    return this.userRepository.find();
-  }
-
-  async findOne(id: number) {
-    return this.userRepository.findOneBy({ id: id });
   }
 }

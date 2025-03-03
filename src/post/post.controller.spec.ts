@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Forum } from '../forum/forum.entity';
 import { Prefix } from '../prefix/prefix.entity';
-import { User } from '../user/user.entity';
+import { User } from '../user/entities/user.entity';
 import { PostController } from './post.controller';
 import { Post } from './post.entity';
 import { PostService } from './post.service';

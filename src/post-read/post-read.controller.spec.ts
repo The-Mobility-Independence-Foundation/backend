@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from '../user/user.entity';
+import { User } from '../user/entities/user.entity';
 import { PostReadController } from './post-read.controller';
 import { PostRead } from './post-read.entity';
 import { PostReadService } from './post-read.service';

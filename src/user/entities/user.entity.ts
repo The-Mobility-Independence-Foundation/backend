@@ -1,8 +1,8 @@
-import { Invite } from '../invite/invite.entity';
-import { Order } from '../order/order.entity';
-import { Organization } from '../organization/organization.entity';
-import { Review } from '../review/review.entity';
-import { Request } from '../request/request.entity';
+import { Invite } from '../../invite/invite.entity';
+import { Order } from '../../order/order.entity';
+import { Organization } from '../../organization/organization.entity';
+import { Review } from '../../review/review.entity';
+import { Request } from '../../request/request.entity';
 import {
   Entity,
   Column,
@@ -12,69 +12,99 @@ import {
   OneToMany,
   ManyToMany,
   JoinTable,
+  OneToOne,
+  Index,
 } from 'typeorm';
-import { Message } from '../message/message.entity';
-import { Listing } from '../listing/listing.entity';
-import { Conversation } from '../conversation/conversation.entity';
-import { Post } from '../post/post.entity';
-import { Comment } from '../comment/comment.entity';
-import { PostSubscription } from '../post-subscription/post-subscription.entity';
-import { PostRead } from '../post-read/post-read.entity';
-import { Report } from '../reports/report.entity';
-import { Audit } from '../audit/audit.entity';
-import { Attachment } from '../attachments/attachment.entity';
+import { Message } from '../../message/message.entity';
+import { Listing } from '../../listing/listing.entity';
+import { Conversation } from '../../conversation/conversation.entity';
+import { Post } from '../../post/post.entity';
+import { Comment } from '../../comment/comment.entity';
+import { PostSubscription } from '../../post-subscription/post-subscription.entity';
+import { PostRead } from '../../post-read/post-read.entity';
+import { Report } from '../../reports/report.entity';
+import { Audit } from '../../audit/audit.entity';
+import { Attachment } from '../../attachments/attachment.entity';
+import {
+  IsEnum,
+  IsBoolean,
+  IsNumber,
+  IsOptional,
+  Min,
+  Max,
+} from 'class-validator';
+import {
+  IsFirstName,
+  IsLastName,
+  IsDisplayName,
+  IsEmail,
+} from '../../common/decorators/user.decorators';
+import { UserValidation } from '../../common/validation/user.validation';
+import { UserAuth } from './user-auth.entity';
 
+/**
+ * The role of a user
+ */
 export enum UserRole {
+  GUEST = 'guest',
   USER = 'user',
   ADMIN = 'admin',
   MODERATOR = 'moderator',
 }
 
+/**
+ * A user
+ */
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @JoinColumn()
   @ManyToOne(() => Organization, (org) => org.members)
+  @JoinColumn()
   organization: Organization | null;
 
-  @Column({ type: 'varchar', length: 20 })
+  @IsFirstName()
+  @Column({ type: 'varchar', length: UserValidation.firstName.max })
   firstName: string;
 
-  @Column({ type: 'varchar', length: 20 })
+  @IsLastName()
+  @Column({ type: 'varchar', length: UserValidation.lastName.max })
   lastName: string;
 
-  @Column({ type: 'varchar', length: 30 })
+  @IsEmail()
+  @Index({ unique: true })
+  @Column({ type: 'varchar', length: UserValidation.email.max })
   email: string;
 
-  @Column({ type: 'varchar', length: 50 }) // TODO: update with a salt and a hash
-  password: string;
-
-  @Column({ type: 'varchar', length: 20 })
+  @IsDisplayName()
+  @Column({ type: 'varchar', length: UserValidation.displayName.max })
   displayName: string;
 
+  @IsEnum(UserRole)
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
   type: UserRole;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   lastActivity: Date;
 
+  @IsBoolean()
   @Column({ default: false })
   inactive: boolean;
 
-  @Column({ type: 'varchar', default: '0000000000', length: 10 })
-  referralCode: string;
+  @Column({ type: 'varchar', length: 10, nullable: true })
+  referralCode?: string | null;
 
+  @IsOptional()
+  @ManyToOne(() => User, (user) => user.referrals, { nullable: true })
   @JoinColumn()
-  @ManyToOne(() => User, (user) => user.referrals)
-  referredBy: User;
+  referredBy?: User | null;
 
+  @IsNumber()
+  @Min(0)
+  @Max(5)
   @Column({ type: 'decimal', default: 0.0 })
   rating: number;
-
-  @Column({ default: false })
-  signupComplete: boolean;
 
   @OneToMany(() => User, (user) => user.referredBy)
   referrals: User[];
@@ -149,4 +179,11 @@ export class User {
 
   @OneToMany(() => Attachment, (attachment) => attachment.author)
   attachmentsCreated: Attachment[];
+
+  @OneToOne(() => UserAuth, (auth) => auth.user, {
+    cascade: true,
+    nullable: false,
+  })
+  @JoinColumn()
+  auth: UserAuth;
 }

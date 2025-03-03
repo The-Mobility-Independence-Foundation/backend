@@ -7,7 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Post } from '../post/post.entity';
-import { User } from '../user/user.entity';
+import { User } from '../user/entities/user.entity';
 import { Forum } from '../forum/forum.entity';
 import { Report } from '../reports/report.entity';
 

@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-
+import { APP_INTERCEPTOR, APP_FILTER } from '@nestjs/core';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { ApiExceptionFilter } from './common/filters/api-exception.filter';
 import { DatabaseModule } from './database/database.module';
-import { AddressModule } from './address/address.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -12,9 +12,17 @@ import { AddressModule } from './address/address.module';
       isGlobal: true,
     }),
     DatabaseModule,
-    AddressModule,
+    AuthModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransformInterceptor,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: ApiExceptionFilter,
+    },
+  ],
 })
 export class AppModule {}

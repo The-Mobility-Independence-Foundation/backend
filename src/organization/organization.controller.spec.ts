@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { OrganizationController } from './organization.controller';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Organization } from './organization.entity';
-import { User } from '../user/user.entity';
+import { User } from '../user/entities/user.entity';
 import { Inventory } from '../inventory/inventory.entity';
 import { OrganizationService } from './organization.service';
 import { Address } from '../address/address.entity';

@@ -1,23 +1,21 @@
-import { Controller, Post, Get, Param } from '@nestjs/common';
-import { User } from './user.entity';
+import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
+import { User } from './entities/user.entity';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Request } from 'express';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { ResponseMessage } from '../common/decorators/response-message.decorator';
 
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @Post()
-  create(): Promise<User> {
-    return this.userService.create();
-  }
-
   @Get()
-  findAll(): Promise<User[]> {
-    return this.userService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: number): Promise<User | null> {
-    return this.userService.findOne(id);
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ResponseMessage('Successfully retrieved user')
+  @ApiOperation({ summary: 'Get the current user' })
+  async getUser(@Req() req: Request): Promise<User> {
+    return req.user as User;
   }
 }

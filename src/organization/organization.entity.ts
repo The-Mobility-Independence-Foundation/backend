@@ -3,7 +3,7 @@ import { Listing } from '../listing/listing.entity';
 import { Inventory } from '../inventory/inventory.entity';
 import { Invite } from '../invite/invite.entity';
 import { Order } from '../order/order.entity';
-import { User } from '../user/user.entity';
+import { User } from '../user/entities/user.entity';
 import { Address } from '../address/address.entity';
 import {
   Entity,

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AttachmentsService } from './attachments.service';
 import { Attachment } from './attachment.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from '../user/user.entity';
+import { User } from '../user/entities/user.entity';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
