@@ -33,7 +33,7 @@ import { ApiTags } from '@nestjs/swagger';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get()
+  //@Get()
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ResponseMessage('Successfully retrieved user')
