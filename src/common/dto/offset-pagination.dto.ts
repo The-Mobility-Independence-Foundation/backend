@@ -2,9 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsOptional, Max, Min } from 'class-validator';
 
 /**
- * Pagination DTO
+ * Offset pagination DTO
  */
-export class PaginationDto {
+export class OffsetPaginationDto {
   @ApiProperty({
     description: 'Page number',
     default: 1,

@@ -6,11 +6,13 @@ import {
 } from 'typeorm';
 
 /**
- * Pagination options
+ * Cursor pagination options
  * @template T - The type of the entity
  */
-export interface PaginationOptions<T extends ObjectLiteral> {
-  where: FindOptionsWhere<T>;
+export interface CursorPaginationOptions<T extends ObjectLiteral> {
+  cursorColumn: keyof T;
+  where?: FindOptionsWhere<T>;
   relations?: FindOptionsRelations<T>;
   order?: FindOptionsOrder<T>;
+  includeCount?: boolean;
 }

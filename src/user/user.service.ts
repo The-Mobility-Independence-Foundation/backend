@@ -8,8 +8,8 @@ import { AuthProviderProfile } from '../auth/entities/auth-provider-profile.enti
 import { UserAuthService } from './user-auth.service';
 import { validateDto } from '../common/utils/validate-dto';
 import { PaginationService } from '../common/services/pagination.service';
-import { PaginationDto } from '../common/dto/pagination.dto';
-import { BaseApiPaginationResponse } from '../common/responses/base-api-pagination.response';
+import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
+import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
 
 @Injectable()
 export class UserService {
@@ -88,13 +88,18 @@ export class UserService {
 
   async getUserConnections(
     id: number,
-    paginationDto: PaginationDto,
-  ): Promise<BaseApiPaginationResponse<User>> {
-    return this.paginationService.paginate(this.userRepository, paginationDto, {
-      where: { id },
-      relations: {
-        connectionsSent: true,
+    cursorPaginationDto: CursorPaginationDto,
+  ): Promise<BaseApiCursorPaginationResponse<User>> {
+    return this.paginationService.paginateWithCursor(
+      this.userRepository,
+      cursorPaginationDto,
+      {
+        cursorColumn: 'id',
+        where: { id },
+        relations: {
+          connectionsSent: true,
+        },
       },
-    });
+    );
   }
 }
