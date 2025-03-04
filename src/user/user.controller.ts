@@ -18,8 +18,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
-import { PaginationDto } from '../common/dto/pagination.dto';
-import { BaseApiPaginationResponse } from '../common/responses/base-api-pagination.response';
+import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
+import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
 
 @ApiTags('users')
 @Controller('users')
@@ -46,8 +46,8 @@ export class UserController {
   })
   async findConnections(
     @Param('id', ParseIntPipe) id: number,
-    @Query() paginationDto: PaginationDto,
-  ): Promise<BaseApiPaginationResponse<User>> {
+    @Query() paginationDto: CursorPaginationDto,
+  ): Promise<BaseApiCursorPaginationResponse<User>> {
     return this.userService.getUserConnections(id, paginationDto);
   }
 }
