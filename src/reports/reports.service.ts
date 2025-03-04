@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { And, LessThan, MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post as PostEntity } from '../post/post.entity';
 import { User } from '../user/entities/user.entity';
@@ -7,6 +7,7 @@ import { Listing } from '../listing/listing.entity';
 import { Report, ReportType } from './report.entity';
 import { Comment } from '../comment/comment.entity';
 import { CreateReportDto } from './dto/create-report.dto';
+import { GetReportsDto } from './dto/get-reports.dto';
 
 @Injectable()
 export class ReportsService {
@@ -114,8 +115,45 @@ export class ReportsService {
     return this.reportRepository.save(report);
   }
 
-  async findAll() {
-    return this.reportRepository.find();
+  async findAll(query: GetReportsDto) {
+    const findOptions: any = {};
+    const findWhere: any = {};
+    const findOrder: any = {
+      id: 'ASC',
+    };
+
+    if (query.nextToken) {
+      findOptions.skip = query.nextToken - 1;
+    }
+
+    if (query.count) {
+      findOptions.take = query.count;
+    }
+
+    if (query.reporterId) {
+      findWhere.reporterId = query.reporterId;
+    }
+
+    if (query.reportedUserId) {
+      findWhere.offenderId = query.reportedUserId;
+    }
+
+    if (query.reportType) {
+      findWhere.type = query.reportType;
+    }
+
+    if (query.before && query.after) {
+      findWhere.reportedOn = And(LessThan(query.before), MoreThan(query.after));
+    } else if (query.before) {
+      findWhere.reportedOn = LessThan(query.before);
+    } else if (query.after) {
+      findWhere.reportedOn = MoreThan(query.after);
+    }
+
+    findOptions.where = findWhere;
+    findOptions.order = findOrder;
+
+    return this.reportRepository.find(findOptions);
   }
 
   async findOne(id: number) {

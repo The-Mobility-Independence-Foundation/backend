@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ReportType } from '../report.entity';
 import {
   IsEnum,
@@ -21,7 +21,7 @@ export class CreateReportDto {
   reportedUserId: number;
 
   @IsOptional()
-  @ApiProperty({
+  @ApiPropertyOptional({
     description:
       "The id of the post being reported, if ReportType = 'post'. Else, null.",
   })
@@ -30,7 +30,7 @@ export class CreateReportDto {
   postId?: number;
 
   @IsOptional()
-  @ApiProperty({
+  @ApiPropertyOptional({
     description:
       "The id of the listing being reported, if ReportType = 'listing'. Else, null.",
   })
@@ -39,7 +39,7 @@ export class CreateReportDto {
   listingId?: number;
 
   @IsOptional()
-  @ApiProperty({
+  @ApiPropertyOptional({
     description:
       "The id of the comment being reported, if ReportType = 'comment'. Else, null.",
   })

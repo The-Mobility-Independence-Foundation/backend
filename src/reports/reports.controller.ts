@@ -6,11 +6,13 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { Report } from './report.entity';
 import { ReportsService } from './reports.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateReportDto } from './dto/create-report.dto';
+import { GetReportsDto } from './dto/get-reports.dto';
 
 @ApiTags('reports')
 @Controller('reports')
@@ -23,8 +25,8 @@ export class ReportsController {
    */
   @Get()
   @ApiOperation({ summary: 'Get all reports that fit search criteria.' })
-  findAll(): Promise<Report[]> {
-    return this.reportService.findAll();
+  findAll(@Query() query: GetReportsDto): Promise<Report[]> {
+    return this.reportService.findAll(query);
   }
 
   /**
