@@ -1,6 +1,13 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { User, UserRole } from './entities/user.entity';
-import { Repository, FindOptionsWhere, FindOptionsRelations, LessThanOrEqual, MoreThanOrEqual, Between } from 'typeorm';
+import {
+  Repository,
+  FindOptionsWhere,
+  FindOptionsRelations,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Between,
+} from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserAuth } from './entities/user-auth.entity';
 import { RegisterDto } from '../auth/dto/register.dto';
@@ -175,7 +182,7 @@ export class UserService {
     const user = await this.userRepository.findOneBy({ id: id });
 
     if (!user) {
-      throw new BadRequestException;
+      throw new BadRequestException();
     }
 
     if (dto.firstName) {
