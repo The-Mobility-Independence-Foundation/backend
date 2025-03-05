@@ -6,6 +6,8 @@ import {
   ParseIntPipe,
   Req,
   UseGuards,
+  Post,
+  Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
@@ -19,7 +21,6 @@ import {
 } from '@nestjs/swagger';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
-import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
 
 @ApiTags('users')
 @Controller('users')
@@ -35,7 +36,7 @@ export class UserController {
     return req.user as User;
   }
 
-  @Get(':id/connections')
+  @Get(':userId/connections')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ResponseMessage('Successfully retrieved user connections')
@@ -44,10 +45,34 @@ export class UserController {
     status: 200,
     description: 'Returns paginated list of user connections',
   })
-  async findConnections(
-    @Param('id', ParseIntPipe) id: number,
+  async getConnections(
+    @Param('userId', ParseIntPipe) userId: number,
     @Query() paginationDto: CursorPaginationDto,
-  ): Promise<BaseApiCursorPaginationResponse<User>> {
-    return this.userService.getUserConnections(id, paginationDto);
+  ) {
+    return this.userService.getConnections(userId, paginationDto);
+  }
+
+  @Post(':userId/connections/:recipientId')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ResponseMessage('Successfully created user connection')
+  @ApiOperation({ summary: 'Create a user connection' })
+  async createConnection(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Param('recipientId', ParseIntPipe) recipientId: number,
+  ) {
+    return this.userService.createConnection(userId, recipientId);
+  }
+
+  @Delete(':userId/connections/:recipientId')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ResponseMessage('Successfully deleted user connection')
+  @ApiOperation({ summary: 'Delete a user connection' })
+  async deleteConnection(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Param('recipientId', ParseIntPipe) recipientId: number,
+  ) {
+    return this.userService.deleteConnection(userId, recipientId);
   }
 }

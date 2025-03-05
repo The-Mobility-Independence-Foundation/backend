@@ -9,7 +9,7 @@ import { UserAuthService } from './user-auth.service';
 import { validateDto } from '../common/utils/validate-dto';
 import { PaginationService } from '../common/services/pagination.service';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
-import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
+import { ConnectionsService } from '../connections/connections.service';
 
 @Injectable()
 export class UserService {
@@ -18,6 +18,7 @@ export class UserService {
     private userRepository: Repository<User>,
     private userAuthService: UserAuthService,
     private paginationService: PaginationService,
+    private connectionsService: ConnectionsService,
   ) {}
 
   /**
@@ -42,6 +43,24 @@ export class UserService {
       },
       relations,
     });
+  }
+
+  /**
+   * Find a user by id
+   * @param id - The id of the user
+   * @param options - Optional query options
+   * @returns The user record or null if not found
+   */
+  async findById(
+    id: number,
+    options: Partial<{
+      where: FindOptionsWhere<Omit<User, 'id'>>;
+      relations: FindOptionsRelations<User>;
+    }> = {},
+  ): Promise<User | null> {
+    const { where = {}, relations } = options;
+
+    return this.userRepository.findOne({ where: { ...where, id }, relations });
   }
 
   /**
@@ -86,20 +105,33 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async getUserConnections(
-    id: number,
-    cursorPaginationDto: CursorPaginationDto,
-  ): Promise<BaseApiCursorPaginationResponse<User>> {
-    return this.paginationService.paginateWithCursor(
-      this.userRepository,
-      cursorPaginationDto,
-      {
-        cursorColumn: 'id',
-        where: { id },
-        relations: {
-          connectionsSent: true,
-        },
-      },
-    );
+  /**
+   * Get the connections of a user through pagination
+   * @param userId - The id of the user
+   * @param paginationDto - The pagination dto
+   * @returns The paginated list of user connections
+   */
+  async getConnections(userId: number, paginationDto: CursorPaginationDto) {
+    return this.connectionsService.findAll(userId, paginationDto);
+  }
+
+  /**
+   * Create a connection between two users
+   * @param userId - The id of the user
+   * @param recipientId - The id of the recipient
+   * @returns The recipient user
+   */
+  async createConnection(userId: number, recipientId: number) {
+    return this.connectionsService.create(userId, recipientId);
+  }
+
+  /**
+   * Delete a connection between two users
+   * @param userId - The id of the user
+   * @param recipientId - The id of the recipient
+   * @returns The recipient user
+   */
+  async deleteConnection(userId: number, recipientId: number) {
+    return this.connectionsService.delete(userId, recipientId);
   }
 }
