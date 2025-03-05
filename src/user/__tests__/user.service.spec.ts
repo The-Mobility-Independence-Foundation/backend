@@ -11,11 +11,16 @@ import { when } from 'jest-when';
 import { RegisterDto } from '../../auth/dto/register.dto';
 import { AuthProviderProfile } from '../../auth/entities/auth-provider-profile.entity';
 import { BadRequestException } from '@nestjs/common';
+import { ConnectionsService } from '../../connections/connections.service';
+import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
+import { Connection } from '../../connections/entities/connection.entity';
+import { BaseApiCursorPaginationResponse } from '../../common/responses/base-api-cursor-pagination.response';
 
 describe('UserService', () => {
   let service: UserService;
   let userAuthService: UserAuthService;
   let userRepository: Repository<User>;
+  let connectionsService: ConnectionsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -33,6 +38,7 @@ describe('UserService', () => {
     service = module.get(UserService);
     userAuthService = module.get(UserAuthService);
     userRepository = module.get(getRepositoryToken(User));
+    connectionsService = module.get(ConnectionsService);
   });
 
   describe('findByEmail', () => {
@@ -215,6 +221,77 @@ describe('UserService', () => {
 
       await expect(service.create(registerDto)).rejects.toThrow(
         BadRequestException,
+      );
+    });
+  });
+
+  describe('getConnections', () => {
+    it('should return paginated connections for a user', async () => {
+      const userId = 1;
+      const paginationDto = new CursorPaginationDto();
+      const expectedResponse =
+        new BaseApiCursorPaginationResponse<Connection>();
+      Object.assign(expectedResponse, {
+        results: [new Connection(), new Connection()],
+        nextCursor: '2',
+        hasNextPage: true,
+        hasPreviousPage: false,
+      });
+
+      when(connectionsService.findAll)
+        .calledWith(userId, paginationDto)
+        .mockResolvedValue(expectedResponse);
+
+      const result = await service.getConnections(userId, paginationDto);
+
+      expect(result).toBeDefined();
+      expect(result).toBe(expectedResponse);
+      expect(connectionsService.findAll).toHaveBeenCalledWith(
+        userId,
+        paginationDto,
+      );
+    });
+  });
+
+  describe('createConnection', () => {
+    it('should create a connection between users', async () => {
+      const userId = 1;
+      const recipientId = 2;
+      const connection = new Connection();
+      Object.assign(connection, {
+        followerId: userId,
+        followingId: recipientId,
+      });
+
+      when(connectionsService.create)
+        .calledWith(userId, recipientId)
+        .mockResolvedValue(connection);
+
+      const result = await service.createConnection(userId, recipientId);
+
+      expect(result).toBeDefined();
+      expect(result).toBe(connection);
+      expect(connectionsService.create).toHaveBeenCalledWith(
+        userId,
+        recipientId,
+      );
+    });
+  });
+
+  describe('deleteConnection', () => {
+    it('should delete a connection between users', async () => {
+      const userId = 1;
+      const recipientId = 2;
+
+      when(connectionsService.delete)
+        .calledWith(userId, recipientId)
+        .mockResolvedValue(undefined);
+
+      await service.deleteConnection(userId, recipientId);
+
+      expect(connectionsService.delete).toHaveBeenCalledWith(
+        userId,
+        recipientId,
       );
     });
   });
