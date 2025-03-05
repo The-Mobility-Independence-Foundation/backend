@@ -7,6 +7,9 @@ import { RegisterDto } from '../auth/dto/register.dto';
 import { AuthProviderProfile } from '../auth/entities/auth-provider-profile.entity';
 import { UserAuthService } from './user-auth.service';
 import { validateDto } from '../common/utils/validate-dto';
+import { PaginationService } from '../common/services/pagination.service';
+import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
+import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
 
 @Injectable()
 export class UserService {
@@ -14,6 +17,7 @@ export class UserService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private userAuthService: UserAuthService,
+    private paginationService: PaginationService,
   ) {}
 
   /**
@@ -80,5 +84,22 @@ export class UserService {
     user = await validateDto(user, User);
 
     return this.userRepository.save(user);
+  }
+
+  async getUserConnections(
+    id: number,
+    cursorPaginationDto: CursorPaginationDto,
+  ): Promise<BaseApiCursorPaginationResponse<User>> {
+    return this.paginationService.paginateWithCursor(
+      this.userRepository,
+      cursorPaginationDto,
+      {
+        cursorColumn: 'id',
+        where: { id },
+        relations: {
+          connectionsSent: true,
+        },
+      },
+    );
   }
 }
