@@ -23,9 +23,9 @@ import {
 } from '@nestjs/swagger';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
+import { ResourceAccess } from '../auth/decorators/resource-access.decorator';
 import { GetUsersDto } from './dto/get-users.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-
 @ApiTags('users')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
@@ -41,6 +41,7 @@ export class UserController {
   }
 
   @Get(':userId/connections')
+  @ResourceAccess()
   @ResponseMessage('Successfully retrieved user connections')
   @ApiOperation({ summary: 'Get user connections' })
   @ApiResponse({
@@ -55,6 +56,7 @@ export class UserController {
   }
 
   @Post(':userId/connections/:recipientId')
+  @ResourceAccess()
   @ResponseMessage('Successfully created user connection')
   @ApiOperation({ summary: 'Create a user connection' })
   async createConnection(
@@ -65,6 +67,7 @@ export class UserController {
   }
 
   @Delete(':userId/connections/:recipientId')
+  @ResourceAccess()
   @ResponseMessage('Successfully deleted user connection')
   @ApiOperation({ summary: 'Delete a user connection' })
   async deleteConnection(
