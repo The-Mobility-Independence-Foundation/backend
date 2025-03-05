@@ -26,7 +26,6 @@ import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
 import { GetUsersDto } from './dto/get-users.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('users')
 @Controller('users')
@@ -87,7 +86,7 @@ export class UserController {
   */
   @Get()
   findAll(@Query() query: GetUsersDto): Promise<User[]> {
-    return this.userService.findAllFiltered(query);
+    return this.userService.findAll(query);
   }
 
   @Get(':id')

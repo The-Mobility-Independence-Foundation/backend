@@ -125,11 +125,12 @@ export class UserService {
     return this.connectionsService.delete(userId, recipientId);
   }
   
-  async findAll() {
-    return this.userRepository.find();
-  }
-
-  async findAllFiltered(query: GetUsersDto) {
+  /**
+   * Returns all users from the database that match the search critera
+   * @param query - The search criteria
+   * @returns An array of the users
+   */
+  async findAll(query: GetUsersDto) {
     const findOptions: any = {};
     const findWhere: any = {};
     const findOrder: any = {
@@ -144,7 +145,7 @@ export class UserService {
     };
 
     if (query.nextToken) {
-      findOptions.skip = query.nextToken - 1;
+      findOptions.skip = query.nextToken;
     }
 
     if (query.count) {
@@ -174,10 +175,26 @@ export class UserService {
     return this.userRepository.find(findOptions);
   }
 
+  /**
+   * Returns a single user from the database with the specified id
+   * @param id - The id of the user to search for
+   * @returns The user, if they exist, otherwise a BadRequestException
+   */
   async findOne(id: number) {
-    return this.userRepository.findOneBy({ id: id });
+    const user = await this.userRepository.findOneBy({ id: id });
+    if (user) {
+      return user;
+    } else {
+      throw new BadRequestException();
+    }
   }
 
+  /**
+   * Updates a user based on their id and the provided dto
+   * @param id - The id of the user to update
+   * @param dto - The fields to change and their new values
+   * @returns The updated user, if they existed, otherwise a BadRequestException
+   */
   async update(id: number, dto: UpdateUserDto) {
     const user = await this.userRepository.findOneBy({ id: id });
 

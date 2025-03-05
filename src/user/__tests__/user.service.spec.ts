@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from '../user.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from '../entities/user.entity';
-import { Repository } from 'typeorm';
+import { User, UserRole } from '../entities/user.entity';
+import { Between, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { createMock } from '@golevelup/ts-jest';
 import { UserAuthService } from '../user-auth.service';
 import { UserAuth } from '../entities/user-auth.entity';
@@ -15,6 +15,8 @@ import { ConnectionsService } from '../../connections/connections.service';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 import { Connection } from '../../connections/connection.entity';
 import { BaseApiCursorPaginationResponse } from '../../common/responses/base-api-cursor-pagination.response';
+import { UpdateUserDto } from '../dto/update-user.dto';
+import { GetUsersDto } from '../dto/get-users.dto';
 
 describe('UserService', () => {
   let service: UserService;
@@ -292,6 +294,300 @@ describe('UserService', () => {
       expect(connectionsService.delete).toHaveBeenCalledWith(
         userId,
         recipientId,
+      );
+    });
+  });
+
+  describe('findOne', () => {
+    it('should return a user if a user with the id exists', async () => {
+      const user = new User();
+      Object.assign(user, {
+        id: 1,
+        email: 'test@test.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        displayName: 'John Doe',
+      });
+
+      when(userRepository.findOneBy)
+        .calledWith({ id: user.id })
+        .mockResolvedValue(user);
+
+      const result = await service.findOne(user.id);
+
+      expect(result).toBeDefined();
+      expect(result).toBe(user);
+    });
+
+    it('should return an error if a user without the id exists', async () => {
+      const bad_id = 999999999;
+
+      when(userRepository.findOneBy)
+        .calledWith({ id: bad_id })
+        .mockResolvedValue(null);
+
+      await expect(service.findOne(bad_id)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+  });
+
+  describe('update', () => {
+    it('should return an error if there is no user with the specified id', async () => {
+      const bad_id = 999999999;
+
+      when(userRepository.findOneBy)
+        .calledWith({ id: bad_id })
+        .mockResolvedValue(null);
+
+      await expect(service.update(bad_id, new UpdateUserDto())).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('should update the first name if the user exists', async () => {
+      const user = new User();
+      Object.assign(user, {
+        id: 1,
+        email: 'test@test.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        displayName: 'John Doe',
+      });
+
+      const dto = new UpdateUserDto();
+      Object.assign(dto, {
+        firstName: 'NotJohn',
+      });
+
+      when(userRepository.findOneBy)
+        .calledWith({ id: user.id })
+        .mockResolvedValue(user);
+
+      when(userRepository.save).mockImplementation((user: User) => {
+        return Promise.resolve(user);
+      });
+
+      const result = await service.update(user.id, dto);
+
+      expect(result).toBeDefined();
+      expect(result.firstName).toBe(dto.firstName);
+      expect(result.lastName).toBe(user.lastName);
+      expect(result.displayName).toBe(user.displayName);
+      expect(result.type).toBe(user.type);
+    });
+
+    it('should update the last name if the user exists', async () => {
+      const user = new User();
+      Object.assign(user, {
+        id: 1,
+        email: 'test@test.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        displayName: 'John Doe',
+      });
+
+      const dto = new UpdateUserDto();
+      Object.assign(dto, {
+        lastName: 'NotDoe',
+      });
+
+      when(userRepository.findOneBy)
+        .calledWith({ id: user.id })
+        .mockResolvedValue(user);
+
+      when(userRepository.save).mockImplementation((user: User) => {
+        return Promise.resolve(user);
+      });
+
+      const result = await service.update(user.id, dto);
+
+      expect(result).toBeDefined();
+      expect(result.firstName).toBe(user.firstName);
+      expect(result.lastName).toBe(dto.lastName);
+      expect(result.displayName).toBe(user.displayName);
+      expect(result.type).toBe(user.type);
+    });
+
+    it('should update the displayname if the user exists', async () => {
+      const user = new User();
+      Object.assign(user, {
+        id: 1,
+        email: 'test@test.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        displayName: 'John Doe',
+      });
+
+      const dto = new UpdateUserDto();
+      Object.assign(dto, {
+        displayName: 'NotJohnDoe',
+      });
+
+      when(userRepository.findOneBy)
+        .calledWith({ id: user.id })
+        .mockResolvedValue(user);
+
+      when(userRepository.save).mockImplementation((user: User) => {
+        return Promise.resolve(user);
+      });
+
+      const result = await service.update(user.id, dto);
+
+      expect(result).toBeDefined();
+      expect(result.firstName).toBe(user.firstName);
+      expect(result.lastName).toBe(user.lastName);
+      expect(result.displayName).toBe(dto.displayName);
+      expect(result.type).toBe(user.type);
+    });
+
+    it('should update the user type if the user exists', async () => {
+      const user = new User();
+      Object.assign(user, {
+        id: 1,
+        email: 'test@test.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        displayName: 'John Doe',
+      });
+
+      const dto = new UpdateUserDto();
+      Object.assign(dto, {
+        accountType: UserRole.ADMIN,
+      });
+
+      when(userRepository.findOneBy)
+        .calledWith({ id: user.id })
+        .mockResolvedValue(user);
+
+      when(userRepository.save).mockImplementation((user: User) => {
+        return Promise.resolve(user);
+      });
+
+      const result = await service.update(user.id, dto);
+
+      expect(result).toBeDefined();
+      expect(result.firstName).toBe(user.firstName);
+      expect(result.lastName).toBe(user.lastName);
+      expect(result.displayName).toBe(user.displayName);
+      expect(result.type).toBe(dto.accountType);
+    });
+  });
+
+  describe('findAll', () => {
+    it('should use skip when nextToken is specified', async () => {
+      const dto = new GetUsersDto();
+      Object.assign(dto, {
+        nextToken: 7,
+      });
+
+      service.findAll(dto);
+
+      expect(userRepository.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          skip: dto.nextToken,
+        }),
+      );
+    });
+
+    it('should use take when count is specified', async () => {
+      const dto = new GetUsersDto();
+      Object.assign(dto, {
+        count: 7,
+      });
+
+      service.findAll(dto);
+
+      expect(userRepository.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          take: dto.count,
+        }),
+      );
+    });
+
+    it('should use displayName when username is specified', async () => {
+      const dto = new GetUsersDto();
+      Object.assign(dto, {
+        username: 'John E. Test',
+      });
+
+      service.findAll(dto);
+
+      expect(userRepository.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            displayName: dto.username,
+          },
+        }),
+      );
+    });
+
+    it('should use type when accountType is specified', async () => {
+      const dto = new GetUsersDto();
+      Object.assign(dto, {
+        accountType: UserRole.ADMIN,
+      });
+
+      service.findAll(dto);
+
+      expect(userRepository.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            type: dto.accountType,
+          },
+        }),
+      );
+    });
+
+    it('should use Between when minRating and maxRating are specified', async () => {
+      const dto = new GetUsersDto();
+      Object.assign(dto, {
+        minRating: 1,
+        maxRating: 5,
+      });
+
+      service.findAll(dto);
+
+      expect(userRepository.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            rating: Between(dto.minRating, dto.maxRating),
+          },
+        }),
+      );
+    });
+
+    it('should use LessThanOrEqual when only maxRating is specified', async () => {
+      const dto = new GetUsersDto();
+      Object.assign(dto, {
+        maxRating: 5,
+      });
+
+      service.findAll(dto);
+
+      expect(userRepository.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            rating: LessThanOrEqual(dto.maxRating),
+          },
+        }),
+      );
+    });
+
+    it('should use MoreThanOrEqual when only minRating is specified', async () => {
+      const dto = new GetUsersDto();
+      Object.assign(dto, {
+        minRating: 3,
+      });
+
+      service.findAll(dto);
+
+      expect(userRepository.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            rating: MoreThanOrEqual(dto.minRating),
+          },
+        }),
       );
     });
   });
