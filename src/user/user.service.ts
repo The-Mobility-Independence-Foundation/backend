@@ -124,7 +124,7 @@ export class UserService {
   async deleteConnection(userId: number, recipientId: number) {
     return this.connectionsService.delete(userId, recipientId);
   }
-  
+
   /**
    * Returns all users from the database that match the search critera
    * @param query - The search criteria
