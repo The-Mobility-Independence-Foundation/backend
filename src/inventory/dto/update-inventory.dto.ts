@@ -16,6 +16,8 @@ export class UpdateInventoryDto {
   })
   description?: string;
 
+  /*
   @ApiProperty()
   address?: number;
+  */
 }

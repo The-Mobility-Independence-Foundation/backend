@@ -69,10 +69,16 @@ export class InventoryService {
    * @returns : Information of a specific inventory
    */
   async findOne(id: number, organizationId: number) {
-    return this.inventoryRepository.findOne({
-      where: { id: id, organization: { id: organizationId } },
+    const inventory = await this.inventoryRepository.findOne({
+      where: { id, organization: { id: organizationId } },
       relations: ['organization', 'address', 'items'],
     });
+
+    if (!inventory) {
+      throw new NotFoundException('Inventory not found');
+    }
+
+    return inventory;
   }
 
   /**
@@ -88,6 +94,7 @@ export class InventoryService {
       throw new NotFoundException('Inventory not found');
     }
 
+    /*
     const address = await this.addressRepository.findOneBy({
       id: dto.address,
     });
@@ -95,6 +102,7 @@ export class InventoryService {
       throw new NotFoundException('Address not found');
     }
     inventory.address = address;
+    */
 
     if (dto.description) {
       inventory.description = dto.description;
