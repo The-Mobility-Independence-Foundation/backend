@@ -13,6 +13,7 @@ import { ReportsService } from './reports.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateReportDto } from './dto/create-report.dto';
 import { GetReportsDto } from './dto/get-reports.dto';
+import { UpdateReportDto } from './dto/update-report.dto';
 
 @ApiTags('reports')
 @Controller('reports')
@@ -57,7 +58,10 @@ export class ReportsController {
    */
   @Patch(':id')
   @ApiOperation({ summary: 'Update the report with a given id.' })
-  update(@Param('id') id: number): Promise<Report | null> {
-    return this.reportService.findOne(id);
+  update(
+    @Param('id') id: number,
+    @Body() dto: UpdateReportDto,
+  ): Promise<Report | null> {
+    return this.reportService.update(id, dto);
   }
 }
