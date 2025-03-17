@@ -1,7 +1,8 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Connection } from './entities/connection.entity';
+import { Connection } from './connection.entity';
+import { User } from '../user/entities/user.entity';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { PaginationService } from '../common/services/pagination.service';
 import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
@@ -11,6 +12,8 @@ export class ConnectionsService {
   constructor(
     @InjectRepository(Connection)
     private connectionRepository: Repository<Connection>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
     private paginationService: PaginationService,
   ) {}
 
@@ -58,6 +61,17 @@ export class ConnectionsService {
    * @returns The created connection
    */
   async create(followerId: number, followingId: number): Promise<Connection> {
+    if (followerId === followingId) {
+      throw new BadRequestException('Cannot create a connection with yourself');
+    }
+
+    const following = await this.userRepository.findOne({
+      where: { id: followingId },
+    });
+    if (!following) {
+      throw new BadRequestException(`Following user not found`);
+    }
+
     if (await this.doesConnectionExist(followerId, followingId)) {
       throw new BadRequestException('Connection already exists');
     }

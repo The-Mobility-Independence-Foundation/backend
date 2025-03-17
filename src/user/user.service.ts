@@ -7,7 +7,6 @@ import { RegisterDto } from '../auth/dto/register.dto';
 import { AuthProviderProfile } from '../auth/entities/auth-provider-profile.entity';
 import { UserAuthService } from './user-auth.service';
 import { validateDto } from '../common/utils/validate-dto';
-import { PaginationService } from '../common/services/pagination.service';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { ConnectionsService } from '../connections/connections.service';
 
@@ -17,7 +16,6 @@ export class UserService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private userAuthService: UserAuthService,
-    private paginationService: PaginationService,
     private connectionsService: ConnectionsService,
   ) {}
 

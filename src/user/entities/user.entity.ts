@@ -41,7 +41,7 @@ import {
 } from '../../common/decorators/user.decorators';
 import { UserValidation } from '../../common/validation/user.validation';
 import { UserAuth } from './user-auth.entity';
-import { Connection } from '../../connections/entities/connection.entity';
+import { Connection } from '../../connections/connection.entity';
 
 /**
  * The role of a user
