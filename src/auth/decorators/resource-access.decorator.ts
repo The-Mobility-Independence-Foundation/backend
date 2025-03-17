@@ -5,7 +5,7 @@ import {
   ApiForbiddenResponse,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { ResourceAccessGuard } from '../guards/resource-access.guard';
+import { ResourceAccessGuard } from '../../auth/guards/resource-access.guard';
 import { ResourceAccessOptions } from '../interfaces/resource-access-options.interface';
 
 /**
@@ -27,6 +27,16 @@ export function ResourceAccess(options: ResourceAccessOptions = {}) {
     ApiForbiddenResponse({ description: 'Forbidden' }),
   );
 }
+/**
+ * Decorator to set resource access to admins and moderators
+ * @param options Configuration options for resource access
+ * @returns A decorator function
+ */
+export function ModeratorAccess(
+  options: Omit<ResourceAccessOptions, 'moderatorAccess'> = {},
+) {
+  return ResourceAccess({ ...options, moderatorAccess: true });
+}
 
 /**
  * Decorator to set resource access to only admins
@@ -37,15 +47,4 @@ export function AdminOnly(
   options: Omit<ResourceAccessOptions, 'adminOnly'> = {},
 ) {
   return ResourceAccess({ ...options, adminOnly: true });
-}
-
-/**
- * Decorator to set resource access to admins and moderators
- * @param options Configuration options for resource access
- * @returns A decorator function
- */
-export function ModeratorAccess(
-  options: Omit<ResourceAccessOptions, 'moderatorAccess'> = {},
-) {
-  return ResourceAccess({ ...options, moderatorAccess: true });
 }
