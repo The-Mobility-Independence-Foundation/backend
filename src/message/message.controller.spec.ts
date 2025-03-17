@@ -4,8 +4,8 @@ import { MessageService } from './message.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Message } from './message.entity';
 import { User } from '../user/entities/user.entity';
-import { Conversation } from '../conversation/conversation.entity';
-import { createMock } from '@golevelup/ts-jest';
+import { Conversation } from '../conversations/entities/conversation.entity';
+
 export const mockRepository = jest.fn(() => ({
   metadata: {
     columns: [],

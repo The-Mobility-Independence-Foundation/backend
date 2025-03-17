@@ -1,4 +1,4 @@
-import { Conversation } from '../conversation/conversation.entity';
+import { Conversation } from '../conversations/entities/conversation.entity';
 import { InventoryItem } from '../inventory-item/inventory-item.entity';
 import { Order } from '../order/order.entity';
 import { User } from '../user/entities/user.entity';

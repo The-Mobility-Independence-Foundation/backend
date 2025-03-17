@@ -8,7 +8,7 @@ import { OrganizationModule } from '../organization/organization.module';
 import { InviteModule } from '../invite/invite.module';
 import { RequestModule } from '../request/request.module';
 import { ReviewModule } from '../review/review.module';
-import { ConversationModule } from '../conversation/conversation.module';
+import { ConversationModule } from '../conversations/conversations.module';
 import { MessageModule } from '../message/message.module';
 import { ListingModule } from '../listing/listing.module';
 import { OrderModule } from '../order/order.module';

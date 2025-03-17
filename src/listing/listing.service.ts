@@ -18,6 +18,30 @@ export class ListingService {
     private readonly inventoryItemRepository: Repository<InventoryItem>,
   ) {}
 
+  /**
+   * Find a listing by id
+   * @param id - The id of the listing
+   * @param options - Optional query options
+   * @returns The listing record
+   */
+  async findById(
+    id: number,
+    options: Partial<{
+      where: FindOptionsWhere<Omit<Listing, 'id'>>;
+      relations: FindOptionsRelations<Listing>;
+    }> = {},
+  ) {
+    const { where = {}, relations } = options;
+
+    return this.listingRepository.findOne({
+      where: {
+        ...where,
+        id: id,
+      },
+      relations,
+    });
+  }
+
   async create() {
     const listing = new Listing();
     const owner = await this.organizationRepository.findOneBy({ id: 1 });

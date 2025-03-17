@@ -17,7 +17,7 @@ import {
 } from 'typeorm';
 import { Message } from '../../message/message.entity';
 import { Listing } from '../../listing/listing.entity';
-import { Conversation } from '../../conversation/conversation.entity';
+import { Conversation } from '../../conversations/entities/conversation.entity';
 import { Post } from '../../post/post.entity';
 import { Comment } from '../../comment/comment.entity';
 import { PostSubscription } from '../../post-subscription/post-subscription.entity';
@@ -141,11 +141,14 @@ export class User {
   @OneToMany(() => Connection, (connection) => connection.following)
   followers: Connection[];
 
-  @OneToMany(
-    () => Conversation,
-    (conversation) => conversation.participant1 && conversation.participant2,
-  )
-  conversations: Conversation[];
+  @OneToMany(() => Conversation, (conversation) => conversation.initiator)
+  initiatedConversations: Conversation[];
+
+  @OneToMany(() => Conversation, (conversation) => conversation.handler)
+  handledConversations: Conversation[];
+
+  @OneToMany(() => Conversation, (conversation) => conversation.participant)
+  participantConversations: Conversation[];
 
   @OneToMany(() => Post, (post) => post.user)
   posts: Post[];

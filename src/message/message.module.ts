@@ -4,7 +4,7 @@ import { MessageController } from './message.controller';
 import { MessageService } from './message.service';
 import { Message } from './message.entity';
 import { User } from '../user/entities/user.entity';
-import { Conversation } from '../conversation/conversation.entity';
+import { Conversation } from '../conversations/entities/conversation.entity';
 import { AttachmentsModule } from '../attachments/attachments.module';
 
 @Module({

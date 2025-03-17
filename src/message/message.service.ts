@@ -1,9 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { Message } from './message.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
-import { Conversation } from '../conversation/conversation.entity';
+import { Conversation } from '../conversations/entities/conversation.entity';
+
+interface CreateMessageDto {
+  conversationId: number;
+  authorId: number;
+  content: string;
+}
 
 @Injectable()
 export class MessageService {
@@ -38,11 +48,30 @@ export class MessageService {
     return savedMessage;
   }
 
-  async findAll() {
-    return this.messageRepository.find();
+  async findAll(conversationId: number): Promise<Message[]> {
+    return this.messageRepository.find({
+      where: { conversation: { id: conversationId } },
+      relations: ['author'],
+      order: { id: 'ASC' },
+    });
   }
 
-  async findOne(id: number) {
-    return this.messageRepository.findOneBy({ id: id });
+  async findOne(id: number): Promise<Message> {
+    const message = await this.messageRepository.findOne({
+      where: { id },
+      relations: ['author', 'conversation'],
+    });
+
+    if (!message) {
+      throw new NotFoundException('Message not found');
+    }
+
+    return message;
+  }
+
+  async markAsRead(messageId: number): Promise<Message> {
+    const message = await this.findOne(messageId);
+    message.readStatus = new Date();
+    return this.messageRepository.save(message);
   }
 }

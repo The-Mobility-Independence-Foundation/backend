@@ -63,6 +63,7 @@ export class PaginationService {
       includeCount = false,
       withDeleted = false,
     } = options;
+    // TODO: support whereClause as an array
     let whereClause = { ...where };
     const orderClause = {
       ...order,
@@ -121,6 +122,7 @@ export class PaginationService {
       count = await repository.count({ where });
     }
 
+    // TODO: Small bug: Cursor appears on first page when direction is next
     const nextCursor =
       hasNextPage && items.length > 0
         ? this.encodeCursor(items[items.length - 1][cursorColumn])

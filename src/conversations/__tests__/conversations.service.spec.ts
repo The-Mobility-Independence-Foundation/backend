@@ -1,9 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConversationService } from './conversation.service';
+import { ConversationsService } from '../conversations.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Conversation } from './conversation.entity';
-import { Listing } from '../listing/listing.entity';
-import { User } from '../user/entities/user.entity';
+import { Conversation } from '../entities/conversation.entity';
+import { Listing } from '../../listing/listing.entity';
+import { User } from '../../user/entities/user.entity';
+import { ConversationHandlerHistory } from '../entities/conversation-handler-history.entity';
+import { createMock } from '@golevelup/ts-jest';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -12,15 +14,19 @@ export const mockRepository = jest.fn(() => ({
   },
 }));
 
-describe('ConversationService', () => {
-  let service: ConversationService;
+describe('ConversationsService', () => {
+  let service: ConversationsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        ConversationService,
+        ConversationsService,
         {
           provide: getRepositoryToken(Conversation),
+          useClass: mockRepository,
+        },
+        {
+          provide: getRepositoryToken(ConversationHandlerHistory),
           useClass: mockRepository,
         },
         {
@@ -32,9 +38,11 @@ describe('ConversationService', () => {
           useClass: mockRepository,
         },
       ],
-    }).compile();
+    })
+      .useMocker(createMock)
+      .compile();
 
-    service = module.get<ConversationService>(ConversationService);
+    service = module.get<ConversationsService>(ConversationsService);
   });
 
   it('should be defined', () => {
