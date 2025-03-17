@@ -33,7 +33,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  //@Get()
+  @Get()
   @ResponseMessage('Successfully retrieved user')
   @ApiOperation({ summary: 'Get the current user' })
   async getUser(@Req() req: Request): Promise<User> {
@@ -43,11 +43,7 @@ export class UserController {
   @Get(':userId/connections')
   @ResourceAccess()
   @ResponseMessage('Successfully retrieved user connections')
-  @ApiOperation({ summary: 'Get user connections' })
-  @ApiResponse({
-    status: 200,
-    description: 'Returns paginated list of user connections',
-  })
+  @ApiOperation({ summary: 'Get user connections (paginated)' })
   async getConnections(
     @Param('userId', ParseIntPipe) userId: number,
     @Query() paginationDto: CursorPaginationDto,
