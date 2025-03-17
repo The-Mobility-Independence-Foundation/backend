@@ -36,7 +36,7 @@ export class InventoryItemService {
       throw new NotFoundException('Inventory not found');
     }
     inventoryItem.inventory = inventory;
-    
+
     if (model) {
       inventoryItem.model = model;
     }
