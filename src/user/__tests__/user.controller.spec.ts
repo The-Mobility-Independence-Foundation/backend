@@ -7,7 +7,7 @@ import { Organization } from '../../organization/organization.entity';
 import { createMock } from '@golevelup/ts-jest';
 import { Repository } from 'typeorm';
 import { Request } from 'express';
-import { Connection } from '../../connections/entities/connection.entity';
+import { Connection } from '../../connections/connection.entity';
 import { when } from 'jest-when';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 import { BaseApiCursorPaginationResponse } from '../../common/responses/base-api-cursor-pagination.response';

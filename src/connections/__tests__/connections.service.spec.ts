@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConnectionsService } from '../connections.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Connection } from '../entities/connection.entity';
+import { Connection } from '../connection.entity';
 import { Repository, DeleteResult } from 'typeorm';
 import { createMock } from '@golevelup/ts-jest';
 import { when } from 'jest-when';
@@ -9,10 +9,12 @@ import { BadRequestException } from '@nestjs/common';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 import { PaginationService } from '../../common/services/pagination.service';
 import { BaseApiCursorPaginationResponse } from '../../common/responses/base-api-cursor-pagination.response';
+import { User } from '../../user/entities/user.entity';
 
 describe('ConnectionsService', () => {
   let service: ConnectionsService;
   let connectionRepository: Repository<Connection>;
+  let userRepository: Repository<User>;
   let paginationService: PaginationService;
 
   beforeEach(async () => {
@@ -24,8 +26,8 @@ describe('ConnectionsService', () => {
           useValue: createMock<Repository<Connection>>(),
         },
         {
-          provide: PaginationService,
-          useValue: createMock<PaginationService>(),
+          provide: getRepositoryToken(User),
+          useValue: createMock<Repository<User>>(),
         },
       ],
     })
@@ -34,6 +36,7 @@ describe('ConnectionsService', () => {
 
     service = module.get(ConnectionsService);
     connectionRepository = module.get(getRepositoryToken(Connection));
+    userRepository = module.get(getRepositoryToken(User));
     paginationService = module.get(PaginationService);
   });
 
@@ -110,6 +113,12 @@ describe('ConnectionsService', () => {
         followingId,
       });
 
+      when(userRepository.findOne)
+        .calledWith({
+          where: { id: followingId },
+        })
+        .mockResolvedValue(new User());
+
       when(connectionRepository.exists)
         .calledWith({
           where: { followerId, followingId },
@@ -129,6 +138,30 @@ describe('ConnectionsService', () => {
       expect(result).toBe(connection);
       expect(result.followerId).toBe(followerId);
       expect(result.followingId).toBe(followingId);
+    });
+
+    it('should throw BadRequestException if follower and following are the same', async () => {
+      const followerId = 1;
+      const followingId = 1;
+
+      await expect(service.create(followerId, followingId)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('should throw BadRequestException if following user not found', async () => {
+      const followerId = 1;
+      const followingId = 2;
+
+      when(userRepository.findOne)
+        .calledWith({
+          where: { id: followingId },
+        })
+        .mockResolvedValue(null);
+
+      await expect(service.create(followerId, followingId)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw BadRequestException if connection already exists', async () => {

@@ -6,7 +6,6 @@ import { ApiExceptionFilter } from './common/filters/api-exception.filter';
 import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
-import { ConnectionsModule } from './connections/connections.module';
 
 @Module({
   imports: [
@@ -16,7 +15,6 @@ import { ConnectionsModule } from './connections/connections.module';
     DatabaseModule,
     AuthModule,
     CommonModule,
-    ConnectionsModule,
   ],
   providers: [
     {

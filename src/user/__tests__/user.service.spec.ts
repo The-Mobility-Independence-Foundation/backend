@@ -13,7 +13,7 @@ import { AuthProviderProfile } from '../../auth/entities/auth-provider-profile.e
 import { BadRequestException } from '@nestjs/common';
 import { ConnectionsService } from '../../connections/connections.service';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
-import { Connection } from '../../connections/entities/connection.entity';
+import { Connection } from '../../connections/connection.entity';
 import { BaseApiCursorPaginationResponse } from '../../common/responses/base-api-cursor-pagination.response';
 
 describe('UserService', () => {
