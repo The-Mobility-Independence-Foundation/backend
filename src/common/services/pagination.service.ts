@@ -123,11 +123,8 @@ export class PaginationService {
       hasNextPage && items.length > 0
         ? this.encodeCursor(items[items.length - 1][cursorColumn])
         : null;
-    // TODO: Small bug here
     const previousCursor =
-      items.length > 0 && hasPreviousPage
-        ? this.encodeCursor(items[0][cursorColumn])
-        : null;
+      items.length > 0 ? this.encodeCursor(items[0][cursorColumn]) : null;
 
     return {
       results: items,
