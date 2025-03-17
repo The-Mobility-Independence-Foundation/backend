@@ -1,8 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsPositive, MaxLength } from 'class-validator';
 
 export class CreateInventoryDto {
   @ApiProperty()
+  @IsPositive()
   @IsNotEmpty({ message: 'Organization cannot be blank' })
   organizationId: number;
 
@@ -23,6 +24,7 @@ export class CreateInventoryDto {
   description: string;
 
   @ApiProperty()
+  @IsPositive()
   @IsNotEmpty({ message: 'Address cannot be blank.' })
   address: number;
 }

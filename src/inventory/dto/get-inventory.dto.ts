@@ -14,7 +14,6 @@ export class getInventoryDto {
 
   @IsOptional()
   @ApiPropertyOptional({ description: 'The name of the inventory.' })
-  @IsPositive()
   name?: string;
 
   @IsOptional()
