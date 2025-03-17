@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InventoryItem } from './inventory-item.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Inventory } from '../inventory/inventory.entity';
 import { Model } from '../model/model.entity';
 import { Part } from '../part/part.entity';
+import { CreateInventoryItemDto } from './dto/create-inventory-item.dto';
+//import { UpdateInventoryItemDto } from './dto/update-inventory-item.dto';
 
 @Injectable()
 export class InventoryItemService {
@@ -22,15 +24,19 @@ export class InventoryItemService {
     private readonly partRepository: Repository<Part>,
   ) {}
 
-  async create() {
+  async create(dto: CreateInventoryItemDto) {
     const inventoryItem = new InventoryItem();
-    const inventory = await this.inventoryRepository.findOneBy({ id: 1 });
     const model = await this.modelRepository.findOneBy({ id: 1 });
     const part = await this.partRepository.findOneBy({ id: 1 });
+    const inventory = await this.inventoryRepository.findOneBy({
+      id: dto.inventory,
+    });
 
-    if (inventory) {
-      inventoryItem.inventory = inventory;
+    if (!inventory) {
+      throw new NotFoundException('Inventory not found');
     }
+    inventoryItem.inventory = inventory;
+    
     if (model) {
       inventoryItem.model = model;
     }
@@ -51,4 +57,15 @@ export class InventoryItemService {
   async findOne(id: number) {
     return this.inventoryItemRepository.findOneBy({ id: id });
   }
+
+  /**
+  async update(
+    organizationId: number,
+    inventoryId: number,
+    id: number,
+    dto: UpdateInventoryItemDto,
+  ) {
+    return ;
+  }
+  */
 }
