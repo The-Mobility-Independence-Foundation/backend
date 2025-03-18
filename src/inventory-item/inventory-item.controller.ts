@@ -42,7 +42,8 @@ export class InventoryItemController {
   @ApiOperation({ summary: 'Retrieve all items in a specific inventory' })
   findAll(
     @Param('organizationId', ParseIntPipe) organizationId: number,
-    @Param('inventoryId', ParseIntPipe) inventoryId: number,): Promise<InventoryItem[]> {
+    @Param('inventoryId', ParseIntPipe) inventoryId: number,
+  ): Promise<InventoryItem[]> {
     return this.inventoryItemService.findAll(organizationId, inventoryId);
   }
 
@@ -51,18 +52,22 @@ export class InventoryItemController {
    * @param organizationId : The ID of the organization
    * @param inventoryId : The ID of the inventory
    * @param itemId : The ID of the inventory item
-   * @returns : The data of the item 
+   * @returns : The data of the item
    */
   @Get('organization/:organizationId/inventory/:inventoryId/items/:itemId')
   @ApiOperation({ summary: 'Retrieve a specific item in a specific inventory' })
   findOne(
     @Param('organizationId', ParseIntPipe) organizationId: number,
     @Param('inventoryId', ParseIntPipe) inventoryId: number,
-    @Param('itemId', ParseIntPipe) itemId: number): Promise<InventoryItem | null> {
-    return this.inventoryItemService.findOne(organizationId, inventoryId, itemId);
+    @Param('itemId', ParseIntPipe) itemId: number,
+  ): Promise<InventoryItem | null> {
+    return this.inventoryItemService.findOne(
+      organizationId,
+      inventoryId,
+      itemId,
+    );
   }
 
-  
   @Patch('organization/:organizationId/inventory/:inventoryId/items/:itemId')
   @ApiOperation({ summary: 'Update information about an inventory item' })
   update(

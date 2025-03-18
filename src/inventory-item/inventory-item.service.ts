@@ -7,7 +7,6 @@ import { Model } from '../model/model.entity';
 import { Part } from '../part/part.entity';
 import { CreateInventoryItemDto } from './dto/create-inventory-item.dto';
 import { UpdateInventoryItemDto } from './dto/update-inventory-item.dto';
-//import { UpdateInventoryItemDto } from './dto/update-inventory-item.dto';
 
 @Injectable()
 export class InventoryItemService {
@@ -33,11 +32,11 @@ export class InventoryItemService {
   async create(dto: CreateInventoryItemDto) {
     const inventoryItem = new InventoryItem();
 
-    const model = await this.modelRepository.findOneBy({ 
-      id: dto.model 
+    const model = await this.modelRepository.findOneBy({
+      id: dto.model,
     });
-    const part = await this.partRepository.findOneBy({ 
-      id: dto.part 
+    const part = await this.partRepository.findOneBy({
+      id: dto.part,
     });
     const inventory = await this.inventoryRepository.findOneBy({
       id: dto.inventory,
@@ -49,12 +48,12 @@ export class InventoryItemService {
     inventoryItem.inventory = inventory;
 
     if (!model) {
-      throw new NotFoundException('Inventory not found');    
+      throw new NotFoundException('Inventory not found');
     }
     inventoryItem.model = model;
 
     if (!part) {
-      throw new NotFoundException('Inventory not found');    
+      throw new NotFoundException('Inventory not found');
     }
     inventoryItem.part = part;
 
@@ -74,13 +73,21 @@ export class InventoryItemService {
    */
   async findAll(organizationId: number, inventoryId: number) {
     return this.inventoryItemRepository.find({
-      where: { 
-        inventory: { 
-          id: inventoryId, 
-          organization: { id: organizationId } 
-        } 
+      where: {
+        inventory: {
+          id: inventoryId,
+          organization: { id: organizationId },
+        },
       },
-      relations: ['inventory', 'inventory.organization', 'inventory.address', 'part', 'model', 'listings', 'tags'],
+      relations: [
+        'inventory',
+        'inventory.organization',
+        'inventory.address',
+        'part',
+        'model',
+        'listings',
+        'tags',
+      ],
     });
   }
 
@@ -91,16 +98,24 @@ export class InventoryItemService {
    * @param itemId : The item being looked for
    * @returns : All date of the specific item
    */
-  async findOne(organizationId: number, inventoryId: number,itemId: number) {
+  async findOne(organizationId: number, inventoryId: number, itemId: number) {
     const item = await this.inventoryItemRepository.findOne({
-      where: { 
+      where: {
         id: itemId,
-        inventory: { 
-          id: inventoryId, 
-          organization: { id: organizationId } 
-        }
+        inventory: {
+          id: inventoryId,
+          organization: { id: organizationId },
+        },
       },
-      relations: ['inventory', 'inventory.organization', 'inventory.address', 'part', 'model', 'listings', 'tags'],
+      relations: [
+        'inventory',
+        'inventory.organization',
+        'inventory.address',
+        'part',
+        'model',
+        'listings',
+        'tags',
+      ],
     });
 
     if (!item) {
@@ -117,21 +132,29 @@ export class InventoryItemService {
     dto: UpdateInventoryItemDto,
   ) {
     const item = await this.inventoryItemRepository.findOne({
-      where: { 
+      where: {
         id: id,
-        inventory: { 
-          id: inventoryId, 
-          organization: { id: organizationId } 
-        }
+        inventory: {
+          id: inventoryId,
+          organization: { id: organizationId },
+        },
       },
-      relations: ['inventory', 'inventory.organization', 'inventory.address', 'part', 'model', 'listings', 'tags'],
+      relations: [
+        'inventory',
+        'inventory.organization',
+        'inventory.address',
+        'part',
+        'model',
+        'listings',
+        'tags',
+      ],
     });
 
     if (!item) {
       throw new NotFoundException('Item not found');
     }
 
-    if(dto.attributes){
+    if (dto.attributes) {
       item.attributes = dto.attributes;
     }
 
@@ -143,15 +166,15 @@ export class InventoryItemService {
     }
     item.inventory = inventory;
 
-    if(dto.notes){
+    if (dto.notes) {
       item.notes = dto.notes;
     }
 
-    if(dto.publicCount){
+    if (dto.publicCount) {
       item.publicCount = dto.publicCount;
     }
 
-    if(dto.quantity){
+    if (dto.quantity) {
       item.quantity = dto.quantity;
     }
 
