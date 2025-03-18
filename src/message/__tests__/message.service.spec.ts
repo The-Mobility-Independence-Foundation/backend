@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MessageService } from './message.service';
+import { MessageService } from '../message.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Message } from './message.entity';
-import { User } from '../user/entities/user.entity';
-import { Conversation } from '../conversations/entities/conversation.entity';
+import { Message } from '../message.entity';
+import { User } from '../../user/entities/user.entity';
+import { Conversation } from '../../conversations/entities/conversation.entity';
 import { createMock } from '@golevelup/ts-jest';
 export const mockRepository = jest.fn(() => ({
   metadata: {

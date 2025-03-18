@@ -6,72 +6,138 @@ import {
 import { Message } from './message.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../user/entities/user.entity';
-import { Conversation } from '../conversations/entities/conversation.entity';
-
-interface CreateMessageDto {
-  conversationId: number;
-  authorId: number;
-  content: string;
-}
+import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
+import { PaginationService } from '../common/services/pagination.service';
+import { SendMessageDto } from './dto/send-message.dto';
+import { ConversationsService } from '../conversations/conversations.service';
+import { ConversationType } from '../conversations/entities/conversation.entity';
+import { UserService } from '../user/user.service';
+import { UpdateMessageDto } from './dto/update-message.dto';
 
 @Injectable()
 export class MessageService {
   constructor(
     @InjectRepository(Message)
     private messageRepository: Repository<Message>,
-
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
-
-    @InjectRepository(Conversation)
-    private conversationRepository: Repository<Conversation>,
+    private conversationService: ConversationsService,
+    private paginationService: PaginationService,
+    private userService: UserService,
   ) {}
 
-  async create(conversationId: number, authorId: number, content: string) {
-    const message = new Message();
-    const sender = await this.userRepository.findOneBy({ id: authorId });
-    const conversation = await this.conversationRepository.findOneBy({
-      id: conversationId,
-    });
+  /**
+   * Find all messages for a conversation
+   * @param conversationId - The id of the conversation
+   * @param paginationDto - The pagination dto
+   * @returns The paginated messages
+   */
+  async findAll(conversationId: number, paginationDto: CursorPaginationDto) {
+    return this.paginationService.paginateWithCursor(
+      this.messageRepository,
+      paginationDto,
+      {
+        cursorColumn: 'id',
+        where: { conversationId },
+      },
+    );
+  }
 
-    if (!sender || !conversation) {
-      throw new Error('Sender or conversation not found');
+  /**
+   * Send a message to a conversation
+   * @param authorId - The id of the author
+   * @param conversationId - The id of the conversation
+   * @param sendMessageDto - The send message dto
+   * @returns The message
+   */
+  async sendMessage(
+    authorId: number,
+    conversationId: number,
+    sendMessageDto: SendMessageDto,
+  ) {
+    const { content, attachments } = sendMessageDto;
+
+    if (!content && !attachments) {
+      throw new BadRequestException(
+        'Message content or attachments are required',
+      );
     }
 
-    message.author = sender;
-    message.conversation = conversation;
-    message.content = content;
+    const conversation =
+      await this.conversationService.findById(conversationId);
+    if (!conversation) {
+      throw new NotFoundException('Conversation not found');
+    }
+
+    if (conversation.type === ConversationType.DIRECT) {
+      if (
+        conversation.initiator.id !== authorId &&
+        conversation.participant?.id !== authorId
+      ) {
+        throw new BadRequestException('Only participants can send messages');
+      }
+    }
+
+    if (conversation.type === ConversationType.INQUIRY) {
+      if (
+        conversation.initiator.id !== authorId &&
+        conversation.handler?.id !== authorId
+      ) {
+        throw new BadRequestException(
+          'Only initiator or handler can send messages',
+        );
+      }
+    }
+
+    const author = await this.userService.findById(authorId);
+    if (!author) {
+      throw new NotFoundException('Author not found');
+    }
+
+    const message = this.messageRepository.create({
+      author,
+      conversation,
+      messageContent: content,
+    });
 
     const savedMessage = await this.messageRepository.save(message);
 
     return savedMessage;
   }
 
-  async findAll(conversationId: number): Promise<Message[]> {
-    return this.messageRepository.find({
-      where: { conversation: { id: conversationId } },
-      relations: ['author'],
-      order: { id: 'ASC' },
-    });
-  }
+  async updateMessage(messageId: number, updateMessageDto: UpdateMessageDto) {
+    const { content, attachments } = updateMessageDto;
 
-  async findOne(id: number): Promise<Message> {
     const message = await this.messageRepository.findOne({
-      where: { id },
-      relations: ['author', 'conversation'],
+      where: { id: messageId },
     });
-
     if (!message) {
       throw new NotFoundException('Message not found');
     }
 
-    return message;
+    if (!content && !attachments) {
+      throw new BadRequestException(
+        'Message content or attachments are required',
+      );
+    }
+
+    if (content) {
+      message.messageContent = content;
+    }
+
+    if (attachments) {
+      // message.attachments = attachments;
+    }
+
+    return this.messageRepository.save(message);
   }
 
-  async markAsRead(messageId: number): Promise<Message> {
-    const message = await this.findOne(messageId);
-    message.readStatus = new Date();
-    return this.messageRepository.save(message);
+  async deleteMessage(messageId: number) {
+    const message = await this.messageRepository.findOne({
+      where: { id: messageId },
+    });
+    if (!message) {
+      throw new NotFoundException('Message not found');
+    }
+
+    return this.messageRepository.delete(messageId);
   }
 }

@@ -130,6 +130,8 @@ export class ConversationsService {
       throw new NotFoundException('Listing not found');
     }
 
+    // TODO: Check if the listing is a valid state
+
     const conversation = this.conversationRepository.create({
       initiatorId,
       listingId,
@@ -184,7 +186,6 @@ export class ConversationsService {
    * @param conversationId - The id of the conversation
    */
   async enterConversation(handlerId: number, conversationId: number) {
-    // Check if the conversation exists
     const conversation = await this.findById(conversationId, {
       relations: {
         initiator: true,
@@ -196,34 +197,33 @@ export class ConversationsService {
       throw new NotFoundException('Conversation not found');
     }
 
-    // Check if the handler exists
+    if (conversation.type !== ConversationType.INQUIRY) {
+      throw new BadRequestException('Conversation is not an inquiry');
+    }
+
     const handler = await this.userService.findById(handlerId);
     if (!handler) {
       throw new NotFoundException('Handler not found');
     }
 
-    // Check if the conversation already has a handler
     if (conversation.handlerId) {
       throw new BadRequestException('Conversation already has a handler');
     }
 
-    // Check if the handler is part of the organization that owns the listing
     if (conversation.listing?.owner.id !== handler.organization?.id) {
       throw new BadRequestException(
         'Handler is not part of the organization that owns the listing',
       );
     }
 
-    // Create a handler history record
     const handlerHistory = this.handlerHistoryRepository.create({
       conversation,
       handler,
     });
     await this.handlerHistoryRepository.insert(handlerHistory);
 
-    // Update the conversation with the new handler
     conversation.handler = handler;
-    await this.conversationRepository.save(conversation);
+    return await this.conversationRepository.save(conversation);
   }
 
   /**
@@ -232,7 +232,6 @@ export class ConversationsService {
    * @param conversationId - The id of the conversation
    */
   async leaveConversation(handlerId: number, conversationId: number) {
-    // Check if the conversation exists
     const conversation = await this.findById(conversationId, {
       relations: {
         initiator: true,
@@ -241,6 +240,10 @@ export class ConversationsService {
     });
     if (!conversation) {
       throw new NotFoundException('Conversation not found');
+    }
+
+    if (conversation.type !== ConversationType.INQUIRY) {
+      throw new BadRequestException('Conversation is not an inquiry');
     }
 
     // Check if the user is the handler of the conversation

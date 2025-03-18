@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserConversationsController } from '../user-conversations.controller';
+import { UsersConversationsController } from '../users-conversations.controller';
 import { createMock } from '@golevelup/ts-jest';
-
+import { STRATEGY_PROVIDERS_TOKEN } from '../../common/resource-access/interfaces/strategy-provider.interface';
+import { ResourceAccessStrategyRegistry } from '../../common/resource-access/interfaces/strategy-provider.interface';
 export const mockRepository = jest.fn(() => ({
   metadata: {
     columns: [],
@@ -10,17 +11,23 @@ export const mockRepository = jest.fn(() => ({
 }));
 
 describe('UserConversationsController', () => {
-  let controller: UserConversationsController;
+  let controller: UsersConversationsController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [UserConversationsController],
+      controllers: [UsersConversationsController],
+      providers: [
+        {
+          provide: STRATEGY_PROVIDERS_TOKEN,
+          useValue: createMock<ResourceAccessStrategyRegistry>(),
+        },
+      ],
     })
       .useMocker(createMock)
       .compile();
 
-    controller = module.get<UserConversationsController>(
-      UserConversationsController,
+    controller = module.get<UsersConversationsController>(
+      UsersConversationsController,
     );
   });
 

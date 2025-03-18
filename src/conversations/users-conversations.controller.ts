@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ConversationsService } from './conversations.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { ResourceAccess } from '../auth/decorators/resource-access.decorator';
+import { ResourceAccess } from '../common/resource-access/decorators/resource-access.decorator';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { InitiateConversationDto } from './dto/initiate-conversation.dto';
@@ -18,7 +18,7 @@ import { InitiateConversationDto } from './dto/initiate-conversation.dto';
 @ResourceAccess()
 @ApiTags('users')
 @Controller('users/:userId/conversations')
-export class UserConversationsController {
+export class UsersConversationsController {
   constructor(private readonly conversationsService: ConversationsService) {}
 
   @Get()
