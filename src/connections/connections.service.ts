@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Connection } from './connection.entity';
@@ -69,7 +73,7 @@ export class ConnectionsService {
       where: { id: followingId },
     });
     if (!following) {
-      throw new BadRequestException(`Following user not found`);
+      throw new NotFoundException(`Following user not found`);
     }
 
     if (await this.doesConnectionExist(followerId, followingId)) {
@@ -89,7 +93,7 @@ export class ConnectionsService {
    */
   async delete(followerId: number, followingId: number): Promise<void> {
     if (!(await this.doesConnectionExist(followerId, followingId))) {
-      throw new BadRequestException('Connection does not exist');
+      throw new NotFoundException('Connection does not exist');
     }
 
     await this.connectionRepository.delete({
