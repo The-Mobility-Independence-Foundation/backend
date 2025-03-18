@@ -5,7 +5,7 @@ import { Connection } from '../connection.entity';
 import { Repository, DeleteResult } from 'typeorm';
 import { createMock } from '@golevelup/ts-jest';
 import { when } from 'jest-when';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 import { PaginationService } from '../../common/services/pagination.service';
 import { BaseApiCursorPaginationResponse } from '../../common/responses/base-api-cursor-pagination.response';
@@ -149,7 +149,7 @@ describe('ConnectionsService', () => {
       );
     });
 
-    it('should throw BadRequestException if following user not found', async () => {
+    it('should throw NotFoundException if following user not found', async () => {
       const followerId = 1;
       const followingId = 2;
 
@@ -160,7 +160,7 @@ describe('ConnectionsService', () => {
         .mockResolvedValue(null);
 
       await expect(service.create(followerId, followingId)).rejects.toThrow(
-        BadRequestException,
+        NotFoundException,
       );
     });
 
@@ -211,7 +211,7 @@ describe('ConnectionsService', () => {
       });
     });
 
-    it('should throw BadRequestException if connection does not exist', async () => {
+    it('should throw NotFoundException if connection does not exist', async () => {
       const followerId = 1;
       const followingId = 2;
 
@@ -222,7 +222,7 @@ describe('ConnectionsService', () => {
         .mockResolvedValue(false);
 
       await expect(service.delete(followerId, followingId)).rejects.toThrow(
-        BadRequestException,
+        NotFoundException,
       );
     });
   });
