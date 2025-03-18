@@ -81,6 +81,8 @@ export class ResourceAccessGuard implements CanActivate {
         throw new ForbiddenException('Invalid strategy provider');
       }
 
+      console.log('strategyInstance', strategyInstance);
+
       // Use the strategy to determine access
       const hasAccess = await strategyInstance.canAccess(user, request.params);
       if (!hasAccess) {

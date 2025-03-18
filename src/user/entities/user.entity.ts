@@ -61,9 +61,12 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @JoinColumn({ name: 'organizationId' })
   @ManyToOne(() => Organization, (org) => org.members)
-  @JoinColumn()
   organization: Organization | null;
+
+  @Column({ nullable: true })
+  organizationId: number | null;
 
   @IsFirstName()
   @Column({ type: 'varchar', length: UserValidation.firstName.max })

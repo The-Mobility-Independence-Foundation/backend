@@ -56,19 +56,27 @@ export class ConversationsMessagesController {
   @ResponseMessage('Successfully updated a message')
   @ApiOperation({ summary: 'Update a message' })
   async updateMessage(
+    // Can we just use the user id from the parameter?
+    @Req() req: Request,
     @Param('messageId', ParseIntPipe) messageId: number,
     @Body() updateMessageDto: UpdateMessageDto,
   ) {
-    return this.messageService.updateMessage(messageId, updateMessageDto);
+    const user = req.user as User;
+    return this.messageService.updateMessage(
+      user.id,
+      messageId,
+      updateMessageDto,
+    );
   }
 
   @Delete(':messageId')
   @ResponseMessage('Successfully deleted a message')
   @ApiOperation({ summary: 'Delete a message' })
   async deleteMessage(
-    @Param('conversationId', ParseIntPipe) conversationId: number,
+    @Req() req: Request,
     @Param('messageId', ParseIntPipe) messageId: number,
   ) {
-    return this.messageService.deleteMessage(messageId);
+    const user = req.user as User;
+    return this.messageService.deleteMessage(user.id, messageId);
   }
 }

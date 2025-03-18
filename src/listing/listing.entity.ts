@@ -26,13 +26,19 @@ export class Listing {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @JoinColumn()
+  @JoinColumn({ name: 'inventoryItemId' })
   @ManyToOne(() => InventoryItem, (invItem) => invItem.listings)
   inventoryItem: InventoryItem;
 
-  @JoinColumn()
+  @Column()
+  inventoryItemId: number;
+
+  @JoinColumn({ name: 'ownerId' })
   @ManyToOne(() => Organization, (org) => org.listings)
   owner: Organization;
+
+  @Column()
+  ownerId: number;
 
   @Column({ type: 'varchar', length: 40 })
   name: string;

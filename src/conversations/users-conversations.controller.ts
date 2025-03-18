@@ -10,14 +10,15 @@ import {
 } from '@nestjs/common';
 import { ConversationsService } from './conversations.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { ResourceAccess } from '../common/resource-access/decorators/resource-access.decorator';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { InitiateConversationDto } from './dto/initiate-conversation.dto';
+import { ResourceAccessStrategyToken } from '../common/resource-access/interfaces/strategy-provider.interface';
+import { UseStrategy } from '../common/resource-access/decorators/resource-access.decorator';
 
-@ResourceAccess()
 @ApiTags('users')
 @Controller('users/:userId/conversations')
+@UseStrategy(ResourceAccessStrategyToken.USER)
 export class UsersConversationsController {
   constructor(private readonly conversationsService: ConversationsService) {}
 
@@ -56,35 +57,5 @@ export class UsersConversationsController {
         listingId,
       );
     }
-  }
-
-  @Get(':conversationId')
-  @ResponseMessage('Successfully retrieved conversation')
-  @ApiOperation({ summary: 'Get a specific conversation by ID' })
-  async findOne(
-    @Param('userId', ParseIntPipe) userId: number,
-    @Param('conversationId', ParseIntPipe) conversationId: number,
-  ) {
-    return this.conversationsService.findById(conversationId);
-  }
-
-  @Post(':conversationId/enter')
-  @ResponseMessage('Successfully entered conversation')
-  @ApiOperation({ summary: 'Enter a conversation' })
-  async enterConversation(
-    @Param('userId', ParseIntPipe) userId: number,
-    @Param('conversationId', ParseIntPipe) conversationId: number,
-  ) {
-    return this.conversationsService.enterConversation(userId, conversationId);
-  }
-
-  @Post(':conversationId/leave')
-  @ResponseMessage('Successfully left conversation')
-  @ApiOperation({ summary: 'Leave a conversation' })
-  async leaveConversation(
-    @Param('userId', ParseIntPipe) userId: number,
-    @Param('conversationId', ParseIntPipe) conversationId: number,
-  ) {
-    return this.conversationsService.leaveConversation(userId, conversationId);
   }
 }

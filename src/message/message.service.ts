@@ -61,6 +61,11 @@ export class MessageService {
       );
     }
 
+    const author = await this.userService.findById(authorId);
+    if (!author) {
+      throw new NotFoundException('Author not found');
+    }
+
     const conversation =
       await this.conversationService.findById(conversationId);
     if (!conversation) {
@@ -72,7 +77,9 @@ export class MessageService {
         conversation.initiator.id !== authorId &&
         conversation.participant?.id !== authorId
       ) {
-        throw new BadRequestException('Only participants can send messages');
+        throw new BadRequestException(
+          'You are not a participant of this conversation',
+        );
       }
     }
 
@@ -82,14 +89,9 @@ export class MessageService {
         conversation.handler?.id !== authorId
       ) {
         throw new BadRequestException(
-          'Only initiator or handler can send messages',
+          'You are not a participant of this conversation',
         );
       }
-    }
-
-    const author = await this.userService.findById(authorId);
-    if (!author) {
-      throw new NotFoundException('Author not found');
     }
 
     const message = this.messageRepository.create({
@@ -103,20 +105,63 @@ export class MessageService {
     return savedMessage;
   }
 
-  async updateMessage(messageId: number, updateMessageDto: UpdateMessageDto) {
+  /**
+   * Update a message
+   * @param authorId - The id of the author
+   * @param messageId - The id of the message
+   * @param updateMessageDto - The update message dto
+   * @returns The message
+   */
+  async updateMessage(
+    authorId: number,
+    messageId: number,
+    updateMessageDto: UpdateMessageDto,
+  ) {
     const { content, attachments } = updateMessageDto;
-
-    const message = await this.messageRepository.findOne({
-      where: { id: messageId },
-    });
-    if (!message) {
-      throw new NotFoundException('Message not found');
-    }
 
     if (!content && !attachments) {
       throw new BadRequestException(
         'Message content or attachments are required',
       );
+    }
+
+    const author = await this.userService.findById(authorId);
+    if (!author) {
+      throw new NotFoundException('Author not found');
+    }
+
+    const message = await this.messageRepository.findOne({
+      where: { id: messageId },
+      relations: ['conversation'],
+    });
+    if (!message) {
+      throw new NotFoundException('Message not found');
+    }
+
+    if (message.author.id !== authorId) {
+      throw new BadRequestException('You are not the author of this message');
+    }
+
+    if (message.conversation.type === ConversationType.DIRECT) {
+      if (
+        message.conversation.initiator.id !== authorId &&
+        message.conversation.participant?.id !== authorId
+      ) {
+        throw new BadRequestException(
+          'You are not a participant of this conversation',
+        );
+      }
+    }
+
+    if (message.conversation.type === ConversationType.INQUIRY) {
+      if (
+        message.conversation.initiator.id !== authorId &&
+        message.conversation.handler?.id !== authorId
+      ) {
+        throw new BadRequestException(
+          'You are not a participant of this conversation',
+        );
+      }
     }
 
     if (content) {
@@ -130,14 +175,53 @@ export class MessageService {
     return this.messageRepository.save(message);
   }
 
-  async deleteMessage(messageId: number) {
+  /**
+   * Delete a message
+   * @param userId - The id of the user
+   * @param messageId - The id of the message
+   * @returns The message
+   */
+  async deleteMessage(userId: number, messageId: number) {
+    const author = await this.userService.findById(userId);
+    if (!author) {
+      throw new NotFoundException('Author not found');
+    }
+
     const message = await this.messageRepository.findOne({
       where: { id: messageId },
+      relations: ['conversation'],
     });
     if (!message) {
       throw new NotFoundException('Message not found');
     }
 
+    if (message.author.id !== userId) {
+      throw new BadRequestException('You are not the author of this message');
+    }
+
+    if (message.conversation.type === ConversationType.DIRECT) {
+      if (
+        message.conversation.initiator.id !== userId &&
+        message.conversation.participant?.id !== userId
+      ) {
+        throw new BadRequestException(
+          'You are not a participant of this conversation',
+        );
+      }
+    }
+
+    if (message.conversation.type === ConversationType.INQUIRY) {
+      if (
+        message.conversation.initiator.id !== userId &&
+        message.conversation.handler?.id !== userId
+      ) {
+        throw new BadRequestException(
+          'You are not a participant of this conversation',
+        );
+      }
+    }
+
+    // TODO: Soft delete the message
     return this.messageRepository.delete(messageId);
   }
 }

@@ -210,7 +210,7 @@ export class ConversationsService {
       throw new BadRequestException('Conversation already has a handler');
     }
 
-    if (conversation.listing?.owner.id !== handler.organization?.id) {
+    if (conversation.listing?.ownerId !== handler.organizationId) {
       throw new BadRequestException(
         'Handler is not part of the organization that owns the listing',
       );

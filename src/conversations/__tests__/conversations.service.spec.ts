@@ -688,14 +688,14 @@ describe('ConversationsService', () => {
 
       const listing = new Listing();
       Object.assign(listing, {
-        owner: { id: 3 },
+        ownerId: 3,
       });
       conversation.listing = listing;
 
       const handler = new User();
       Object.assign(handler, {
         id: handlerId,
-        organization: { id: 4 },
+        organizationId: 4,
       });
 
       when(conversationRepository.findOne)
