@@ -6,8 +6,9 @@ import { User } from '../../user/entities/user.entity';
 import { Report } from '../report.entity';
 import { ReportsController } from '../reports.controller';
 import { ReportsService } from '../reports.service';
-import { mockRepository } from './reports.service.spec';
 import { Comment } from '../../comment/comment.entity';
+import { createMock } from '@golevelup/ts-jest';
+import { Repository } from 'typeorm';
 
 describe('ReportsController', () => {
   let controller: ReportsController;
@@ -19,23 +20,23 @@ describe('ReportsController', () => {
         ReportsService,
         {
           provide: getRepositoryToken(Report),
-          useClass: mockRepository,
+          useValue: createMock<Repository<Report>>(),
         },
         {
           provide: getRepositoryToken(User),
-          useClass: mockRepository,
+          useValue: createMock<Repository<User>>(),
         },
         {
           provide: getRepositoryToken(Listing),
-          useClass: mockRepository,
+          useValue: createMock<Repository<Listing>>(),
         },
         {
           provide: getRepositoryToken(PostEntity),
-          useClass: mockRepository,
+          useValue: createMock<Repository<PostEntity>>(),
         },
         {
           provide: getRepositoryToken(Comment),
-          useClass: mockRepository,
+          useValue: createMock<Repository<Comment>>(),
         },
       ],
     }).compile();

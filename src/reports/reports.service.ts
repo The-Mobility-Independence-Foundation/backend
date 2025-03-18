@@ -33,7 +33,7 @@ export class ReportsService {
     const report = new Report();
 
     if (dto.reporterId == dto.reportedUserId) {
-      return new BadRequestException('You cannot report yourself.');
+      throw new BadRequestException('You cannot report yourself.');
     }
 
     const reporter = await this.userRepository.findOneBy({
@@ -44,19 +44,19 @@ export class ReportsService {
     });
 
     if (!reporter) {
-      return new BadRequestException('Invalid reporterId');
+      throw new BadRequestException('Invalid reporterId');
     }
     report.reporter = reporter;
 
     if (!reportedUser) {
-      return new BadRequestException('ReportedUser not found.');
+      throw new BadRequestException('ReportedUser not found.');
     }
     report.offender = reportedUser;
 
     switch (dto.reportType) {
       case ReportType.COMMENT:
         if (!dto.commentId) {
-          return new BadRequestException(
+          throw new BadRequestException(
             'ReportType is comment, but no commentId provided.',
           );
         }
@@ -66,14 +66,14 @@ export class ReportsService {
         });
 
         if (!comment) {
-          return new BadRequestException('Invalid commentId provided.');
+          throw new BadRequestException('Invalid commentId provided.');
         }
 
         report.comment = comment;
         break;
       case ReportType.LISTING:
         if (!dto.listingId) {
-          return new BadRequestException(
+          throw new BadRequestException(
             'ReportType is listing, but no listingId provided.',
           );
         }
@@ -83,14 +83,14 @@ export class ReportsService {
         });
 
         if (!listing) {
-          return new BadRequestException('Invalid listingId provided.');
+          throw new BadRequestException('Invalid listingId provided.');
         }
 
         report.listing = listing;
         break;
       case ReportType.POST:
         if (!dto.postId) {
-          return new BadRequestException(
+          throw new BadRequestException(
             'ReportType is post, but no postId provided.',
           );
         }
@@ -98,7 +98,7 @@ export class ReportsService {
         const post = await this.postRepository.findOneBy({ id: dto.postId });
 
         if (!post) {
-          return new BadRequestException('Invalid postId provided.');
+          throw new BadRequestException('Invalid postId provided.');
         }
 
         report.post = post;
@@ -107,7 +107,7 @@ export class ReportsService {
         // no validation needed
         break;
       default:
-        return new BadRequestException('Unsupported report type.');
+        throw new BadRequestException('Unsupported report type.');
     }
 
     report.reason = dto.reason;
@@ -124,7 +124,7 @@ export class ReportsService {
     };
 
     if (query.nextToken) {
-      findOptions.skip = query.nextToken - 1;
+      findOptions.skip = query.nextToken;
     }
 
     if (query.count) {
@@ -158,7 +158,13 @@ export class ReportsService {
   }
 
   async findOne(id: number) {
-    return this.reportRepository.findOneBy({ id: id });
+    const report = await this.reportRepository.findOneBy({ id: id });
+
+    if (report) {
+      return report;
+    } else {
+      throw new BadRequestException();
+    }
   }
 
   async update(id: number, dto: UpdateReportDto) {
