@@ -185,24 +185,4 @@ export class ReportsService {
 
     return await this.reportRepository.save(report);
   }
-
-  async update(id: number, dto: UpdateReportDto) {
-    const report = await this.reportRepository.findOneBy({ id: id });
-    if (!report) {
-      throw new BadRequestException('Invalid reportID.');
-    }
-
-    const moderator = await this.userRepository.findOneBy({
-      id: dto.moderatorId,
-    });
-    if (!moderator) {
-      throw new BadRequestException('Invalid moderatorID');
-    }
-
-    report.moderator = moderator;
-    report.actionTaken = dto.actionTaken;
-    report.actionTakenOn = new Date();
-
-    return await this.reportRepository.save(report);
-  }
 }
