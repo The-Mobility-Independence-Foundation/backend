@@ -4,10 +4,10 @@ import {
   ApiUnauthorizedResponse,
   ApiForbiddenResponse,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { ResourceAccessGuard } from '../../auth/guards/resource-access.guard';
+import { JwtAuthGuard } from '../../../auth/guards/jwt-auth.guard';
+import { ResourceAccessGuard } from '../guards/resource-access.guard';
 import { ResourceAccessOptions } from '../interfaces/resource-access-options.interface';
-
+import { ResourceAccessStrategyToken } from '../interfaces/strategy-provider.interface';
 /**
  * Metadata key for resource access control
  */
@@ -27,6 +27,7 @@ export function ResourceAccess(options: ResourceAccessOptions = {}) {
     ApiForbiddenResponse({ description: 'Forbidden' }),
   );
 }
+
 /**
  * Decorator to set resource access to admins and moderators
  * @param options Configuration options for resource access
@@ -47,4 +48,23 @@ export function AdminOnly(
   options: Omit<ResourceAccessOptions, 'adminOnly'> = {},
 ) {
   return ResourceAccess({ ...options, adminOnly: true });
+}
+
+/**
+ * Decorator to set resource access using a strategy provider
+ * @param providerToken The token of the strategy provider
+ * @param config Configuration for the strategy
+ * @param options Additional configuration options
+ * @returns A decorator function
+ */
+export function UseStrategy(
+  providerToken: ResourceAccessStrategyToken,
+  options: Omit<ResourceAccessOptions, 'strategy'> = {},
+) {
+  return ResourceAccess({
+    ...options,
+    strategy: {
+      providerToken,
+    },
+  });
 }

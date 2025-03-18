@@ -1,16 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from '../user.controller';
 import { UserService } from '../user.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from '../entities/user.entity';
-import { Organization } from '../../organization/organization.entity';
 import { createMock } from '@golevelup/ts-jest';
-import { Repository } from 'typeorm';
 import { Request } from 'express';
 import { Connection } from '../../connections/connection.entity';
 import { when } from 'jest-when';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 import { BaseApiCursorPaginationResponse } from '../../common/responses/base-api-cursor-pagination.response';
+import {
+  ResourceAccessStrategyRegistry,
+  STRATEGY_PROVIDERS_TOKEN,
+} from '../../common/resource-access/interfaces/strategy-provider.interface';
+import { User } from '../entities/user.entity';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -21,12 +22,8 @@ describe('UserController', () => {
       controllers: [UserController],
       providers: [
         {
-          provide: getRepositoryToken(User),
-          useValue: createMock<Repository<User>>(),
-        },
-        {
-          provide: getRepositoryToken(Organization),
-          useValue: createMock<Repository<Organization>>(),
+          provide: STRATEGY_PROVIDERS_TOKEN,
+          useValue: createMock<ResourceAccessStrategyRegistry>(),
         },
       ],
     })

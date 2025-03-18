@@ -6,34 +6,31 @@ import {
   Query,
   ParseIntPipe,
   Req,
-  UseGuards,
   Post,
   Delete,
   Body,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { Request } from 'express';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiTags, ApiResponse } from '@nestjs/swagger';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
-import { ResourceAccess } from '../auth/decorators/resource-access.decorator';
+import { UseStrategy } from '../common/resource-access/decorators/resource-access.decorator';
+import { ResourceAccessStrategyToken } from '../common/resource-access/interfaces/strategy-provider.interface';
+import { Request } from 'express';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { UseGuards } from '@nestjs/common';
 import { GetUsersDto } from './dto/get-users.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+
 @ApiTags('users')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('users')
+@UseStrategy(ResourceAccessStrategyToken.USER)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get()
+  @Get('/@me')
+  @UseStrategy(ResourceAccessStrategyToken.USER_ME)
   @ResponseMessage('Successfully retrieved user')
   @ApiOperation({ summary: 'Get the current user' })
   async getUser(@Req() req: Request): Promise<User> {
@@ -41,7 +38,6 @@ export class UserController {
   }
 
   @Get(':userId/connections')
-  @ResourceAccess()
   @ResponseMessage('Successfully retrieved user connections')
   @ApiOperation({ summary: 'Get user connections (paginated)' })
   async getConnections(
@@ -52,7 +48,6 @@ export class UserController {
   }
 
   @Post(':userId/connections/:recipientId')
-  @ResourceAccess()
   @ResponseMessage('Successfully created user connection')
   @ApiOperation({ summary: 'Create a user connection' })
   async createConnection(
@@ -63,7 +58,6 @@ export class UserController {
   }
 
   @Delete(':userId/connections/:recipientId')
-  @ResourceAccess()
   @ResponseMessage('Successfully deleted user connection')
   @ApiOperation({ summary: 'Delete a user connection' })
   async deleteConnection(
@@ -80,7 +74,6 @@ export class UserController {
   @ResponseMessage('Successfully retrieved all users matching your criteria')
   @ApiOperation({ summary: 'Get all users matching search criteria' })
   @ApiResponse({
-    status: 200,
     description: 'Returns paginated list of users',
   })
   async findAll(@Query() query: GetUsersDto) {
@@ -102,7 +95,6 @@ export class UserController {
   @ResponseMessage('Successfully updated user')
   @ApiOperation({ summary: 'Update a specific user given their id' })
   @ApiResponse({
-    status: 200,
     description: 'Returns the updated user record',
   })
   async update(

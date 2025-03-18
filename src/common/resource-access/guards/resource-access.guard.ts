@@ -1,11 +1,14 @@
-import { ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import { ExecutionContext } from '@nestjs/common';
 import { CanActivate } from '@nestjs/common';
-import { Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RESOURCE_ACCESS } from '../decorators/resource-access.decorator';
 import { ResourceAccessOptions } from '../interfaces/resource-access-options.interface';
-import { User, UserRole } from '../../user/entities/user.entity';
+import { User, UserRole } from '../../../user/entities/user.entity';
+import {
+  ResourceAccessStrategyRegistry,
+  STRATEGY_PROVIDERS_TOKEN,
+} from '../interfaces/strategy-provider.interface';
 
 /**
  * Guard for resource access control based on the user's role and path parameters.
@@ -13,16 +16,18 @@ import { User, UserRole } from '../../user/entities/user.entity';
  * It allows:
  * - Admins to access any resource.
  * - Moderators to access resources that they are assigned to.
- * - Regular users to access their own resources.
  *
- * This guard will also check if the user is accessing their own resource by comparing the userId (or other param) in the path
- * parameters with the userId in the request user object.
+ * This guard also uses strategies to determine access based on the resource type.
  */
 @Injectable()
 export class ResourceAccessGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(
+    private reflector: Reflector,
+    @Inject(STRATEGY_PROVIDERS_TOKEN)
+    private strategyProviders: ResourceAccessStrategyRegistry,
+  ) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const user: User | undefined = request.user;
 
@@ -37,12 +42,10 @@ export class ResourceAccessGuard implements CanActivate {
         context.getClass(),
       ]) ?? {};
 
-    // TODO: Maybe we can extend this to support other resource types (ex: 'postId', 'commentId', ...)
-    // We allow the options to be overridden for each endpoint, but specify default values here
     const {
+      strategy,
       adminOnly = false,
       moderatorAccess = false,
-      userIdParam = 'userId',
       forbiddenMessage = 'You do not have permission to access this resource',
     } = options;
 
@@ -50,14 +53,12 @@ export class ResourceAccessGuard implements CanActivate {
     const isModerator = user.type === UserRole.MODERATOR;
     const hasModeratorAccess = moderatorAccess && isModerator;
 
-    // If user is admin, allow access
-    if (isAdmin) {
-      return true;
-    }
-
-    // If admin-only and user is not admin, deny access
+    // If admin-only, only allow admins
     if (adminOnly) {
-      throw new ForbiddenException(forbiddenMessage);
+      if (!isAdmin) {
+        throw new ForbiddenException(forbiddenMessage);
+      }
+      return true;
     }
 
     // If moderator access is allowed and user is moderator, allow access
@@ -65,16 +66,32 @@ export class ResourceAccessGuard implements CanActivate {
       return true;
     }
 
-    // TODO: What if no userIdParam is provided?
-
-    // At this point, they are regular users, so we check if they are accessing their own resource
-    const resourceUserId = parseInt(request.params[userIdParam]);
-
-    // If no user id in params or it doesn't match the authenticated user, deny access
-    if (isNaN(resourceUserId) || user.id !== resourceUserId) {
+    // If no strategy is provided, deny access
+    if (!strategy) {
       throw new ForbiddenException(forbiddenMessage);
     }
 
-    return true;
+    try {
+      // Get strategy instance
+      const strategyInstance = this.strategyProviders[strategy.providerToken];
+
+      if (!strategyInstance) {
+        throw new ForbiddenException('Invalid strategy provider');
+      }
+
+      // Use the strategy to determine access
+      const hasAccess = await strategyInstance.canAccess(user, request.params);
+      if (!hasAccess) {
+        throw new ForbiddenException(strategyInstance.getForbiddenMessage());
+      }
+
+      return true;
+    } catch (error) {
+      if (error instanceof ForbiddenException) {
+        throw error;
+      }
+
+      throw new ForbiddenException(forbiddenMessage);
+    }
   }
 }
