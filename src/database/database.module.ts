@@ -25,6 +25,7 @@ import { PostSubscriptionModule } from '../post-subscription/post-subscription.m
 import { PostReadModule } from '../post-read/post-read.module';
 import { ReportsModule } from '../reports/reports.module';
 import { AttachmentsModule } from '../attachments/attachments.module';
+import { ConnectionsModule } from '../connections/connections.module';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { AttachmentsModule } from '../attachments/attachments.module';
     PostReadModule,
     ReportsModule,
     AttachmentsModule,
+    ConnectionsModule,
   ],
 })
 export class DatabaseModule {}

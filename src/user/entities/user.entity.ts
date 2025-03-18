@@ -41,6 +41,7 @@ import {
 } from '../../common/decorators/user.decorators';
 import { UserValidation } from '../../common/validation/user.validation';
 import { UserAuth } from './user-auth.entity';
+import { Connection } from '../../connections/connection.entity';
 
 /**
  * The role of a user
@@ -134,12 +135,11 @@ export class User {
   @ManyToMany(() => Listing, (listing) => listing.bookmarks)
   bookmarks: Listing[];
 
-  @JoinTable({ name: 'connections' })
-  @ManyToMany(() => User, (user) => user.connectionsRecieved)
-  connectionsSent: User[];
+  @OneToMany(() => Connection, (connection) => connection.follower)
+  following: Connection[];
 
-  @ManyToMany(() => User, (user) => user.connectionsSent)
-  connectionsRecieved: User[];
+  @OneToMany(() => Connection, (connection) => connection.following)
+  followers: Connection[];
 
   @OneToMany(
     () => Conversation,

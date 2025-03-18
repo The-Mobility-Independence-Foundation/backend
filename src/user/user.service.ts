@@ -7,9 +7,8 @@ import { RegisterDto } from '../auth/dto/register.dto';
 import { AuthProviderProfile } from '../auth/entities/auth-provider-profile.entity';
 import { UserAuthService } from './user-auth.service';
 import { validateDto } from '../common/utils/validate-dto';
-import { PaginationService } from '../common/services/pagination.service';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
-import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
+import { ConnectionsService } from '../connections/connections.service';
 
 @Injectable()
 export class UserService {
@@ -17,7 +16,7 @@ export class UserService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private userAuthService: UserAuthService,
-    private paginationService: PaginationService,
+    private connectionsService: ConnectionsService,
   ) {}
 
   /**
@@ -86,20 +85,33 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async getUserConnections(
-    id: number,
-    cursorPaginationDto: CursorPaginationDto,
-  ): Promise<BaseApiCursorPaginationResponse<User>> {
-    return this.paginationService.paginateWithCursor(
-      this.userRepository,
-      cursorPaginationDto,
-      {
-        cursorColumn: 'id',
-        where: { id },
-        relations: {
-          connectionsSent: true,
-        },
-      },
-    );
+  /**
+   * Get the connections of a user through pagination
+   * @param userId - The id of the user
+   * @param paginationDto - The pagination dto
+   * @returns The paginated list of user connections
+   */
+  async getConnections(userId: number, paginationDto: CursorPaginationDto) {
+    return this.connectionsService.findAll(userId, paginationDto);
+  }
+
+  /**
+   * Create a connection between two users
+   * @param userId - The id of the user
+   * @param recipientId - The id of the recipient
+   * @returns The recipient user
+   */
+  async createConnection(userId: number, recipientId: number) {
+    return this.connectionsService.create(userId, recipientId);
+  }
+
+  /**
+   * Delete a connection between two users
+   * @param userId - The id of the user
+   * @param recipientId - The id of the recipient
+   * @returns The recipient user
+   */
+  async deleteConnection(userId: number, recipientId: number) {
+    return this.connectionsService.delete(userId, recipientId);
   }
 }
