@@ -144,21 +144,15 @@ export class UserService {
       type: true,
     };
 
-    if (query.nextToken) {
-      findOptions.skip = query.nextToken;
-    }
+    Object.assign(findOptions, {
+      skip: query.nextToken,
+      take: query.count,
+    });
 
-    if (query.count) {
-      findOptions.take = query.count;
-    }
-
-    if (query.username) {
-      findWhere.displayName = query.username;
-    }
-
-    if (query.accountType) {
-      findWhere.type = query.accountType;
-    }
+    Object.assign(findWhere, {
+      displayName: query.username,
+      type: query.accountType,
+    });
 
     if (query.maxRating && query.minRating) {
       findWhere.rating = Between(query.minRating, query.maxRating);
@@ -214,18 +208,12 @@ export class UserService {
   async update(id: number, dto: UpdateUserDto) {
     const user = await this.findById(id);
 
-    if (dto.firstName) {
-      user.firstName = dto.firstName;
-    }
-    if (dto.lastName) {
-      user.lastName = dto.lastName;
-    }
-    if (dto.displayName) {
-      user.displayName = dto.displayName;
-    }
-    if (dto.accountType) {
-      user.type = dto.accountType;
-    }
+    Object.assign(user, {
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+      displayName: dto.displayName,
+      type: dto.accountType,
+    });
 
     return this.userRepository.save(user);
   }
