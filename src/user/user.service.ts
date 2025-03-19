@@ -15,6 +15,7 @@ import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { ConnectionsService } from '../connections/connections.service';
 import { GetUsersDto } from './dto/get-users.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { PaginationService } from '../common/services/pagination.service';
 
 @Injectable()
 export class UserService {
@@ -23,6 +24,7 @@ export class UserService {
     private userRepository: Repository<User>,
     private userAuthService: UserAuthService,
     private connectionsService: ConnectionsService,
+    private paginationService: PaginationService,
   ) {}
 
   /**
@@ -127,34 +129,28 @@ export class UserService {
    * @returns An array of the users
    */
   async findAll(query: GetUsersDto) {
-    const findOptions: any = {};
     const findWhere: any = {};
-    const findOrder: any = {
-      id: 'ASC',
-    };
-    const findSelect: any = {
-      id: true,
-      firstName: true,
-      lastName: true,
-      displayName: true,
-      type: true,
-    };
-
-    Object.assign(findOptions, {
-      skip: query.nextToken,
-      take: query.count,
-    });
+    const paginationDto = new CursorPaginationDto();
 
     Object.assign(findWhere, {
       displayName: query.username,
       type: query.accountType,
     });
 
-    findOptions.where = findWhere;
-    findOptions.order = findOrder;
-    findOptions.select = findSelect;
+    Object.assign(paginationDto, {
+      cursor: query.cursor,
+      limit: query.limit,
+      direction: query.direction,
+    });
 
-    return this.userRepository.find(findOptions);
+    return this.paginationService.paginateWithCursor(
+      this.userRepository,
+      paginationDto,
+      {
+        cursorColumn: 'id',
+        where: findWhere,
+      },
+    );
   }
 
   /**
