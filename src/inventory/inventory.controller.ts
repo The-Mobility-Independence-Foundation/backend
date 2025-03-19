@@ -10,7 +10,7 @@ import {
 import { InventoryService } from './inventory.service';
 import { Inventory } from './inventory.entity';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
 
 @ApiTags('inventory')
@@ -24,10 +24,6 @@ export class InventoryController {
    */
   @Post()
   @ApiOperation({ summary: 'Initiate creation of an inventory' })
-  @ApiResponse({
-    status: 201,
-    description: 'Inventory successfully created',
-  })
   create(@Body() dto: CreateInventoryDto): Promise<Inventory> {
     return this.inventoryService.create(dto);
   }
