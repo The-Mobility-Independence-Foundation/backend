@@ -1,18 +1,9 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsOptional, IsPositive } from 'class-validator';
+import { ApiPropertyOptional, IntersectionType } from '@nestjs/swagger';
+import { IsBoolean, IsOptional } from 'class-validator';
 import { UserRole } from '../entities/user.entity';
+import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 
-export class GetUsersDto {
-  @IsOptional()
-  @ApiPropertyOptional()
-  @IsPositive()
-  nextToken?: number;
-
-  @IsOptional()
-  @ApiPropertyOptional()
-  @IsPositive()
-  count?: number;
-
+export class SearchUsersDto {
   @IsOptional()
   @ApiPropertyOptional()
   username?: string;
@@ -26,3 +17,8 @@ export class GetUsersDto {
   @IsBoolean({ message: '$value is not a boolean value' })
   isActive?: boolean;
 }
+
+export class GetUsersDto extends IntersectionType(
+  CursorPaginationDto,
+  SearchUsersDto,
+) {}

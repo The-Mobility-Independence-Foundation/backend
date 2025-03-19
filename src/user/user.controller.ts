@@ -55,8 +55,6 @@ export class UserController {
   }
 
   @Post(':userId/connections/:recipientId')
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @ResponseMessage('Successfully created user connection')
   @ApiOperation({ summary: 'Create a user connection' })
   async createConnection(
@@ -67,8 +65,6 @@ export class UserController {
   }
 
   @Delete(':userId/connections/:recipientId')
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @ResponseMessage('Successfully deleted user connection')
   @ApiOperation({ summary: 'Delete a user connection' })
   async deleteConnection(

@@ -17,12 +17,14 @@ import { Connection } from '../../connections/connection.entity';
 import { BaseApiCursorPaginationResponse } from '../../common/responses/base-api-cursor-pagination.response';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { GetUsersDto } from '../dto/get-users.dto';
+import { PaginationService } from '../../common/services/pagination.service';
 
 describe('UserService', () => {
   let service: UserService;
   let userAuthService: UserAuthService;
   let userRepository: Repository<User>;
   let connectionsService: ConnectionsService;
+  let paginationService: PaginationService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -41,6 +43,7 @@ describe('UserService', () => {
     userAuthService = module.get(UserAuthService);
     userRepository = module.get(getRepositoryToken(User));
     connectionsService = module.get(ConnectionsService);
+    paginationService = module.get(PaginationService);
   });
 
   describe('findByEmail', () => {
@@ -473,36 +476,6 @@ describe('UserService', () => {
   });
 
   describe('findAll', () => {
-    it('should use skip when nextToken is specified', async () => {
-      const dto = new GetUsersDto();
-      Object.assign(dto, {
-        nextToken: 7,
-      });
-
-      service.findAll(dto);
-
-      expect(userRepository.find).toHaveBeenCalledWith(
-        expect.objectContaining({
-          skip: dto.nextToken,
-        }),
-      );
-    });
-
-    it('should use take when count is specified', async () => {
-      const dto = new GetUsersDto();
-      Object.assign(dto, {
-        count: 7,
-      });
-
-      service.findAll(dto);
-
-      expect(userRepository.find).toHaveBeenCalledWith(
-        expect.objectContaining({
-          take: dto.count,
-        }),
-      );
-    });
-
     it('should use displayName when username is specified', async () => {
       const dto = new GetUsersDto();
       Object.assign(dto, {
@@ -511,7 +484,9 @@ describe('UserService', () => {
 
       service.findAll(dto);
 
-      expect(userRepository.find).toHaveBeenCalledWith(
+      expect(paginationService.paginateWithCursor).toHaveBeenCalledWith(
+        userRepository,
+        new CursorPaginationDto(),
         expect.objectContaining({
           where: {
             displayName: dto.username,
@@ -528,7 +503,9 @@ describe('UserService', () => {
 
       service.findAll(dto);
 
-      expect(userRepository.find).toHaveBeenCalledWith(
+      expect(paginationService.paginateWithCursor).toHaveBeenCalledWith(
+        userRepository,
+        new CursorPaginationDto(),
         expect.objectContaining({
           where: {
             type: dto.accountType,
