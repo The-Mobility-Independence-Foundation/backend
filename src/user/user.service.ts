@@ -13,7 +13,6 @@ import { UserAuthService } from './user-auth.service';
 import { validateDto } from '../common/utils/validate-dto';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { ConnectionsService } from '../connections/connections.service';
-import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
 import { GetUsersDto } from './dto/get-users.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 

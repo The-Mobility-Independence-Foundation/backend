@@ -23,7 +23,6 @@ import {
 } from '@nestjs/swagger';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
-import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
 import { GetUsersDto } from './dto/get-users.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -40,7 +39,6 @@ export class UserController {
   async getUser(@Req() req: Request): Promise<User> {
     return req.user as User;
   }
-
 
   @Get(':userId/connections')
   @ResponseMessage('Successfully retrieved user connections')
