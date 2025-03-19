@@ -85,20 +85,17 @@ export class UserController {
     Returns all users matching the given search criteria.
   */
   @Get()
-  findAll(@Query() query: GetUsersDto): Promise<User[]> {
+  async findAll(@Query() query: GetUsersDto) {
     return this.userService.findAll(query);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number): Promise<User | null> {
-    return this.userService.findOne(id);
+  async findOne(@Param('id') id: number) {
+    return this.userService.findById(id);
   }
 
   @Patch(':id')
-  update(
-    @Param('id') id: number,
-    @Body() dto: UpdateUserDto,
-  ): Promise<User | null> {
+  async update(@Param('id') id: number, @Body() dto: UpdateUserDto) {
     return this.userService.update(id, dto);
   }
 }
