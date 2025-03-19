@@ -1,11 +1,4 @@
-import {
-  IsBoolean,
-  IsNotEmpty,
-  IsOptional,
-  Max,
-  MaxLength,
-  Min,
-} from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, MaxLength } from 'class-validator';
 import { UserRole } from '../entities/user.entity';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -40,12 +33,6 @@ export class UpdateUserDto {
   @IsOptional()
   @ApiPropertyOptional({ enum: UserRole })
   accountType?: UserRole;
-
-  @IsOptional()
-  @ApiPropertyOptional()
-  @Min(0, { message: 'Rating must be greater than 0.0' })
-  @Max(5, { message: 'Rating must be less than 5.0' })
-  rating?: number;
 
   @IsOptional()
   @ApiPropertyOptional()

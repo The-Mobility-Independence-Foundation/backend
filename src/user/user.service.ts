@@ -1,13 +1,10 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { User, UserRole } from './entities/user.entity';
 import {
-  Repository,
-  FindOptionsWhere,
-  FindOptionsRelations,
-  LessThanOrEqual,
-  MoreThanOrEqual,
-  Between,
-} from 'typeorm';
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
+import { User, UserRole } from './entities/user.entity';
+import { Repository, FindOptionsWhere, FindOptionsRelations } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserAuth } from './entities/user-auth.entity';
 import { RegisterDto } from '../auth/dto/register.dto';
@@ -154,14 +151,6 @@ export class UserService {
       type: query.accountType,
     });
 
-    if (query.maxRating && query.minRating) {
-      findWhere.rating = Between(query.minRating, query.maxRating);
-    } else if (query.maxRating) {
-      findWhere.rating = LessThanOrEqual(query.maxRating);
-    } else if (query.minRating) {
-      findWhere.rating = MoreThanOrEqual(query.minRating);
-    }
-
     findOptions.where = findWhere;
     findOptions.order = findOrder;
     findOptions.select = findSelect;
@@ -195,7 +184,7 @@ export class UserService {
     if (user) {
       return user;
     } else {
-      throw new BadRequestException('User does not exist.');
+      throw new NotFoundException('User does not exist.');
     }
   }
 

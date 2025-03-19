@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from '../user.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User, UserRole } from '../entities/user.entity';
-import { Between, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { createMock } from '@golevelup/ts-jest';
 import { UserAuthService } from '../user-auth.service';
 import { UserAuth } from '../entities/user-auth.entity';
@@ -10,7 +10,7 @@ import { AuthType } from '../entities/user-auth.entity';
 import { when } from 'jest-when';
 import { RegisterDto } from '../../auth/dto/register.dto';
 import { AuthProviderProfile } from '../../auth/entities/auth-provider-profile.entity';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ConnectionsService } from '../../connections/connections.service';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 import { Connection } from '../../connections/connection.entity';
@@ -326,9 +326,7 @@ describe('UserService', () => {
         .calledWith({ where: { id: bad_id } })
         .mockResolvedValue(null);
 
-      await expect(service.findById(bad_id)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(service.findById(bad_id)).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -341,7 +339,7 @@ describe('UserService', () => {
         .mockResolvedValue(null);
 
       await expect(service.update(bad_id, new UpdateUserDto())).rejects.toThrow(
-        BadRequestException,
+        NotFoundException,
       );
     });
 
@@ -534,58 +532,6 @@ describe('UserService', () => {
         expect.objectContaining({
           where: {
             type: dto.accountType,
-          },
-        }),
-      );
-    });
-
-    it('should use Between when minRating and maxRating are specified', async () => {
-      const dto = new GetUsersDto();
-      Object.assign(dto, {
-        minRating: 1,
-        maxRating: 5,
-      });
-
-      service.findAll(dto);
-
-      expect(userRepository.find).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: {
-            rating: Between(dto.minRating, dto.maxRating),
-          },
-        }),
-      );
-    });
-
-    it('should use LessThanOrEqual when only maxRating is specified', async () => {
-      const dto = new GetUsersDto();
-      Object.assign(dto, {
-        maxRating: 5,
-      });
-
-      service.findAll(dto);
-
-      expect(userRepository.find).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: {
-            rating: LessThanOrEqual(dto.maxRating),
-          },
-        }),
-      );
-    });
-
-    it('should use MoreThanOrEqual when only minRating is specified', async () => {
-      const dto = new GetUsersDto();
-      Object.assign(dto, {
-        minRating: 3,
-      });
-
-      service.findAll(dto);
-
-      expect(userRepository.find).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: {
-            rating: MoreThanOrEqual(dto.minRating),
           },
         }),
       );
