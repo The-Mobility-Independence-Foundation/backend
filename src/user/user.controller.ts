@@ -28,22 +28,21 @@ import { GetUsersDto } from './dto/get-users.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @ApiTags('users')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   //@Get()
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @ResponseMessage('Successfully retrieved user')
   @ApiOperation({ summary: 'Get the current user' })
   async getUser(@Req() req: Request): Promise<User> {
     return req.user as User;
   }
 
+
   @Get(':userId/connections')
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @ResponseMessage('Successfully retrieved user connections')
   @ApiOperation({ summary: 'Get user connections' })
   @ApiResponse({
@@ -85,17 +84,38 @@ export class UserController {
     Returns all users matching the given search criteria.
   */
   @Get()
+  @ResponseMessage('Successfully retrieved all users matching your criteria')
+  @ApiOperation({ summary: 'Get all users matching search criteria' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns paginated list of users',
+  })
   async findAll(@Query() query: GetUsersDto) {
     return this.userService.findAll(query);
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number) {
+  @ResponseMessage('Successfully found user')
+  @ApiOperation({ summary: 'Find a specific user given their id' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns a user record',
+  })
+  async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.userService.findById(id);
   }
 
   @Patch(':id')
-  async update(@Param('id') id: number, @Body() dto: UpdateUserDto) {
+  @ResponseMessage('Successfully updated user')
+  @ApiOperation({ summary: 'Update a specific user given their id' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns the updated user record',
+  })
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateUserDto,
+  ) {
     return this.userService.update(id, dto);
   }
 }
