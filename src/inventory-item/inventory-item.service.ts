@@ -48,12 +48,12 @@ export class InventoryItemService {
     inventoryItem.inventory = inventory;
 
     if (!model) {
-      throw new NotFoundException('Inventory not found');
+      throw new NotFoundException('Model not found');
     }
     inventoryItem.model = model;
 
     if (!part) {
-      throw new NotFoundException('Inventory not found');
+      throw new NotFoundException('Part not found');
     }
     inventoryItem.part = part;
 
@@ -83,10 +83,10 @@ export class InventoryItemService {
         'inventory',
         'inventory.organization',
         'inventory.address',
-        'part',
-        'model',
+        'part.name',
+        'model.name',
         'listings',
-        'tags',
+        'tags.name',
       ],
     });
   }
@@ -111,10 +111,10 @@ export class InventoryItemService {
         'inventory',
         'inventory.organization',
         'inventory.address',
-        'part',
-        'model',
+        'part.name',
+        'model.name',
         'listings',
-        'tags',
+        'tags.name',
       ],
     });
 
