@@ -76,9 +76,9 @@ export class InventoryService {
 
     if (!inventory) {
       throw new NotFoundException('Inventory not found');
+    } else {
+      return inventory;
     }
-
-    return inventory;
   }
 
   /**
@@ -88,7 +88,10 @@ export class InventoryService {
    * @param dto : The updated information
    */
   async update(organizationId: number, id: number, dto: UpdateInventoryDto) {
-    const inventory = await this.inventoryRepository.findOneBy({ id: id });
+    const inventory = await this.inventoryRepository.findOne({
+      where: { id },
+      relations: ['organization', 'address', 'items'], // Ensure relations are loaded
+    });
 
     if (!inventory) {
       throw new NotFoundException('Inventory not found');

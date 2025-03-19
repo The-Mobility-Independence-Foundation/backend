@@ -9,13 +9,7 @@ import { createMock } from '@golevelup/ts-jest';
 import { NotFoundException } from '@nestjs/common';
 import { CreateInventoryDto } from '../dto/create-inventory.dto';
 import { UpdateInventoryDto } from '../dto/update-inventory.dto';
-
-export const mockRepository = jest.fn(() => ({
-  metadata: {
-    columns: [],
-    relations: [],
-  },
-}));
+import { when } from 'jest-when';
 
 describe('InventoryService', () => {
   let service: InventoryService;
@@ -27,11 +21,7 @@ describe('InventoryService', () => {
         InventoryService,
         {
           provide: getRepositoryToken(Inventory),
-          useValue: {
-            findOne: jest.fn(),
-            find: jest.fn(),
-            findOneBy: jest.fn(),
-          },
+          useValue: createMock<Repository<Inventory>>(),
         },
         {
           provide: getRepositoryToken(Organization),
@@ -42,7 +32,9 @@ describe('InventoryService', () => {
           useValue: createMock<Repository<Address>>(),
         },
       ],
-    }).compile();
+    })
+      .useMocker(createMock)
+      .compile();
 
     service = module.get(InventoryService);
     inventoryRepository = module.get(getRepositoryToken(Inventory));
@@ -75,7 +67,12 @@ describe('InventoryService', () => {
         address,
       });
 
-      jest.spyOn(inventoryRepository, 'findOne').mockResolvedValue(inventory);
+      when(inventoryRepository.findOne)
+        .calledWith({
+          where: { id: inventory.id, organization: { id: 1 } },
+          relations: ['organization', 'address', 'items'],
+        })
+        .mockResolvedValue(inventory);
 
       const result = await service.findOne(inventory.id, 1);
 
@@ -86,7 +83,12 @@ describe('InventoryService', () => {
     it('should return an error if an inventory without the id exists', async () => {
       const bad_id = 999999999;
 
-      jest.spyOn(inventoryRepository, 'findOne').mockResolvedValue(null);
+      when(inventoryRepository.findOne)
+        .calledWith({
+          where: { id: bad_id, organization: { id: 1 } },
+          relations: ['organization', 'address', 'items'],
+        })
+        .mockResolvedValue(null);
 
       await expect(service.findOne(bad_id, 1)).rejects.toThrow(
         NotFoundException,
@@ -139,8 +141,11 @@ describe('InventoryService', () => {
         address2,
       });
 
-      jest
-        .spyOn(inventoryRepository, 'find')
+      when(inventoryRepository.find)
+        .calledWith({
+          where: { organization: { id: 1 } },
+          relations: ['organization', 'address', 'items'],
+        })
         .mockResolvedValue([inventory1, inventory2]);
 
       const result = await service.findAll(1);
@@ -171,7 +176,12 @@ describe('InventoryService', () => {
         address1,
       });
 
-      jest.spyOn(inventoryRepository, 'find').mockResolvedValue([]);
+      when(inventoryRepository.find)
+        .calledWith({
+          where: { organization: { id: 1 } },
+          relations: ['organization', 'address', 'items'],
+        })
+        .mockResolvedValue([]);
 
       const result = await service.findAll(1);
 
@@ -210,7 +220,9 @@ describe('InventoryService', () => {
         address,
       });
 
-      inventoryRepository.save = jest.fn().mockResolvedValue(savedInventory);
+      when(inventoryRepository.save)
+        .calledWith(expect.any(Inventory))
+        .mockResolvedValue(savedInventory);
 
       const result = await service.create(createDto);
 
@@ -254,9 +266,16 @@ describe('InventoryService', () => {
         name: '53 West Inventory',
       });
 
-      jest.spyOn(inventoryRepository, 'findOneBy').mockResolvedValue(inventory);
+      when(inventoryRepository.findOne)
+        .calledWith(expect.objectContaining({ where: { id: inventory.id } }))
+        .mockResolvedValue(Promise.resolve(inventory));
 
-      inventoryRepository.save = jest.fn().mockResolvedValue(inventory);
+      when(inventoryRepository.save)
+        .calledWith(expect.any(Inventory))
+        .mockResolvedValue({
+          ...inventory,
+          name: dto.name ?? inventory.name,
+        });
 
       const result = await service.update(
         inventory.organization.id,
@@ -300,9 +319,16 @@ describe('InventoryService', () => {
         description: 'Main Inventory',
       });
 
-      jest.spyOn(inventoryRepository, 'findOneBy').mockResolvedValue(inventory);
+      when(inventoryRepository.findOne)
+        .calledWith(expect.objectContaining({ where: { id: inventory.id } }))
+        .mockResolvedValue(Promise.resolve(inventory));
 
-      inventoryRepository.save = jest.fn().mockResolvedValue(inventory);
+      when(inventoryRepository.save)
+        .calledWith(expect.any(Inventory))
+        .mockResolvedValue({
+          ...inventory,
+          description: dto.description ?? inventory.description,
+        });
 
       const result = await service.update(
         inventory.organization.id,
