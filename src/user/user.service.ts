@@ -176,16 +176,32 @@ export class UserService {
   }
 
   /**
-   * Returns a single user from the database with the specified id
-   * @param id - The id of the user to search for
-   * @returns The user, if they exist, otherwise a BadRequestException
+   * Find a user by id
+   * @param id - The id of the user
+   * @param options - Optional query options
+   * @returns The user record
    */
-  async findOne(id: number) {
-    const user = await this.userRepository.findOneBy({ id: id });
+  async findById(
+    id: number,
+    options: Partial<{
+      where: FindOptionsWhere<Omit<User, 'id'>>;
+      relations: FindOptionsRelations<User>;
+    }> = {},
+  ) {
+    const { where = {}, relations } = options;
+
+    const user = await this.userRepository.findOne({
+      where: {
+        ...where,
+        id: id,
+      },
+      relations,
+    });
+
     if (user) {
       return user;
     } else {
-      throw new BadRequestException();
+      throw new BadRequestException('User does not exist.');
     }
   }
 
@@ -196,11 +212,7 @@ export class UserService {
    * @returns The updated user, if they existed, otherwise a BadRequestException
    */
   async update(id: number, dto: UpdateUserDto) {
-    const user = await this.userRepository.findOneBy({ id: id });
-
-    if (!user) {
-      throw new BadRequestException();
-    }
+    const user = await this.findById(id);
 
     if (dto.firstName) {
       user.firstName = dto.firstName;

@@ -309,24 +309,24 @@ describe('UserService', () => {
         displayName: 'John Doe',
       });
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: user.id })
+      when(userRepository.findOne)
+        .calledWith({ where: { id: user.id } })
         .mockResolvedValue(user);
 
-      const result = await service.findOne(user.id);
+      const result = await service.findById(user.id);
 
       expect(result).toBeDefined();
       expect(result).toBe(user);
     });
 
-    it('should return an error if a user without the id exists', async () => {
+    it('should return null if no user with the id exists', async () => {
       const bad_id = 999999999;
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: bad_id })
+      when(userRepository.findOne)
+        .calledWith({ where: { id: bad_id } })
         .mockResolvedValue(null);
 
-      await expect(service.findOne(bad_id)).rejects.toThrow(
+      await expect(service.findById(bad_id)).rejects.toThrow(
         BadRequestException,
       );
     });
@@ -336,8 +336,8 @@ describe('UserService', () => {
     it('should return an error if there is no user with the specified id', async () => {
       const bad_id = 999999999;
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: bad_id })
+      when(userRepository.findOne)
+        .calledWith({ where: { id: bad_id } })
         .mockResolvedValue(null);
 
       await expect(service.update(bad_id, new UpdateUserDto())).rejects.toThrow(
@@ -360,8 +360,8 @@ describe('UserService', () => {
         firstName: 'NotJohn',
       });
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: user.id })
+      when(userRepository.findOne)
+        .calledWith({ where: { id: user.id } })
         .mockResolvedValue(user);
 
       when(userRepository.save).mockImplementation((user: User) => {
@@ -392,8 +392,8 @@ describe('UserService', () => {
         lastName: 'NotDoe',
       });
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: user.id })
+      when(userRepository.findOne)
+        .calledWith({ where: { id: user.id } })
         .mockResolvedValue(user);
 
       when(userRepository.save).mockImplementation((user: User) => {
@@ -424,8 +424,8 @@ describe('UserService', () => {
         displayName: 'NotJohnDoe',
       });
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: user.id })
+      when(userRepository.findOne)
+        .calledWith({ where: { id: user.id } })
         .mockResolvedValue(user);
 
       when(userRepository.save).mockImplementation((user: User) => {
@@ -456,8 +456,8 @@ describe('UserService', () => {
         accountType: UserRole.ADMIN,
       });
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: user.id })
+      when(userRepository.findOne)
+        .calledWith({ where: { id: user.id } })
         .mockResolvedValue(user);
 
       when(userRepository.save).mockImplementation((user: User) => {
