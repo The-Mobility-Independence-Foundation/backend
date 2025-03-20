@@ -5,16 +5,6 @@ import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 
 export class GetReportsDto extends CursorPaginationDto {
   @IsOptional()
-  @ApiPropertyOptional({ description: 'The id of the nest report to get.' })
-  @IsPositive()
-  nextToken?: number;
-
-  @IsOptional()
-  @ApiPropertyOptional({ description: 'The number of reports to get.' })
-  @IsPositive()
-  count?: number;
-
-  @IsOptional()
   @ApiPropertyOptional({
     description: 'The id of the person making the report.',
   })
