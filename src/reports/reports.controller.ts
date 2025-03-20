@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
@@ -7,18 +6,27 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { Report } from './report.entity';
 import { ReportsService } from './reports.service';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CreateReportDto } from './dto/create-report.dto';
 import { GetReportsDto } from './dto/get-reports.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ResponseMessage } from '../common/decorators/response-message.decorator';
 
 @ApiTags('reports')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('reports')
 export class ReportsController {
-  constructor(private reportService: ReportsService) {}
+  constructor(private readonly reportService: ReportsService) {}
 
   /**
    * Gets all reports that fit the search criteria.
@@ -26,7 +34,12 @@ export class ReportsController {
    */
   @Get()
   @ApiOperation({ summary: 'Get all reports that fit search criteria.' })
-  findAll(@Query() query: GetReportsDto): Promise<Report[]> {
+  @ResponseMessage('Successfully found reports')
+  @ApiResponse({
+    status: 200,
+    description: 'Returns paginated list of reports',
+  })
+  findAll(@Query() query: GetReportsDto) {
     return this.reportService.findAll(query);
   }
 
@@ -36,7 +49,12 @@ export class ReportsController {
    */
   @Post()
   @ApiOperation({ summary: 'Create a new report.' })
-  create(@Body() dto: CreateReportDto): Promise<Report | BadRequestException> {
+  @ResponseMessage('Successfully created report')
+  @ApiResponse({
+    status: 200,
+    description: 'Returns the newly created report record',
+  })
+  create(@Body() dto: CreateReportDto) {
     return this.reportService.create(dto);
   }
 
@@ -47,8 +65,13 @@ export class ReportsController {
    */
   @Get(':id')
   @ApiOperation({ summary: 'Get a report based on its id.' })
-  findOneBy(@Param('id') id: number): Promise<Report | null> {
-    return this.reportService.findOne(id);
+  @ResponseMessage('Successfully found report')
+  @ApiResponse({
+    status: 200,
+    description: 'Returns the report record',
+  })
+  findOneBy(@Param('id') id: number) {
+    return this.reportService.findById(id);
   }
 
   /**
@@ -58,10 +81,12 @@ export class ReportsController {
    */
   @Patch(':id')
   @ApiOperation({ summary: 'Update the report with a given id.' })
-  update(
-    @Param('id') id: number,
-    @Body() dto: UpdateReportDto,
-  ): Promise<Report | null> {
+  @ResponseMessage('Successfully updated report')
+  @ApiResponse({
+    status: 200,
+    description: 'Returns updated report record',
+  })
+  update(@Param('id') id: number, @Body() dto: UpdateReportDto) {
     return this.reportService.update(id, dto);
   }
 }

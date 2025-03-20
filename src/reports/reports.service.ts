@@ -1,5 +1,16 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { And, LessThan, MoreThan, Repository } from 'typeorm';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import {
+  And,
+  FindOptionsRelations,
+  FindOptionsWhere,
+  LessThan,
+  MoreThan,
+  Repository,
+} from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post as PostEntity } from '../post/post.entity';
 import { User } from '../user/entities/user.entity';
@@ -9,6 +20,8 @@ import { Comment } from '../comment/comment.entity';
 import { CreateReportDto } from './dto/create-report.dto';
 import { GetReportsDto } from './dto/get-reports.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
+import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
+import { PaginationService } from '../common/services/pagination.service';
 
 @Injectable()
 export class ReportsService {
@@ -27,8 +40,15 @@ export class ReportsService {
 
     @InjectRepository(Comment)
     private commentRepository: Repository<Comment>,
+
+    private paginationService: PaginationService,
   ) {}
 
+  /**
+   * Creates a new report using the dto
+   * @param dto - The dto that contains all the info for the report
+   * @returns The newly created report record
+   */
   async create(dto: CreateReportDto) {
     const report = new Report();
 
@@ -36,6 +56,7 @@ export class ReportsService {
       throw new BadRequestException('You cannot report yourself.');
     }
 
+    // TODO: once user is merged, update with findById
     const reporter = await this.userRepository.findOneBy({
       id: dto.reporterId,
     });
@@ -44,12 +65,12 @@ export class ReportsService {
     });
 
     if (!reporter) {
-      throw new BadRequestException('Invalid reporterId');
+      throw new NotFoundException('Invalid reporterId');
     }
     report.reporter = reporter;
 
     if (!reportedUser) {
-      throw new BadRequestException('ReportedUser not found.');
+      throw new NotFoundException('ReportedUser not found.');
     }
     report.offender = reportedUser;
 
@@ -61,12 +82,13 @@ export class ReportsService {
           );
         }
 
+        //TODO: once comment service has findById, use that
         const comment = await this.commentRepository.findOneBy({
           id: dto.commentId,
         });
 
         if (!comment) {
-          throw new BadRequestException('Invalid commentId provided.');
+          throw new NotFoundException('Invalid commentId provided.');
         }
 
         report.comment = comment;
@@ -78,12 +100,13 @@ export class ReportsService {
           );
         }
 
+        // TODO: once listing has findById, use that
         const listing = await this.listingRepository.findOneBy({
           id: dto.listingId,
         });
 
         if (!listing) {
-          throw new BadRequestException('Invalid listingId provided.');
+          throw new NotFoundException('Invalid listingId provided.');
         }
 
         report.listing = listing;
@@ -95,10 +118,11 @@ export class ReportsService {
           );
         }
 
+        //TODO: once post service has findById, use that
         const post = await this.postRepository.findOneBy({ id: dto.postId });
 
         if (!post) {
-          throw new BadRequestException('Invalid postId provided.');
+          throw new NotFoundException('Invalid postId provided.');
         }
 
         report.post = post;
@@ -116,32 +140,26 @@ export class ReportsService {
     return this.reportRepository.save(report);
   }
 
+  /**
+   * Find all reports based on search criteria
+   * @param query - The dto with the search criteria
+   * @returns An array of reports
+   */
   async findAll(query: GetReportsDto) {
-    const findOptions: any = {};
     const findWhere: any = {};
-    const findOrder: any = {
-      id: 'ASC',
-    };
+    const paginationDto = new CursorPaginationDto();
 
-    if (query.nextToken) {
-      findOptions.skip = query.nextToken;
-    }
+    Object.assign(findWhere, {
+      reporterId: query.reporterId,
+      offenderId: query.reportedUserId,
+      type: query.reportType,
+    });
 
-    if (query.count) {
-      findOptions.take = query.count;
-    }
-
-    if (query.reporterId) {
-      findWhere.reporterId = query.reporterId;
-    }
-
-    if (query.reportedUserId) {
-      findWhere.offenderId = query.reportedUserId;
-    }
-
-    if (query.reportType) {
-      findWhere.type = query.reportType;
-    }
+    Object.assign(paginationDto, {
+      cursor: query.cursor,
+      limit: query.limit,
+      direction: query.direction,
+    });
 
     if (query.before && query.after) {
       findWhere.reportedOn = And(LessThan(query.before), MoreThan(query.after));
@@ -151,38 +169,70 @@ export class ReportsService {
       findWhere.reportedOn = MoreThan(query.after);
     }
 
-    findOptions.where = findWhere;
-    findOptions.order = findOrder;
-
-    return this.reportRepository.find(findOptions);
+    return this.paginationService.paginateWithCursor(
+      this.reportRepository,
+      paginationDto,
+      {
+        cursorColumn: 'id',
+        where: findWhere,
+      },
+    );
   }
 
-  async findOne(id: number) {
-    const report = await this.reportRepository.findOneBy({ id: id });
+  /**
+   * Find a report by id
+   * @param id - The id of the report
+   * @param options - Optional query options
+   * @returns The report record
+   */
+  async findById(
+    id: number,
+    options: Partial<{
+      where: FindOptionsWhere<Omit<Report, 'id'>>;
+      relations: FindOptionsRelations<Report>;
+    }> = {},
+  ) {
+    const { where = {}, relations } = options;
+
+    const report = await this.reportRepository.findOne({
+      where: {
+        ...where,
+        id: id,
+      },
+      relations,
+    });
 
     if (report) {
       return report;
     } else {
-      throw new BadRequestException();
+      throw new NotFoundException('Report does not exist.');
     }
   }
 
+  /**
+   * Update a report with moderator information
+   * @param id - The id of the report
+   * @param dto - The dto with what the moderator is doing
+   * @returns The updated report record
+   */
   async update(id: number, dto: UpdateReportDto) {
-    const report = await this.reportRepository.findOneBy({ id: id });
-    if (!report) {
-      throw new BadRequestException('Invalid reportID.');
-    }
+    const report = await this.findById(id);
 
+    console.log('no error thrown');
+    console.log(report);
+    // TODO: once users branch is merged into dev, replace this with userService.findById
     const moderator = await this.userRepository.findOneBy({
       id: dto.moderatorId,
     });
     if (!moderator) {
-      throw new BadRequestException('Invalid moderatorID');
+      throw new NotFoundException('Invalid moderatorID');
     }
 
-    report.moderator = moderator;
-    report.actionTaken = dto.actionTaken;
-    report.actionTakenOn = new Date();
+    Object.assign(report, {
+      moderator: moderator,
+      actionTaken: dto.actionTaken,
+      actionTakenOn: new Date(),
+    });
 
     return await this.reportRepository.save(report);
   }

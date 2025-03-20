@@ -1,18 +1,9 @@
 import { IsOptional, IsPositive } from 'class-validator';
 import { ReportType } from '../report.entity';
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional, IntersectionType } from '@nestjs/swagger';
+import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 
-export class GetReportsDto {
-  @IsOptional()
-  @ApiPropertyOptional({ description: 'The id of the nest report to get.' })
-  @IsPositive()
-  nextToken?: number;
-
-  @IsOptional()
-  @ApiPropertyOptional({ description: 'The number of reports to get.' })
-  @IsPositive()
-  count?: number;
-
+export class SearchReportsDto {
   @IsOptional()
   @ApiPropertyOptional({
     description: 'The id of the person making the report.',
@@ -46,3 +37,8 @@ export class GetReportsDto {
   @ApiPropertyOptional({ description: 'Only get reports on this date.' })
   on?: Date;
 }
+
+export class GetReportsDto extends IntersectionType(
+  CursorPaginationDto,
+  SearchReportsDto,
+) {}

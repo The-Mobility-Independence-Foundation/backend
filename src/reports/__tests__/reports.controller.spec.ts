@@ -39,7 +39,9 @@ describe('ReportsController', () => {
           useValue: createMock<Repository<Comment>>(),
         },
       ],
-    }).compile();
+    })
+      .useMocker(createMock)
+      .compile();
 
     controller = module.get<ReportsController>(ReportsController);
   });

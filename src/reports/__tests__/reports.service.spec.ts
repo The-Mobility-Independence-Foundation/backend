@@ -9,10 +9,12 @@ import { Comment } from '../../comment/comment.entity';
 import { And, LessThan, MoreThan, Repository } from 'typeorm';
 import { createMock } from '@golevelup/ts-jest';
 import { when } from 'jest-when';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CreateReportDto } from '../dto/create-report.dto';
 import { UpdateReportDto } from '../dto/update-report.dto';
 import { GetReportsDto } from '../dto/get-reports.dto';
+import { PaginationService } from '../../common/services/pagination.service';
+import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 
 describe('ReportsService', () => {
   let service: ReportsService;
@@ -21,6 +23,7 @@ describe('ReportsService', () => {
   let listingRepository: Repository<Listing>;
   let postRepository: Repository<PostEntity>;
   let commentRepository: Repository<Comment>;
+  let paginationService: PaginationService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -57,6 +60,7 @@ describe('ReportsService', () => {
     listingRepository = module.get(getRepositoryToken(Listing));
     postRepository = module.get(getRepositoryToken(PostEntity));
     commentRepository = module.get(getRepositoryToken(Comment));
+    paginationService = module.get(PaginationService);
   });
 
   it('should be defined', () => {
@@ -125,7 +129,7 @@ describe('ReportsService', () => {
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
     });
 
-    it('should throw a BadRequestException when the reporter doesnt exist', async () => {
+    it('should throw a NotFoundException when the reporter doesnt exist', async () => {
       Object.assign(dto, {
         reporterId: 999999999,
         reportedUserId: 2,
@@ -141,10 +145,10 @@ describe('ReportsService', () => {
         .calledWith({ id: dto.reportedUserId })
         .mockResolvedValue(offender);
 
-      await expect(service.create(dto)).rejects.toThrow(BadRequestException);
+      await expect(service.create(dto)).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw a BadRequestException when the reported user doesnt exist', async () => {
+    it('should throw a NotFoundException when the reported user doesnt exist', async () => {
       Object.assign(dto, {
         reporterId: 1,
         reportedUserId: 999999999,
@@ -160,7 +164,7 @@ describe('ReportsService', () => {
         .calledWith({ id: dto.reportedUserId })
         .mockResolvedValue(null);
 
-      await expect(service.create(dto)).rejects.toThrow(BadRequestException);
+      await expect(service.create(dto)).rejects.toThrow(NotFoundException);
     });
 
     it('should throw a BadRequestException when ReportType is comment but commentId not specified', async () => {
@@ -182,7 +186,7 @@ describe('ReportsService', () => {
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
     });
 
-    it('should throw a BadRequestException when ReportType is comment and commentId is invalid', async () => {
+    it('should throw a NotFoundException when ReportType is comment and commentId is invalid', async () => {
       Object.assign(dto, {
         reporterId: 1,
         reportedUserId: 2,
@@ -203,7 +207,7 @@ describe('ReportsService', () => {
         .calledWith({ id: dto.commentId })
         .mockResolvedValue(null);
 
-      await expect(service.create(dto)).rejects.toThrow(BadRequestException);
+      await expect(service.create(dto)).rejects.toThrow(NotFoundException);
     });
 
     it('should throw a BadRequestException when ReportType is list but listingId not specified', async () => {
@@ -225,7 +229,7 @@ describe('ReportsService', () => {
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
     });
 
-    it('should throw a BadRequestException when ReportType is listing and listingId is invalid', async () => {
+    it('should throw a NotFoundException when ReportType is listing and listingId is invalid', async () => {
       Object.assign(dto, {
         reporterId: 1,
         reportedUserId: 2,
@@ -246,7 +250,7 @@ describe('ReportsService', () => {
         .calledWith({ id: dto.listingId })
         .mockResolvedValue(null);
 
-      await expect(service.create(dto)).rejects.toThrow(BadRequestException);
+      await expect(service.create(dto)).rejects.toThrow(NotFoundException);
     });
 
     it('should throw a BadRequestException when ReportType is post but postId not specified', async () => {
@@ -268,7 +272,7 @@ describe('ReportsService', () => {
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
     });
 
-    it('should throw a BadRequestException when ReportType is post and postId is invalid', async () => {
+    it('should throw a NotFoundException when ReportType is post and postId is invalid', async () => {
       Object.assign(dto, {
         reporterId: 1,
         reportedUserId: 2,
@@ -289,7 +293,7 @@ describe('ReportsService', () => {
         .calledWith({ id: dto.postId })
         .mockResolvedValue(null);
 
-      await expect(service.create(dto)).rejects.toThrow(BadRequestException);
+      await expect(service.create(dto)).rejects.toThrow(NotFoundException);
     });
 
     it('should throw a BadRequestException when ReportType is undefined', async () => {
@@ -417,34 +421,6 @@ describe('ReportsService', () => {
       dto = new GetReportsDto();
     });
 
-    it('should use skip when nextToken is specified', async () => {
-      Object.assign(dto, {
-        nextToken: 7,
-      });
-
-      service.findAll(dto);
-
-      expect(reportRepository.find).toHaveBeenCalledWith(
-        expect.objectContaining({
-          skip: dto.nextToken,
-        }),
-      );
-    });
-
-    it('should use take when count is specified', async () => {
-      Object.assign(dto, {
-        count: 7,
-      });
-
-      service.findAll(dto);
-
-      expect(reportRepository.find).toHaveBeenCalledWith(
-        expect.objectContaining({
-          take: dto.count,
-        }),
-      );
-    });
-
     it('should use reporterId when reporterId is specified', async () => {
       Object.assign(dto, {
         reporterId: 7,
@@ -452,7 +428,9 @@ describe('ReportsService', () => {
 
       service.findAll(dto);
 
-      expect(reportRepository.find).toHaveBeenCalledWith(
+      expect(paginationService.paginateWithCursor).toHaveBeenCalledWith(
+        reportRepository,
+        new CursorPaginationDto(),
         expect.objectContaining({
           where: {
             reporterId: dto.reporterId,
@@ -468,7 +446,9 @@ describe('ReportsService', () => {
 
       service.findAll(dto);
 
-      expect(reportRepository.find).toHaveBeenCalledWith(
+      expect(paginationService.paginateWithCursor).toHaveBeenCalledWith(
+        reportRepository,
+        new CursorPaginationDto(),
         expect.objectContaining({
           where: {
             offenderId: dto.reportedUserId,
@@ -484,7 +464,9 @@ describe('ReportsService', () => {
 
       service.findAll(dto);
 
-      expect(reportRepository.find).toHaveBeenCalledWith(
+      expect(paginationService.paginateWithCursor).toHaveBeenCalledWith(
+        reportRepository,
+        new CursorPaginationDto(),
         expect.objectContaining({
           where: {
             type: dto.reportType,
@@ -501,7 +483,9 @@ describe('ReportsService', () => {
 
       service.findAll(dto);
 
-      expect(reportRepository.find).toHaveBeenCalledWith(
+      expect(paginationService.paginateWithCursor).toHaveBeenCalledWith(
+        reportRepository,
+        new CursorPaginationDto(),
         expect.objectContaining({
           where: {
             reportedOn: And(LessThan(dto.before), MoreThan(dto.after)),
@@ -517,7 +501,9 @@ describe('ReportsService', () => {
 
       service.findAll(dto);
 
-      expect(reportRepository.find).toHaveBeenCalledWith(
+      expect(paginationService.paginateWithCursor).toHaveBeenCalledWith(
+        reportRepository,
+        new CursorPaginationDto(),
         expect.objectContaining({
           where: {
             reportedOn: LessThan(dto.before),
@@ -533,7 +519,9 @@ describe('ReportsService', () => {
 
       service.findAll(dto);
 
-      expect(reportRepository.find).toHaveBeenCalledWith(
+      expect(paginationService.paginateWithCursor).toHaveBeenCalledWith(
+        reportRepository,
+        new CursorPaginationDto(),
         expect.objectContaining({
           where: {
             reportedOn: MoreThan(dto.after),
@@ -579,26 +567,24 @@ describe('ReportsService', () => {
         type: ReportType.PROFILE,
       });
 
-      when(reportRepository.findOneBy)
-        .calledWith({ id: report.id })
+      when(reportRepository.findOne)
+        .calledWith({ where: { id: report.id } })
         .mockResolvedValue(report);
 
-      const result = await service.findOne(report.id);
+      const result = await service.findById(report.id);
 
       expect(result).toBeDefined();
       expect(result).toBe(report);
     });
 
-    it('should return an error if a user with the id doesnt exist', async () => {
+    it('should throw an error if a user with the id doesnt exist', async () => {
       const bad_id = 999999999;
 
-      when(reportRepository.findOneBy)
-        .calledWith({ id: bad_id })
+      when(reportRepository.findOne)
+        .calledWith({ where: { id: bad_id } })
         .mockResolvedValue(null);
 
-      await expect(service.findOne(bad_id)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(service.findById(bad_id)).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -651,8 +637,8 @@ describe('ReportsService', () => {
         actionTaken: 'I banned his ass.',
       });
 
-      when(reportRepository.findOneBy)
-        .calledWith({ id: bad_id })
+      when(reportRepository.findOne)
+        .calledWith({ where: { id: bad_id } })
         .mockResolvedValue(null);
 
       when(userRepository.findOneBy)
@@ -660,7 +646,7 @@ describe('ReportsService', () => {
         .mockResolvedValue(moderator);
 
       await expect(service.update(bad_id, dto)).rejects.toThrow(
-        BadRequestException,
+        NotFoundException,
       );
     });
 
@@ -681,7 +667,7 @@ describe('ReportsService', () => {
         .mockResolvedValue(null);
 
       await expect(service.update(report.id, dto)).rejects.toThrow(
-        BadRequestException,
+        NotFoundException,
       );
     });
 
