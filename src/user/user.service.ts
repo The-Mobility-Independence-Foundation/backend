@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { User, UserRole } from './entities/user.entity';
 import { Repository, FindOptionsWhere, FindOptionsRelations } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,6 +13,9 @@ import { UserAuthService } from './user-auth.service';
 import { validateDto } from '../common/utils/validate-dto';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { ConnectionsService } from '../connections/connections.service';
+import { GetUsersDto } from './dto/get-users.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { PaginationService } from '../common/services/pagination.service';
 
 @Injectable()
 export class UserService {
@@ -17,6 +24,7 @@ export class UserService {
     private userRepository: Repository<User>,
     private userAuthService: UserAuthService,
     private connectionsService: ConnectionsService,
+    private paginationService: PaginationService,
   ) {}
 
   /**
@@ -113,5 +121,84 @@ export class UserService {
    */
   async deleteConnection(userId: number, recipientId: number) {
     return this.connectionsService.delete(userId, recipientId);
+  }
+
+  /**
+   * Returns all users from the database that match the search critera
+   * @param query - The search criteria
+   * @returns An array of the users
+   */
+  async findAll(query: GetUsersDto) {
+    const findWhere: any = {};
+    const paginationDto = new CursorPaginationDto();
+
+    Object.assign(findWhere, {
+      displayName: query.username,
+      type: query.accountType,
+    });
+
+    Object.assign(paginationDto, {
+      cursor: query.cursor,
+      limit: query.limit,
+      direction: query.direction,
+    });
+
+    return this.paginationService.paginateWithCursor(
+      this.userRepository,
+      paginationDto,
+      {
+        cursorColumn: 'id',
+        where: findWhere,
+      },
+    );
+  }
+
+  /**
+   * Find a user by id
+   * @param id - The id of the user
+   * @param options - Optional query options
+   * @returns The user record
+   */
+  async findById(
+    id: number,
+    options: Partial<{
+      where: FindOptionsWhere<Omit<User, 'id'>>;
+      relations: FindOptionsRelations<User>;
+    }> = {},
+  ) {
+    const { where = {}, relations } = options;
+
+    const user = await this.userRepository.findOne({
+      where: {
+        ...where,
+        id: id,
+      },
+      relations,
+    });
+
+    if (user) {
+      return user;
+    } else {
+      throw new NotFoundException('User does not exist.');
+    }
+  }
+
+  /**
+   * Updates a user based on their id and the provided dto
+   * @param id - The id of the user to update
+   * @param dto - The fields to change and their new values
+   * @returns The updated user, if they existed, otherwise a BadRequestException
+   */
+  async update(id: number, dto: UpdateUserDto) {
+    const user = await this.findById(id);
+
+    Object.assign(user, {
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+      displayName: dto.displayName,
+      type: dto.accountType,
+    });
+
+    return this.userRepository.save(user);
   }
 }
