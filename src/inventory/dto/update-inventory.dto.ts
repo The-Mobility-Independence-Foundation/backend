@@ -15,9 +15,4 @@ export class UpdateInventoryDto {
       'Description is too long. Maximum length is $constraint1 characters.',
   })
   description?: string;
-
-  /*
-  @ApiProperty()
-  address?: number;
-  */
 }

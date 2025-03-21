@@ -6,12 +6,15 @@ import {
   Body,
   Patch,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
 import { Inventory } from './inventory.entity';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
+import { GetInventoriesDto } from './dto/get-inventory.dto';
+import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
 
 @ApiTags('inventory')
 @Controller('inventory')
@@ -37,8 +40,9 @@ export class InventoryController {
   @ApiOperation({ summary: 'Retrieve an organizations inventories' })
   findAll(
     @Param('organizationId', ParseIntPipe) organizationId: number,
-  ): Promise<Inventory[]> {
-    return this.inventoryService.findAll(organizationId);
+    @Query() query: GetInventoriesDto,
+  ): Promise<BaseApiCursorPaginationResponse<Inventory>> {
+    return this.inventoryService.findAll(organizationId, query);
   }
 
   /**

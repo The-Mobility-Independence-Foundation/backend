@@ -5,6 +5,7 @@ import { Inventory } from '../inventory.entity';
 import { Organization } from '../../organization/organization.entity';
 import { InventoryService } from '../inventory.service';
 import { Address } from '../../address/address.entity';
+import { PaginationService } from '../../common/services/pagination.service';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -12,6 +13,10 @@ export const mockRepository = jest.fn(() => ({
     relations: [],
   },
 }));
+
+export const mockPaginationService = {
+  paginateWithCursor: jest.fn(),
+};
 
 describe('InventoryController', () => {
   let controller: InventoryController;
@@ -32,6 +37,10 @@ describe('InventoryController', () => {
         {
           provide: getRepositoryToken(Address),
           useClass: mockRepository,
+        },
+        {
+          provide: PaginationService, 
+          useValue: mockPaginationService,
         },
       ],
     }).compile();
