@@ -147,4 +147,22 @@ export class InventoryService {
 
     return await this.inventoryRepository.save(inventory);
   }
+
+  async findById(
+    id: number,
+    options: Partial<{
+      where: FindOptionsWhere<Omit<Inventory, 'id'>>;
+      relations: string[] | FindOptionsRelations<Inventory>;
+    }> = {},
+  ) {
+    const { where = {}, relations } = options;
+
+    return this.inventoryRepository.findOne({
+      where: {
+        ...where,
+        id,
+      },
+      relations: relations as string[],
+    });
+  }
 }
