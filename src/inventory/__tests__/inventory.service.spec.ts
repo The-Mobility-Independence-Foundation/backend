@@ -13,11 +13,16 @@ import { when } from 'jest-when';
 import { PaginationService } from '../../common/services/pagination.service';
 import { GetInventoriesDto } from '../dto/get-inventory.dto';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
+import { AddressService } from '../../address/address.service';
+import { OrganizationService } from '../../organization/organization.service';
+import { User } from '../../user/entities/user.entity';
 
 describe('InventoryService', () => {
   let service: InventoryService;
   let inventoryRepository: Repository<Inventory>;
   let paginationService: PaginationService;
+  let organizationService: OrganizationService;
+  let addressService: AddressService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -35,6 +40,10 @@ describe('InventoryService', () => {
           provide: getRepositoryToken(Address),
           useValue: createMock<Repository<Address>>(),
         },
+        {
+          provide: getRepositoryToken(User), 
+          useValue: createMock<Repository<User>>(),
+        },
       ],
     })
       .useMocker(createMock)
@@ -42,6 +51,8 @@ describe('InventoryService', () => {
 
     service = module.get(InventoryService);
     paginationService = module.get(PaginationService);
+    organizationService = module.get(OrganizationService);
+    addressService = module.get(AddressService);
     inventoryRepository = module.get(getRepositoryToken(Inventory));
   });
 
@@ -107,22 +118,22 @@ describe('InventoryService', () => {
       Object.assign(dto, {
         name: 'Sample Inventory',
       });
-  
+
       service.findAll(1, dto);
-  
+
       expect(paginationService.paginateWithCursor).toHaveBeenCalledWith(
         inventoryRepository,
         expect.any(CursorPaginationDto),
         expect.objectContaining({
           where: {
-            name: dto.name, 
+            name: dto.name,
             organization: { id: 1 },
           },
           cursorColumn: 'id',
         }),
       );
     });
-  
+
     it('should apply pagination parameters correctly', async () => {
       const dto = new GetInventoriesDto();
       Object.assign(dto, {
@@ -130,9 +141,9 @@ describe('InventoryService', () => {
         limit: 10,
         direction: 'forward',
       });
-  
+
       service.findAll(1, dto);
-  
+
       expect(paginationService.paginateWithCursor).toHaveBeenCalledWith(
         inventoryRepository,
         expect.objectContaining({
@@ -145,7 +156,7 @@ describe('InventoryService', () => {
         }),
       );
     });
-  
+
     it('should handle both filters and pagination together', async () => {
       const dto = new GetInventoriesDto();
       Object.assign(dto, {
@@ -154,9 +165,9 @@ describe('InventoryService', () => {
         limit: 10,
         direction: 'forward',
       });
-  
+
       service.findAll(1, dto);
-  
+
       expect(paginationService.paginateWithCursor).toHaveBeenCalledWith(
         inventoryRepository,
         expect.objectContaining({
@@ -166,14 +177,13 @@ describe('InventoryService', () => {
         }),
         expect.objectContaining({
           where: {
-            name: dto.name, 
+            name: dto.name,
             organization: { id: 1 },
           },
         }),
       );
     });
   });
-    
   describe('create', () => {
     it('should create a new inventory with a create inventory DTO', async () => {
       const createDto = new CreateInventoryDto();
@@ -199,6 +209,17 @@ describe('InventoryService', () => {
         address,
       });
 
+      // Mock the organization service to return a valid organization
+      when(organizationService.findById)
+      .calledWith(createDto.organizationId, { relations: ['address', 'user', 'inventory'] }) 
+      .mockResolvedValue(organization);
+
+      // Mock the address service to return a valid address
+      when(addressService.findById)
+        .calledWith(createDto.address)
+        .mockResolvedValue(address);
+
+      // Mock the save method to return the saved inventory
       when(inventoryRepository.save)
         .calledWith(expect.any(Inventory))
         .mockResolvedValue(savedInventory);
@@ -211,6 +232,51 @@ describe('InventoryService', () => {
       expect(result.name).toBe(createDto.name);
       expect(result.description).toBe(createDto.description);
       expect(result.address.id).toBe(createDto.address);
+    });
+
+    it('should throw NotFoundException if organization is not found', async () => {
+      const createDto = new CreateInventoryDto();
+      Object.assign(createDto, {
+        organizationId: 1,
+        name: '42 West Inventory',
+        description: 'Main inventory',
+        address: 1,
+      });
+
+      // Mock organization service to return null
+      when(organizationService.findById)
+        .calledWith(createDto.organizationId)
+        .mockResolvedValue(null);
+
+      await expect(service.create(createDto)).rejects.toThrow(
+        new NotFoundException('Organization not found'),
+      );
+    });
+
+    it('should throw NotFoundException if address is not found', async () => {
+      const createDto = new CreateInventoryDto();
+      Object.assign(createDto, {
+        organizationId: 1,
+        name: '42 West Inventory',
+        description: 'Main inventory',
+        address: 1,
+      });
+
+      // Mock organization service to return a valid organization
+      when(organizationService.findById)
+        .calledWith(createDto.organizationId, expect.any(Object)) // Ensure method signature matches
+        .mockResolvedValue({
+          id: 1,
+          name: 'Test Organization',
+        } as Organization); // Provide a valid mock organization
+
+      when(addressService.findById)
+        .calledWith(createDto.address)
+        .mockResolvedValue(null);
+
+      await expect(service.create(createDto)).rejects.toThrow(
+        new NotFoundException('Address not found'),
+      );
     });
   });
   describe('update', () => {

@@ -1,18 +1,8 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { MaxLength } from 'class-validator';
+import { PickType } from '@nestjs/mapped-types';
+import { CreateInventoryDto } from './create-inventory.dto';
 
-export class UpdateInventoryDto {
-  @ApiProperty()
-  @MaxLength(40, {
-    message:
-      'Inventory name is too long. Maximum length is $constraint1 characters.',
-  })
-  name?: string;
+export class UpdateInventoryDto extends PickType(CreateInventoryDto, [
+  'name',
+  'description',
+] as const) {}
 
-  @ApiProperty()
-  @MaxLength(200, {
-    message:
-      'Description is too long. Maximum length is $constraint1 characters.',
-  })
-  description?: string;
-}
