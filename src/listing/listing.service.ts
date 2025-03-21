@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Listing } from './listing.entity';
-import { Repository } from 'typeorm';
+import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InventoryItem } from '../inventory-item/inventory-item.entity';
 import { Organization } from '../organization/organization.entity';
@@ -48,5 +48,35 @@ export class ListingService {
 
   async findOne(id: number) {
     return this.listingRepository.findOneBy({ id: id });
+  }
+
+  /**
+   * Find a listing by id
+   * @param id - The id of the listing
+   * @param options - Optional query options
+   * @returns The listing record
+   */
+  async findById(
+    id: number,
+    options: Partial<{
+      where: FindOptionsWhere<Omit<Listing, 'id'>>;
+      relations: FindOptionsRelations<Listing>;
+    }> = {},
+  ) {
+    const { where = {}, relations } = options;
+
+    const listing = await this.listingRepository.findOne({
+      where: {
+        ...where,
+        id: id,
+      },
+      relations,
+    });
+
+    if (listing) {
+      return listing;
+    } else {
+      throw new NotFoundException('Listing does not exist.');
+    }
   }
 }

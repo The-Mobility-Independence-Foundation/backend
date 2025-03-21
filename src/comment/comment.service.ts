@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Comment } from './comment.entity';
-import { Repository } from 'typeorm';
+import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
 import { Post } from '../post/post.entity';
@@ -53,6 +53,36 @@ export class CommentService {
   }
 
   async findOne(id: number) {
-    return this.commentRepository.findOneBy({ id: id });
+    return this.findById(id);
+  }
+
+  /**
+   * Find a comment by id
+   * @param id - The id of the comment
+   * @param options - Optional query options
+   * @returns The comment record
+   */
+  async findById(
+    id: number,
+    options: Partial<{
+      where: FindOptionsWhere<Omit<Comment, 'id'>>;
+      relations: FindOptionsRelations<Comment>;
+    }> = {},
+  ) {
+    const { where = {}, relations } = options;
+
+    const comment = await this.commentRepository.findOne({
+      where: {
+        ...where,
+        id: id,
+      },
+      relations,
+    });
+
+    if (comment) {
+      return comment;
+    } else {
+      throw new NotFoundException('Comment does not exist.');
+    }
   }
 }

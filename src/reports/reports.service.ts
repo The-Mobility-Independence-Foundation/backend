@@ -12,16 +12,16 @@ import {
   Repository,
 } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Post as PostEntity } from '../post/post.entity';
-import { User } from '../user/entities/user.entity';
-import { Listing } from '../listing/listing.entity';
 import { Report, ReportType } from './report.entity';
-import { Comment } from '../comment/comment.entity';
 import { CreateReportDto } from './dto/create-report.dto';
 import { GetReportsDto } from './dto/get-reports.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { PaginationService } from '../common/services/pagination.service';
+import { UserService } from '../user/user.service';
+import { CommentService } from '../comment/comment.service';
+import { ListingService } from '../listing/listing.service';
+import { PostService } from '../post/post.service';
 
 @Injectable()
 export class ReportsService {
@@ -29,19 +29,11 @@ export class ReportsService {
     @InjectRepository(Report)
     private reportRepository: Repository<Report>,
 
-    @InjectRepository(PostEntity)
-    private postRepository: Repository<PostEntity>,
-
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
-
-    @InjectRepository(Listing)
-    private listingRepository: Repository<Listing>,
-
-    @InjectRepository(Comment)
-    private commentRepository: Repository<Comment>,
-
     private paginationService: PaginationService,
+    private userService: UserService,
+    private commentService: CommentService,
+    private postService: PostService,
+    private listingService: ListingService,
   ) {}
 
   /**
@@ -56,23 +48,8 @@ export class ReportsService {
       throw new BadRequestException('You cannot report yourself.');
     }
 
-    // TODO: once user is merged, update with findById
-    const reporter = await this.userRepository.findOneBy({
-      id: dto.reporterId,
-    });
-    const reportedUser = await this.userRepository.findOneBy({
-      id: dto.reportedUserId,
-    });
-
-    if (!reporter) {
-      throw new NotFoundException('Invalid reporterId');
-    }
-    report.reporter = reporter;
-
-    if (!reportedUser) {
-      throw new NotFoundException('ReportedUser not found.');
-    }
-    report.offender = reportedUser;
+    report.reporter = await this.userService.findById(dto.reporterId);
+    report.offender = await this.userService.findById(dto.reportedUserId);
 
     switch (dto.reportType) {
       case ReportType.COMMENT:
@@ -82,16 +59,7 @@ export class ReportsService {
           );
         }
 
-        //TODO: once comment service has findById, use that
-        const comment = await this.commentRepository.findOneBy({
-          id: dto.commentId,
-        });
-
-        if (!comment) {
-          throw new NotFoundException('Invalid commentId provided.');
-        }
-
-        report.comment = comment;
+        report.comment = await this.commentService.findById(dto.commentId);
         break;
       case ReportType.LISTING:
         if (!dto.listingId) {
@@ -100,16 +68,7 @@ export class ReportsService {
           );
         }
 
-        // TODO: once listing has findById, use that
-        const listing = await this.listingRepository.findOneBy({
-          id: dto.listingId,
-        });
-
-        if (!listing) {
-          throw new NotFoundException('Invalid listingId provided.');
-        }
-
-        report.listing = listing;
+        report.listing = await this.listingService.findById(dto.listingId);
         break;
       case ReportType.POST:
         if (!dto.postId) {
@@ -118,14 +77,7 @@ export class ReportsService {
           );
         }
 
-        //TODO: once post service has findById, use that
-        const post = await this.postRepository.findOneBy({ id: dto.postId });
-
-        if (!post) {
-          throw new NotFoundException('Invalid postId provided.');
-        }
-
-        report.post = post;
+        report.post = await this.postService.findById(dto.postId);
         break;
       case ReportType.PROFILE:
         // no validation needed
@@ -218,18 +170,9 @@ export class ReportsService {
   async update(id: number, dto: UpdateReportDto) {
     const report = await this.findById(id);
 
-    console.log('no error thrown');
-    console.log(report);
-    // TODO: once users branch is merged into dev, replace this with userService.findById
-    const moderator = await this.userRepository.findOneBy({
-      id: dto.moderatorId,
-    });
-    if (!moderator) {
-      throw new NotFoundException('Invalid moderatorID');
-    }
+    report.moderator = await this.userService.findById(dto.moderatorId);
 
     Object.assign(report, {
-      moderator: moderator,
       actionTaken: dto.actionTaken,
       actionTakenOn: new Date(),
     });

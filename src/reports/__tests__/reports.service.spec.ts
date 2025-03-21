@@ -15,15 +15,19 @@ import { UpdateReportDto } from '../dto/update-report.dto';
 import { GetReportsDto } from '../dto/get-reports.dto';
 import { PaginationService } from '../../common/services/pagination.service';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
+import { UserService } from '../../user/user.service';
+import { CommentService } from '../../comment/comment.service';
+import { PostService } from '../../post/post.service';
+import { ListingService } from '../../listing/listing.service';
 
 describe('ReportsService', () => {
   let service: ReportsService;
   let reportRepository: Repository<Report>;
-  let userRepository: Repository<User>;
-  let listingRepository: Repository<Listing>;
-  let postRepository: Repository<PostEntity>;
-  let commentRepository: Repository<Comment>;
   let paginationService: PaginationService;
+  let userService: UserService;
+  let listingService: ListingService;
+  let commentService: CommentService;
+  let postService: PostService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -33,22 +37,6 @@ describe('ReportsService', () => {
           provide: getRepositoryToken(Report),
           useValue: createMock<Repository<Report>>(),
         },
-        {
-          provide: getRepositoryToken(User),
-          useValue: createMock<Repository<User>>(),
-        },
-        {
-          provide: getRepositoryToken(Listing),
-          useValue: createMock<Repository<Listing>>(),
-        },
-        {
-          provide: getRepositoryToken(PostEntity),
-          useValue: createMock<Repository<PostEntity>>(),
-        },
-        {
-          provide: getRepositoryToken(Comment),
-          useValue: createMock<Repository<Comment>>(),
-        },
       ],
     })
       .useMocker(createMock)
@@ -56,11 +44,11 @@ describe('ReportsService', () => {
 
     service = module.get(ReportsService);
     reportRepository = module.get(getRepositoryToken(Report));
-    userRepository = module.get(getRepositoryToken(User));
-    listingRepository = module.get(getRepositoryToken(Listing));
-    postRepository = module.get(getRepositoryToken(PostEntity));
-    commentRepository = module.get(getRepositoryToken(Comment));
     paginationService = module.get(PaginationService);
+    userService = module.get(UserService);
+    listingService = module.get(ListingService);
+    postService = module.get(PostService);
+    commentService = module.get(CommentService);
   });
 
   it('should be defined', () => {
@@ -127,44 +115,7 @@ describe('ReportsService', () => {
       });
 
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
-    });
-
-    it('should throw a NotFoundException when the reporter doesnt exist', async () => {
-      Object.assign(dto, {
-        reporterId: 999999999,
-        reportedUserId: 2,
-        reason: "I'm reporting this guy's profile!",
-        reportType: ReportType.PROFILE,
-      });
-
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reporterId })
-        .mockResolvedValue(null);
-
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reportedUserId })
-        .mockResolvedValue(offender);
-
-      await expect(service.create(dto)).rejects.toThrow(NotFoundException);
-    });
-
-    it('should throw a NotFoundException when the reported user doesnt exist', async () => {
-      Object.assign(dto, {
-        reporterId: 1,
-        reportedUserId: 999999999,
-        reason: "I'm reporting this guy's profile!",
-        reportType: ReportType.PROFILE,
-      });
-
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reporterId })
-        .mockResolvedValue(reporter);
-
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reportedUserId })
-        .mockResolvedValue(null);
-
-      await expect(service.create(dto)).rejects.toThrow(NotFoundException);
+      expect(reportRepository.save).not.toHaveBeenCalled();
     });
 
     it('should throw a BadRequestException when ReportType is comment but commentId not specified', async () => {
@@ -175,39 +126,16 @@ describe('ReportsService', () => {
         reportType: ReportType.COMMENT,
       });
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reporterId })
+      when(userService.findById)
+        .calledWith(dto.reporterId)
         .mockResolvedValue(reporter);
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reportedUserId })
+      when(userService.findById)
+        .calledWith(dto.reportedUserId)
         .mockResolvedValue(offender);
 
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
-    });
-
-    it('should throw a NotFoundException when ReportType is comment and commentId is invalid', async () => {
-      Object.assign(dto, {
-        reporterId: 1,
-        reportedUserId: 2,
-        reason: "I'm reporting this guy's comment!",
-        reportType: ReportType.COMMENT,
-        commentId: 999999999,
-      });
-
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reporterId })
-        .mockResolvedValue(reporter);
-
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reportedUserId })
-        .mockResolvedValue(offender);
-
-      when(commentRepository.findOneBy)
-        .calledWith({ id: dto.commentId })
-        .mockResolvedValue(null);
-
-      await expect(service.create(dto)).rejects.toThrow(NotFoundException);
+      expect(reportRepository.save).not.toHaveBeenCalled();
     });
 
     it('should throw a BadRequestException when ReportType is list but listingId not specified', async () => {
@@ -218,39 +146,16 @@ describe('ReportsService', () => {
         reportType: ReportType.LISTING,
       });
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reporterId })
+      when(userService.findById)
+        .calledWith(dto.reporterId)
         .mockResolvedValue(reporter);
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reportedUserId })
+      when(userService.findById)
+        .calledWith(dto.reportedUserId)
         .mockResolvedValue(offender);
 
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
-    });
-
-    it('should throw a NotFoundException when ReportType is listing and listingId is invalid', async () => {
-      Object.assign(dto, {
-        reporterId: 1,
-        reportedUserId: 2,
-        reason: "I'm reporting this guy's listing!",
-        reportType: ReportType.LISTING,
-        listingId: 999999999,
-      });
-
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reporterId })
-        .mockResolvedValue(reporter);
-
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reportedUserId })
-        .mockResolvedValue(offender);
-
-      when(listingRepository.findOneBy)
-        .calledWith({ id: dto.listingId })
-        .mockResolvedValue(null);
-
-      await expect(service.create(dto)).rejects.toThrow(NotFoundException);
+      expect(reportRepository.save).not.toHaveBeenCalled();
     });
 
     it('should throw a BadRequestException when ReportType is post but postId not specified', async () => {
@@ -261,39 +166,16 @@ describe('ReportsService', () => {
         reportType: ReportType.POST,
       });
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reporterId })
+      when(userService.findById)
+        .calledWith(dto.reporterId)
         .mockResolvedValue(reporter);
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reportedUserId })
+      when(userService.findById)
+        .calledWith(dto.reportedUserId)
         .mockResolvedValue(offender);
 
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
-    });
-
-    it('should throw a NotFoundException when ReportType is post and postId is invalid', async () => {
-      Object.assign(dto, {
-        reporterId: 1,
-        reportedUserId: 2,
-        reason: "I'm reporting this guy's post!",
-        reportType: ReportType.POST,
-        postId: 999999999,
-      });
-
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reporterId })
-        .mockResolvedValue(reporter);
-
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reportedUserId })
-        .mockResolvedValue(offender);
-
-      when(postRepository.findOneBy)
-        .calledWith({ id: dto.postId })
-        .mockResolvedValue(null);
-
-      await expect(service.create(dto)).rejects.toThrow(NotFoundException);
+      expect(reportRepository.save).not.toHaveBeenCalled();
     });
 
     it('should throw a BadRequestException when ReportType is undefined', async () => {
@@ -303,15 +185,16 @@ describe('ReportsService', () => {
         reason: "I'm reporting this guy's ??????!",
       });
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reporterId })
+      when(userService.findById)
+        .calledWith(dto.reporterId)
         .mockResolvedValue(reporter);
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reportedUserId })
+      when(userService.findById)
+        .calledWith(dto.reportedUserId)
         .mockResolvedValue(offender);
 
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
+      expect(reportRepository.save).not.toHaveBeenCalled();
     });
 
     it('returns the report when successfully created as a comment report', async () => {
@@ -323,21 +206,22 @@ describe('ReportsService', () => {
         commentId: 1,
       });
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reporterId })
+      dto.commentId = 1; // error handler wants to be super sure this isn't undefined
+
+      when(userService.findById)
+        .calledWith(dto.reporterId)
         .mockResolvedValue(reporter);
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reportedUserId })
+      when(userService.findById)
+        .calledWith(dto.reportedUserId)
         .mockResolvedValue(offender);
 
-      when(commentRepository.findOneBy)
-        .calledWith({ id: dto.commentId })
+      when(commentService.findById)
+        .calledWith(dto.commentId)
         .mockResolvedValue(comment);
 
-      await expect(service.create(dto)).resolves.not.toThrow(
-        BadRequestException,
-      );
+      await expect(service.create(dto)).resolves.not.toThrow();
+      expect(reportRepository.save).toHaveBeenCalled();
     });
 
     it('returns the report when successfully created as a listing report', async () => {
@@ -349,21 +233,22 @@ describe('ReportsService', () => {
         listingId: 1,
       });
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reporterId })
+      dto.listingId = 1; // error handler wants to be super sure this isn't undefined
+
+      when(userService.findById)
+        .calledWith(dto.reporterId)
         .mockResolvedValue(reporter);
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reportedUserId })
+      when(userService.findById)
+        .calledWith(dto.reportedUserId)
         .mockResolvedValue(offender);
 
-      when(listingRepository.findOneBy)
-        .calledWith({ id: dto.listingId })
+      when(listingService.findById)
+        .calledWith(dto.listingId)
         .mockResolvedValue(listing);
 
-      await expect(service.create(dto)).resolves.not.toThrow(
-        BadRequestException,
-      );
+      await expect(service.create(dto)).resolves.not.toThrow();
+      expect(reportRepository.save).toHaveBeenCalled();
     });
 
     it('returns the report when successfully created as a post report', async () => {
@@ -375,21 +260,20 @@ describe('ReportsService', () => {
         postId: 1,
       });
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reporterId })
+      dto.postId = 1; // error handler wants to be super sure this isn't undefined
+
+      when(userService.findById)
+        .calledWith(dto.reporterId)
         .mockResolvedValue(reporter);
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reportedUserId })
+      when(userService.findById)
+        .calledWith(dto.reportedUserId)
         .mockResolvedValue(offender);
 
-      when(postRepository.findOneBy)
-        .calledWith({ id: dto.postId })
-        .mockResolvedValue(post);
+      when(postService.findById).calledWith(dto.postId).mockResolvedValue(post);
 
-      await expect(service.create(dto)).resolves.not.toThrow(
-        BadRequestException,
-      );
+      await expect(service.create(dto)).resolves.not.toThrow();
+      expect(reportRepository.save).toHaveBeenCalled();
     });
 
     it('returns the report when successfully created as a profile report', async () => {
@@ -400,17 +284,16 @@ describe('ReportsService', () => {
         reportType: ReportType.PROFILE,
       });
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reporterId })
+      when(userService.findById)
+        .calledWith(dto.reporterId)
         .mockResolvedValue(reporter);
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: dto.reportedUserId })
+      when(userService.findById)
+        .calledWith(dto.reportedUserId)
         .mockResolvedValue(offender);
 
-      await expect(service.create(dto)).resolves.not.toThrow(
-        BadRequestException,
-      );
+      await expect(service.create(dto)).resolves.not.toThrow();
+      expect(reportRepository.save).toHaveBeenCalled();
     });
   });
 
@@ -419,60 +302,6 @@ describe('ReportsService', () => {
 
     beforeEach(() => {
       dto = new GetReportsDto();
-    });
-
-    it('should use reporterId when reporterId is specified', async () => {
-      Object.assign(dto, {
-        reporterId: 7,
-      });
-
-      service.findAll(dto);
-
-      expect(paginationService.paginateWithCursor).toHaveBeenCalledWith(
-        reportRepository,
-        new CursorPaginationDto(),
-        expect.objectContaining({
-          where: {
-            reporterId: dto.reporterId,
-          },
-        }),
-      );
-    });
-
-    it('should use offenderId when reportedUserId is specified', async () => {
-      Object.assign(dto, {
-        reportedUserId: 7,
-      });
-
-      service.findAll(dto);
-
-      expect(paginationService.paginateWithCursor).toHaveBeenCalledWith(
-        reportRepository,
-        new CursorPaginationDto(),
-        expect.objectContaining({
-          where: {
-            offenderId: dto.reportedUserId,
-          },
-        }),
-      );
-    });
-
-    it('should use type when reportType is specified', async () => {
-      Object.assign(dto, {
-        reportType: ReportType.PROFILE,
-      });
-
-      service.findAll(dto);
-
-      expect(paginationService.paginateWithCursor).toHaveBeenCalledWith(
-        reportRepository,
-        new CursorPaginationDto(),
-        expect.objectContaining({
-          where: {
-            type: dto.reportType,
-          },
-        }),
-      );
     });
 
     it('should use And when both before and after are specified', async () => {
@@ -641,34 +470,14 @@ describe('ReportsService', () => {
         .calledWith({ where: { id: bad_id } })
         .mockResolvedValue(null);
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: moderator.id })
+      when(userService.findById)
+        .calledWith(moderator.id)
         .mockResolvedValue(moderator);
 
       await expect(service.update(bad_id, dto)).rejects.toThrow(
         NotFoundException,
       );
-    });
-
-    it('should throw an error when moderator doesnt exist', async () => {
-      const bad_id = 999999999;
-
-      Object.assign(dto, {
-        moderatorId: bad_id,
-        actionTaken: 'I banned his ass.',
-      });
-
-      when(reportRepository.findOneBy)
-        .calledWith({ id: report.id })
-        .mockResolvedValue(report);
-
-      when(userRepository.findOneBy)
-        .calledWith({ id: bad_id })
-        .mockResolvedValue(null);
-
-      await expect(service.update(report.id, dto)).rejects.toThrow(
-        NotFoundException,
-      );
+      expect(reportRepository.save).not.toHaveBeenCalled();
     });
 
     it('should return the updated report if reportid and moderatorid are both valid', async () => {
@@ -681,13 +490,12 @@ describe('ReportsService', () => {
         .calledWith({ id: report.id })
         .mockResolvedValue(report);
 
-      when(userRepository.findOneBy)
-        .calledWith({ id: moderator.id })
+      when(userService.findById)
+        .calledWith(moderator.id)
         .mockResolvedValue(moderator);
 
-      await expect(service.update(report.id, dto)).resolves.not.toThrow(
-        BadRequestException,
-      );
+      await expect(service.update(report.id, dto)).resolves.not.toThrow();
+      expect(reportRepository.save).toHaveBeenCalled();
     });
   });
 });

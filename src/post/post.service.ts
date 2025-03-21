@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './post.entity';
 import { User } from '../user/entities/user.entity';
@@ -52,5 +52,35 @@ export class PostService {
 
   async findOne(id: number) {
     return this.postRepository.findOneBy({ id: id });
+  }
+
+  /**
+   * Find a post by id
+   * @param id - The id of the post
+   * @param options - Optional query options
+   * @returns The post record
+   */
+  async findById(
+    id: number,
+    options: Partial<{
+      where: FindOptionsWhere<Omit<Post, 'id'>>;
+      relations: FindOptionsRelations<Post>;
+    }> = {},
+  ) {
+    const { where = {}, relations } = options;
+
+    const post = await this.postRepository.findOne({
+      where: {
+        ...where,
+        id: id,
+      },
+      relations,
+    });
+
+    if (post) {
+      return post;
+    } else {
+      throw new NotFoundException('Post does not exist.');
+    }
   }
 }
