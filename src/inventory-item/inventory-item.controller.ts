@@ -7,7 +7,7 @@ import {
   ParseIntPipe,
   Patch,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation } from '@nestjs/swagger';
 import { CreateInventoryItemDto } from './dto/create-inventory-item.dto';
 import { UpdateInventoryItemDto } from './dto/update-inventory-item.dto';
 import { InventoryItem } from './inventory-item.entity';
@@ -24,10 +24,6 @@ export class InventoryItemController {
    */
   @Post()
   @ApiOperation({ summary: 'Initiate creation of an inventory item' })
-  @ApiResponse({
-    status: 201,
-    description: 'Inventory item successfully created',
-  })
   create(@Body() dto: CreateInventoryItemDto): Promise<InventoryItem> {
     return this.inventoryItemService.create(dto);
   }

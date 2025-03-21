@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InventoryItem } from './inventory-item.entity';
-import { Repository } from 'typeorm';
+import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Inventory } from '../inventory/inventory.entity';
 import { Model } from '../model/model.entity';
@@ -112,6 +112,7 @@ export class InventoryItemService {
         'inventory.organization',
         'inventory.address',
         'part.name',
+        'part.partNumber',
         'model.name',
         'listings',
         'tags.name',
@@ -179,5 +180,29 @@ export class InventoryItemService {
     }
 
     return await this.inventoryItemRepository.save(item);
+  }
+
+  /**
+   * Finds a specific inventory item based on the ID given
+   * @param id : The ID of the specific inventory item given
+   * @param options : Any specific options needed to search
+   * @returns : The inventory item and any information
+   */
+  async findById(
+    id: number,
+    options: Partial<{
+      where: FindOptionsWhere<Omit<InventoryItem, 'id'>>;
+      relations: string[] | FindOptionsRelations<InventoryItem>;
+    }> = {},
+  ) {
+    const { where = {}, relations } = options;
+
+    return this.inventoryItemRepository.findOne({
+      where: {
+        ...where,
+        id,
+      },
+      relations: relations as string[],
+    });
   }
 }
