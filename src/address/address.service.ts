@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Address } from './address.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 
 @Injectable()
 export class AddressService {
@@ -27,5 +27,23 @@ export class AddressService {
 
   async findAll(): Promise<Address[]> {
     return this.addressRepository.find();
+  }
+
+  async findById(
+    id: number,
+    options: Partial<{
+      where: FindOptionsWhere<Omit<Address, 'id'>>;
+      relations: string[] | FindOptionsRelations<Address>;
+    }> = {},
+  ) {
+    const { where = {}, relations } = options;
+  
+    return this.addressRepository.findOne({
+      where: {
+        ...where,
+        id,
+      },
+      relations: relations as string[],
+    });
   }
 }

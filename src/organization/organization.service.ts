@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { Organization } from './organization.entity';
 import { User } from '../user/entities/user.entity';
 import { Inventory } from '../inventory/inventory.entity';
@@ -51,5 +51,23 @@ export class OrganizationService {
 
   async findOne(id: number) {
     return this.organizationRepository.findOneBy({ id: id });
+  }
+
+  async findById(
+    id: number,
+    options: Partial<{
+      where: FindOptionsWhere<Omit<Organization, 'id'>>;
+      relations: string[] | FindOptionsRelations<Organization>;
+    }> = {},
+  ) {
+    const { where = {}, relations } = options;
+  
+    return this.organizationRepository.findOne({
+      where: {
+        ...where,
+        id,
+      },
+      relations: relations as string[],
+    });
   }
 }

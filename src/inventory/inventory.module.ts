@@ -6,10 +6,13 @@ import { Inventory } from './inventory.entity';
 import { Organization } from '../organization/organization.entity';
 import { Address } from '../address/address.entity';
 import { PaginationService } from '../common/services/pagination.service';
+import { OrganizationService } from '../organization/organization.service';
+import { AddressService } from '../address/address.service';
+import { User } from '../user/entities/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Inventory, Organization, Address])],
+  imports: [TypeOrmModule.forFeature([Inventory, Organization, Address, User])],
   controllers: [InventoryController],
-  providers: [InventoryService, PaginationService],
+  providers: [InventoryService, PaginationService, OrganizationService, AddressService],
 })
 export class InventoryModule {}
