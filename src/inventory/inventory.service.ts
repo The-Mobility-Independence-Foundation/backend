@@ -37,9 +37,12 @@ export class InventoryService {
   async create(dto: CreateInventoryDto): Promise<Inventory> {
     const inventory = new Inventory();
 
-    const organization = await this.organizationService.findById(dto.organizationId, {
-      relations: ['address', 'user', 'inventory'],
-    });
+    const organization = await this.organizationService.findById(
+      dto.organizationId,
+      {
+        relations: ['address', 'user', 'inventory'],
+      },
+    );
     if (!organization) {
       throw new NotFoundException('Organization not found');
     }

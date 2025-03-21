@@ -61,7 +61,7 @@ export class OrganizationService {
     }> = {},
   ) {
     const { where = {}, relations } = options;
-  
+
     return this.organizationRepository.findOne({
       where: {
         ...where,

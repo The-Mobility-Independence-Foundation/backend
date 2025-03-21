@@ -41,7 +41,7 @@ describe('InventoryService', () => {
           useValue: createMock<Repository<Address>>(),
         },
         {
-          provide: getRepositoryToken(User), 
+          provide: getRepositoryToken(User),
           useValue: createMock<Repository<User>>(),
         },
       ],
@@ -211,8 +211,10 @@ describe('InventoryService', () => {
 
       // Mock the organization service to return a valid organization
       when(organizationService.findById)
-      .calledWith(createDto.organizationId, { relations: ['address', 'user', 'inventory'] }) 
-      .mockResolvedValue(organization);
+        .calledWith(createDto.organizationId, {
+          relations: ['address', 'user', 'inventory'],
+        })
+        .mockResolvedValue(organization);
 
       // Mock the address service to return a valid address
       when(addressService.findById)
