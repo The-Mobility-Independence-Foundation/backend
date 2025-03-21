@@ -1,11 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Inventory } from './inventory.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { Organization } from '../organization/organization.entity';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { Address } from '../address/address.entity';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
+import { PaginationService } from '../common/services/pagination.service';
+import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
+import { GetInventoriesDto } from './dto/get-inventory.dto';
 
 @Injectable()
 export class InventoryService {
@@ -18,6 +21,9 @@ export class InventoryService {
 
     @InjectRepository(Address)
     private readonly addressRepository: Repository<Address>,
+
+    private readonly paginationService: PaginationService,
+
   ) {}
 
   /**
@@ -55,11 +61,27 @@ export class InventoryService {
    * @param organizationId : The id of the organization
    * @returns A collection of all relevant inventory information owned by this organization
    */
-  async findAll(organizationId: number) {
-    return this.inventoryRepository.find({
-      where: { organization: { id: organizationId } },
-      relations: ['organization', 'address', 'items'],
+  async findAll(organizationId: number, query: GetInventoriesDto) {
+    const findWhere: any = { 
+      organization: { id: organizationId }, 
+      name: query.name, 
+    };
+    const paginationDto = new CursorPaginationDto();
+
+    Object.assign(paginationDto, {
+      cursor: query.cursor,
+      limit: query.limit,
+      direction: query.direction,
     });
+
+    return this.paginationService.paginateWithCursor(
+      this.inventoryRepository,
+      paginationDto,
+      {
+        cursorColumn: 'id',
+        where: findWhere,
+      },
+    );
   }
 
   /**
@@ -68,17 +90,29 @@ export class InventoryService {
    * @param organizationId : Id of the specific organization
    * @returns : Information of a specific inventory
    */
-  async findOne(id: number, organizationId: number) {
+  async findOne(id: number,
+    organizationId: number,
+    options: Partial<{
+      where: FindOptionsWhere<Omit<Inventory, 'id'>>;
+      relations: FindOptionsRelations<Inventory>;
+    }> = {},
+  ) {
+    const { where = {}, relations = ['organization', 'address', 'items'] } = options;
+  
     const inventory = await this.inventoryRepository.findOne({
-      where: { id, organization: { id: organizationId } },
-      relations: ['organization', 'address', 'items'],
+      where: {
+        ...where,
+        id,
+        organization: { id: organizationId },
+      },
+      relations,
     });
-
+  
     if (!inventory) {
       throw new NotFoundException('Inventory not found');
-    } else {
-      return inventory;
     }
+  
+    return inventory;
   }
 
   /**
@@ -90,22 +124,12 @@ export class InventoryService {
   async update(organizationId: number, id: number, dto: UpdateInventoryDto) {
     const inventory = await this.inventoryRepository.findOne({
       where: { id },
-      relations: ['organization', 'address', 'items'], // Ensure relations are loaded
+      relations: ['organization', 'address', 'items'], 
     });
 
     if (!inventory) {
       throw new NotFoundException('Inventory not found');
     }
-
-    /*
-    const address = await this.addressRepository.findOneBy({
-      id: dto.address,
-    });
-    if (!address) {
-      throw new NotFoundException('Address not found');
-    }
-    inventory.address = address;
-    */
 
     if (dto.description) {
       inventory.description = dto.description;
