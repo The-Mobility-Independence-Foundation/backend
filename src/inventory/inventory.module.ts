@@ -13,6 +13,11 @@ import { User } from '../user/entities/user.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Inventory, Organization, Address, User])],
   controllers: [InventoryController],
-  providers: [InventoryService, PaginationService, OrganizationService, AddressService],
+  providers: [
+    InventoryService,
+    PaginationService,
+    OrganizationService,
+    AddressService,
+  ],
 })
 export class InventoryModule {}

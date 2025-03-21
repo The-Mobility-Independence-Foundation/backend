@@ -49,7 +49,7 @@ describe('InventoryController', () => {
           useClass: mockRepository,
         },
         {
-          provide: PaginationService, 
+          provide: PaginationService,
           useValue: mockPaginationService,
         },
         {

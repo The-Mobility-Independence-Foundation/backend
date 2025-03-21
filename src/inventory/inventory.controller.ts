@@ -19,8 +19,7 @@ import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cu
 @ApiTags('inventory')
 @Controller('inventory')
 export class InventoryController {
-  constructor(
-    private readonly inventoryService: InventoryService) {}
+  constructor(private readonly inventoryService: InventoryService) {}
 
   /**
    * Create a new inventory

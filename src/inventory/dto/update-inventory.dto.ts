@@ -5,4 +5,3 @@ export class UpdateInventoryDto extends PickType(CreateInventoryDto, [
   'name',
   'description',
 ] as const) {}
-
