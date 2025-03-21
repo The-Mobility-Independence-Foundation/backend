@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Part } from './part.entity';
-import { Repository } from 'typeorm';
+import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { Model } from '../model/model.entity';
 
 @Injectable()
@@ -10,7 +10,7 @@ export class PartService {
     @InjectRepository(Part)
     private readonly partRepository: Repository<Part>,
 
-    @InjectRepository(Part)
+    @InjectRepository(Model)
     private readonly modelRepository: Repository<Model>,
   ) {}
 
@@ -35,5 +35,29 @@ export class PartService {
 
   async findOne(id: number) {
     return this.partRepository.findOneBy({ id: id });
+  }
+
+  /**
+   * Finds a specific part based on the ID given
+   * @param id : The ID of the specific part given
+   * @param options : Any specific options needed to search
+   * @returns : The part and any information
+   */
+  async findById(
+    id: number,
+    options: Partial<{
+      where: FindOptionsWhere<Omit<Part, 'id'>>;
+      relations: string[] | FindOptionsRelations<Part>;
+    }> = {},
+  ) {
+    const { where = {}, relations } = options;
+
+    return this.partRepository.findOne({
+      where: {
+        ...where,
+        id,
+      },
+      relations: relations as string[],
+    });
   }
 }

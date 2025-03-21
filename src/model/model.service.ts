@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Manufacturer, Model } from './model.entity';
-import { Repository } from 'typeorm';
+import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
@@ -13,6 +13,10 @@ export class ModelService {
     private readonly manufacturerRepository: Repository<Manufacturer>,
   ) {}
 
+  /**
+   *
+   * @returns
+   */
   async create() {
     const model = new Model();
     const manufacturer = await this.manufacturerRepository.findOneBy({ id: 1 });
@@ -26,11 +30,44 @@ export class ModelService {
     return this.modelRepository.save(model);
   }
 
+  /**
+   *
+   * @returns
+   */
   async findAll() {
     return this.modelRepository.find();
   }
 
+  /**
+   *
+   * @param id
+   * @returns
+   */
   async findOne(id: number) {
     return this.modelRepository.findOneBy({ id: id });
+  }
+
+  /**
+   * Finds a specific model based on the ID given
+   * @param id : ID of the model being looked for
+   * @param options : Any specific options needed to search
+   * @returns : The model and any information
+   */
+  async findById(
+    id: number,
+    options: Partial<{
+      where: FindOptionsWhere<Omit<Model, 'id'>>;
+      relations: string[] | FindOptionsRelations<Model>;
+    }> = {},
+  ) {
+    const { where = {}, relations } = options;
+
+    return this.modelRepository.findOne({
+      where: {
+        ...where,
+        id,
+      },
+      relations: relations as string[],
+    });
   }
 }

@@ -37,7 +37,7 @@ export class Part {
   @JoinColumn()
   model: Model;
 
-  @Column({ type: 'varchar', length: 30 })
+  @Column({ type: 'varchar', length: 30, nullable: true })
   partNumber: string;
 
   @ManyToMany(() => PartType, (pt) => pt.parts)
