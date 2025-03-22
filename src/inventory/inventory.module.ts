@@ -16,5 +16,6 @@ import { CommonModule } from '../common/common.module';
   ],
   controllers: [InventoryController],
   providers: [InventoryService],
+  exports: [InventoryService],
 })
 export class InventoryModule {}
