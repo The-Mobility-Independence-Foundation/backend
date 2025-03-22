@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { Organization } from './organization.entity';
@@ -53,7 +53,7 @@ export class OrganizationService {
     return this.organizationRepository.findOneBy({ id: id });
   }
 
-  async findById(
+  async findByIdOrThrow(
     id: number,
     options: Partial<{
       where: FindOptionsWhere<Omit<Organization, 'id'>>;
@@ -62,12 +62,19 @@ export class OrganizationService {
   ) {
     const { where = {}, relations } = options;
 
-    return this.organizationRepository.findOne({
+    const organization = await this.organizationRepository.findOne({
       where: {
         ...where,
         id,
       },
       relations: relations as string[],
     });
+
+    if (organization){
+      return organization;
+    }
+    else{
+      throw new NotFoundException('Organization not found.');
+    }
   }
 }

@@ -15,7 +15,6 @@ import { GetInventoriesDto } from '../dto/get-inventory.dto';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 import { AddressService } from '../../address/address.service';
 import { OrganizationService } from '../../organization/organization.service';
-import { User } from '../../user/entities/user.entity';
 
 describe('InventoryService', () => {
   let service: InventoryService;
@@ -31,18 +30,6 @@ describe('InventoryService', () => {
         {
           provide: getRepositoryToken(Inventory),
           useValue: createMock<Repository<Inventory>>(),
-        },
-        {
-          provide: getRepositoryToken(Organization),
-          useValue: createMock<Repository<Organization>>(),
-        },
-        {
-          provide: getRepositoryToken(Address),
-          useValue: createMock<Repository<Address>>(),
-        },
-        {
-          provide: getRepositoryToken(User),
-          useValue: createMock<Repository<User>>(),
         },
       ],
     })
@@ -90,7 +77,7 @@ describe('InventoryService', () => {
         })
         .mockResolvedValue(inventory);
 
-      const result = await service.findOne(inventory.id, 1);
+      const result = await service.findWithOrganization(inventory.id, 1);
 
       expect(result).toBeDefined();
       expect(result).toEqual(inventory);
@@ -106,7 +93,7 @@ describe('InventoryService', () => {
         })
         .mockResolvedValue(null);
 
-      await expect(service.findOne(bad_id, 1)).rejects.toThrow(
+      await expect(service.findWithOrganization(bad_id, 1)).rejects.toThrow(
         NotFoundException,
       );
     });
@@ -209,19 +196,16 @@ describe('InventoryService', () => {
         address,
       });
 
-      // Mock the organization service to return a valid organization
-      when(organizationService.findById)
+      when(organizationService.findByIdOrThrow)
         .calledWith(createDto.organizationId, {
           relations: ['address', 'user', 'inventory'],
         })
         .mockResolvedValue(organization);
 
-      // Mock the address service to return a valid address
-      when(addressService.findById)
+      when(addressService.findByIdOrThrow)
         .calledWith(createDto.address)
         .mockResolvedValue(address);
 
-      // Mock the save method to return the saved inventory
       when(inventoryRepository.save)
         .calledWith(expect.any(Inventory))
         .mockResolvedValue(savedInventory);
@@ -245,13 +229,15 @@ describe('InventoryService', () => {
         address: 1,
       });
 
-      // Mock organization service to return null
-      when(organizationService.findById)
-        .calledWith(createDto.organizationId)
-        .mockResolvedValue(null);
+      when(organizationService.findByIdOrThrow)
+      .calledWith(createDto.organizationId, expect.any(Object)) 
+      .mockRejectedValue(new NotFoundException('Organization not found.'));
 
-      await expect(service.create(createDto)).rejects.toThrow(
-        new NotFoundException('Organization not found'),
+      await expect(service.create(createDto)).rejects.toThrow(NotFoundException);
+
+      expect(organizationService.findByIdOrThrow).toHaveBeenCalledWith(
+        createDto.organizationId,
+        expect.any(Object)
       );
     });
 
@@ -264,20 +250,19 @@ describe('InventoryService', () => {
         address: 1,
       });
 
-      // Mock organization service to return a valid organization
-      when(organizationService.findById)
-        .calledWith(createDto.organizationId, expect.any(Object)) // Ensure method signature matches
+      when(organizationService.findByIdOrThrow)
+        .calledWith(createDto.organizationId, expect.any(Object))
         .mockResolvedValue({
           id: 1,
           name: 'Test Organization',
-        } as Organization); // Provide a valid mock organization
+        } as Organization);
 
-      when(addressService.findById)
+      when(addressService.findByIdOrThrow)
         .calledWith(createDto.address)
-        .mockResolvedValue(null);
+        .mockRejectedValue(new NotFoundException('Address not found.'));
 
       await expect(service.create(createDto)).rejects.toThrow(
-        new NotFoundException('Address not found'),
+        new NotFoundException('Address not found.'),
       );
     });
   });
@@ -321,7 +306,7 @@ describe('InventoryService', () => {
         .calledWith(expect.any(Inventory))
         .mockResolvedValue({
           ...inventory,
-          name: dto.name ?? inventory.name,
+          name: dto.name,
         });
 
       const result = await service.update(
@@ -374,7 +359,7 @@ describe('InventoryService', () => {
         .calledWith(expect.any(Inventory))
         .mockResolvedValue({
           ...inventory,
-          description: dto.description ?? inventory.description,
+          description: dto.description,
         });
 
       const result = await service.update(

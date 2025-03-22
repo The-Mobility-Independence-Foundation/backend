@@ -7,16 +7,20 @@ import {
   Patch,
   ParseIntPipe,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
 import { Inventory } from './inventory.entity';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
 import { GetInventoriesDto } from './dto/get-inventory.dto';
 import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('inventory')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('inventory')
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
@@ -59,7 +63,7 @@ export class InventoryController {
     @Param('id', ParseIntPipe) id: number,
     @Param('organizationId', ParseIntPipe) organizationId: number,
   ): Promise<Inventory | null> {
-    return this.inventoryService.findOne(id, organizationId);
+    return this.inventoryService.findWithOrganization(id, organizationId);
   }
 
   /**
