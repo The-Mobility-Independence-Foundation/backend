@@ -4,9 +4,10 @@ import { PartController } from './part.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Part, PartType } from './part.entity';
 import { Tag } from '../tag/tag.entity';
+import { Model } from '../model/model.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Part, PartType, Tag])],
+  imports: [TypeOrmModule.forFeature([Part, PartType, Tag, Model])],
   providers: [PartService],
   controllers: [PartController],
 })

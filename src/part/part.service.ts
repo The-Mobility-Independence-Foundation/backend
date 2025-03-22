@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Part } from './part.entity';
 import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
@@ -43,7 +43,7 @@ export class PartService {
    * @param options : Any specific options needed to search
    * @returns : The part and any information
    */
-  async findById(
+  async findByIdOrThrow(
     id: number,
     options: Partial<{
       where: FindOptionsWhere<Omit<Part, 'id'>>;
@@ -52,12 +52,18 @@ export class PartService {
   ) {
     const { where = {}, relations } = options;
 
-    return this.partRepository.findOne({
+    const part = await this.partRepository.findOne({
       where: {
         ...where,
         id,
       },
       relations: relations as string[],
     });
+
+    if (part) {
+      return part;
+    } else {
+      throw new NotFoundException('Part not found');
+    }
   }
 }

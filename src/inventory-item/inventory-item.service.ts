@@ -40,15 +40,15 @@ export class InventoryItemService {
   async create(dto: CreateInventoryItemDto) {
     const inventoryItem = new InventoryItem();
 
-    const model = await this.modelService.findById(dto.model, {
+    const model = await this.modelService.findByIdOrThrow(dto.model, {
       relations: ['manufacturer', 'types'],
     });
 
-    const part = await this.partService.findById(dto.part, {
+    const part = await this.partService.findByIdOrThrow(dto.part, {
       relations: ['model', 'types'],
     });
 
-    //Change to inventory.findById when PR merged
+    //Change to inventory.findByIdOrThrow when PR merged
     const inventory = await this.inventoryRepository.findOneBy({
       id: dto.inventory,
     });
@@ -58,14 +58,8 @@ export class InventoryItemService {
     }
     inventoryItem.inventory = inventory;
 
-    if (!model) {
-      throw new NotFoundException('Model not found');
-    }
     inventoryItem.model = model;
 
-    if (!part) {
-      throw new NotFoundException('Part not found');
-    }
     inventoryItem.part = part;
 
     inventoryItem.notes = dto.notes;
@@ -145,12 +139,14 @@ export class InventoryItemService {
    * @param dto : All the information to be changed
    * @returns : The updated item being saved in the repository
    */
+  //Update to use object assign
   async update(
     organizationId: number,
     inventoryId: number,
     id: number,
     dto: UpdateInventoryItemDto,
   ) {
+    //Change to use find ..
     const item = await this.inventoryItemRepository.findOne({
       where: {
         id: id,
@@ -177,6 +173,17 @@ export class InventoryItemService {
     if (dto.attributes) {
       item.attributes = dto.attributes;
     }
+
+    const model = await this.modelService.findByIdOrThrow(dto.model, {
+      relations: ['manufacturer', 'types'],
+    });
+
+    const part = await this.partService.findByIdOrThrow(dto.part, {
+      relations: ['model', 'types'],
+    });
+
+    item.model = model;
+    item.part = part;
 
     const inventory = await this.inventoryRepository.findOneBy({
       id: dto.inventory,
@@ -207,7 +214,7 @@ export class InventoryItemService {
    * @param options : Any specific options needed to search
    * @returns : The inventory item and any information
    */
-  async findById(
+  async findByIdOrThrow(
     id: number,
     options: Partial<{
       where: FindOptionsWhere<Omit<InventoryItem, 'id'>>;
@@ -216,12 +223,18 @@ export class InventoryItemService {
   ) {
     const { where = {}, relations } = options;
 
-    return this.inventoryItemRepository.findOne({
+    const item = await this.inventoryItemRepository.findOne({
       where: {
         ...where,
         id,
       },
       relations: relations as string[],
     });
+
+    if (item) {
+      return item;
+    } else {
+      throw new NotFoundException('Item not found');
+    }
   }
 }

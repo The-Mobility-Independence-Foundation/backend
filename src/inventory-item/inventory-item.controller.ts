@@ -6,13 +6,19 @@ import {
   Body,
   ParseIntPipe,
   Patch,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ResponseMessage } from '../common/decorators/response-message.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateInventoryItemDto } from './dto/create-inventory-item.dto';
 import { UpdateInventoryItemDto } from './dto/update-inventory-item.dto';
 import { InventoryItem } from './inventory-item.entity';
 import { InventoryItemService } from './inventory-item.service';
 
+@ApiTags('inventoryItem')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('inventoryItem')
 export class InventoryItemController {
   constructor(private readonly inventoryItemService: InventoryItemService) {}
@@ -24,6 +30,7 @@ export class InventoryItemController {
    */
   @Post()
   @ApiOperation({ summary: 'Initiate creation of an inventory item' })
+  @ResponseMessage('Successfully created inventory item')
   create(@Body() dto: CreateInventoryItemDto): Promise<InventoryItem> {
     return this.inventoryItemService.create(dto);
   }
@@ -36,6 +43,7 @@ export class InventoryItemController {
    */
   @Get('organization/:organizationId/inventory/:inventoryId/items')
   @ApiOperation({ summary: 'Retrieve all items in a specific inventory' })
+  @ResponseMessage('Successfully found all inventory item')
   findAll(
     @Param('organizationId', ParseIntPipe) organizationId: number,
     @Param('inventoryId', ParseIntPipe) inventoryId: number,
@@ -52,6 +60,7 @@ export class InventoryItemController {
    */
   @Get('organization/:organizationId/inventory/:inventoryId/items/:itemId')
   @ApiOperation({ summary: 'Retrieve a specific item in a specific inventory' })
+  @ResponseMessage('Successfully found a specific inventory item')
   findOne(
     @Param('organizationId', ParseIntPipe) organizationId: number,
     @Param('inventoryId', ParseIntPipe) inventoryId: number,
@@ -66,6 +75,7 @@ export class InventoryItemController {
 
   @Patch('organization/:organizationId/inventory/:inventoryId/items/:itemId')
   @ApiOperation({ summary: 'Update information about an inventory item' })
+  @ResponseMessage('Successfully updated inventory item')
   update(
     @Param('organizationId', ParseIntPipe) organizationId: number,
     @Param('inventoryId', ParseIntPipe) inventoryId: number,
