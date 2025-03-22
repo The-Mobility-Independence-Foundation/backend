@@ -7,6 +7,10 @@ import { Model } from '../model/model.entity';
 import { Part } from '../part/part.entity';
 import { CreateInventoryItemDto } from './dto/create-inventory-item.dto';
 import { UpdateInventoryItemDto } from './dto/update-inventory-item.dto';
+//import { GetInventoryItemsDto } from './dto/get-inventory-item.dto';
+import { PartService } from '../part/part.service';
+import { ModelService } from '../model/model.service';
+import { PaginationService } from '../common/services/pagination.service';
 
 @Injectable()
 export class InventoryItemService {
@@ -22,6 +26,10 @@ export class InventoryItemService {
 
     @InjectRepository(Part)
     private readonly partRepository: Repository<Part>,
+
+    private readonly paginationService: PaginationService,
+    private readonly partService: PartService,
+    private readonly modelService: ModelService,
   ) {}
 
   /**
@@ -32,12 +40,15 @@ export class InventoryItemService {
   async create(dto: CreateInventoryItemDto) {
     const inventoryItem = new InventoryItem();
 
-    const model = await this.modelRepository.findOneBy({
-      id: dto.model,
+    const model = await this.modelService.findById(dto.model, {
+      relations: ['manufacturer', 'types'],
     });
-    const part = await this.partRepository.findOneBy({
-      id: dto.part,
+
+    const part = await this.partService.findById(dto.part, {
+      relations: ['model', 'types'],
     });
+
+    //Change to inventory.findById when PR merged
     const inventory = await this.inventoryRepository.findOneBy({
       id: dto.inventory,
     });
