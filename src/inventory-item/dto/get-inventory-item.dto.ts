@@ -52,6 +52,11 @@ export class SearchInventoryItemDto {
   })
   @IsObject()
   attributes?: Record<string, any>;
+
+  @IsOptional()
+  @ApiPropertyOptional({ description: 'Tags related to the inventory item.' })
+  @IsInt({ each: true })
+  tag?: number[];
 }
 
 export class GetInventoryItemsDto extends IntersectionType(
