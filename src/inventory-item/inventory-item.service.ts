@@ -126,6 +126,14 @@ export class InventoryItemService {
     return item;
   }
 
+  /**
+   * Update a specific inventory item with the given data
+   * @param organizationId : The organization who knows the inventory where the item is
+   * @param inventoryId : The inventory where the item is stored
+   * @param id : The ID of the specific item
+   * @param dto : All the information to be changed
+   * @returns : The updated item being saved in the repository
+   */
   async update(
     organizationId: number,
     inventoryId: number,
