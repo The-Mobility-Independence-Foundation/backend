@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Address } from './address.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
@@ -29,7 +29,7 @@ export class AddressService {
     return this.addressRepository.find();
   }
 
-  async findById(
+  async findByIdOrThrow(
     id: number,
     options: Partial<{
       where: FindOptionsWhere<Omit<Address, 'id'>>;
@@ -38,12 +38,19 @@ export class AddressService {
   ) {
     const { where = {}, relations } = options;
 
-    return this.addressRepository.findOne({
+    const address = await this.addressRepository.findOne({
       where: {
         ...where,
         id,
       },
       relations: relations as string[],
     });
+
+    if(address){
+      return address;
+    }
+    else{
+      throw new NotFoundException('Address not found.');
+    }
   }
 }

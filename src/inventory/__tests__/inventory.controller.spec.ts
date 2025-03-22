@@ -8,6 +8,7 @@ import { Address } from '../../address/address.entity';
 import { PaginationService } from '../../common/services/pagination.service';
 import { OrganizationService } from '../../organization/organization.service';
 import { AddressService } from '../../address/address.service';
+import { createMock } from '@golevelup/ts-jest';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -16,20 +17,11 @@ export const mockRepository = jest.fn(() => ({
   },
 }));
 
-export const mockPaginationService = {
-  paginateWithCursor: jest.fn(),
-};
-
-export const mockOrganizationService = {
-  findById: jest.fn(),
-};
-
-export const mockAddressService = {
-  findById: jest.fn(),
-};
-
 describe('InventoryController', () => {
   let controller: InventoryController;
+  let paginationService: PaginationService;
+  let organizationService: OrganizationService;
+  let addressService: AddressService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -48,22 +40,15 @@ describe('InventoryController', () => {
           provide: getRepositoryToken(Address),
           useClass: mockRepository,
         },
-        {
-          provide: PaginationService,
-          useValue: mockPaginationService,
-        },
-        {
-          provide: OrganizationService,
-          useValue: mockOrganizationService,
-        },
-        {
-          provide: AddressService,
-          useValue: mockAddressService,
-        },
       ],
-    }).compile();
+    })
+    .useMocker(createMock)
+    .compile();
 
     controller = module.get<InventoryController>(InventoryController);
+    paginationService = module.get(PaginationService);
+    organizationService = module.get(OrganizationService);
+    addressService = module.get(AddressService);
   });
 
   it('should be defined', () => {

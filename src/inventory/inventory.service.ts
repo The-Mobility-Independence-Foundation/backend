@@ -2,9 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Inventory } from './inventory.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
-import { Organization } from '../organization/organization.entity';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
-import { Address } from '../address/address.entity';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
 import { PaginationService } from '../common/services/pagination.service';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
@@ -17,12 +15,6 @@ export class InventoryService {
   constructor(
     @InjectRepository(Inventory)
     private readonly inventoryRepository: Repository<Inventory>,
-
-    @InjectRepository(Organization)
-    private readonly organizationRepository: Repository<Organization>,
-
-    @InjectRepository(Address)
-    private readonly addressRepository: Repository<Address>,
 
     private readonly paginationService: PaginationService,
     private readonly organizationService: OrganizationService,
@@ -37,21 +29,15 @@ export class InventoryService {
   async create(dto: CreateInventoryDto): Promise<Inventory> {
     const inventory = new Inventory();
 
-    const organization = await this.organizationService.findById(
+    const organization = await this.organizationService.findByIdOrThrow(
       dto.organizationId,
       {
         relations: ['address', 'user', 'inventory'],
       },
     );
-    if (!organization) {
-      throw new NotFoundException('Organization not found');
-    }
     inventory.organization = organization;
 
-    const address = await this.addressService.findById(dto.address);
-    if (!address) {
-      throw new NotFoundException('Address not found');
-    }
+    const address = await this.addressService.findByIdOrThrow(dto.address);
     inventory.address = address;
 
     inventory.name = dto.name;
@@ -94,7 +80,7 @@ export class InventoryService {
    * @param organizationId : Id of the specific organization
    * @returns : Information of a specific inventory
    */
-  async findOne(
+  async findWithOrganization(
     id: number,
     organizationId: number,
     options: Partial<{
@@ -105,18 +91,13 @@ export class InventoryService {
     const { where = {}, relations = ['organization', 'address', 'items'] } =
       options;
 
-    const inventory = await this.inventoryRepository.findOne({
-      where: {
-        ...where,
-        id,
-        organization: { id: organizationId },
-      },
-      relations,
-    });
-
-    if (!inventory) {
-      throw new NotFoundException('Inventory not found');
-    }
+      const inventory = await this.findByIdOrThrow(id, {
+        where: {
+          organization: { id: organizationId },
+          ...where,  // Spread other conditions from the 'where' object
+        },
+        relations,
+      });
 
     return inventory;
   }
@@ -128,27 +109,19 @@ export class InventoryService {
    * @param dto : The updated information
    */
   async update(organizationId: number, id: number, dto: UpdateInventoryDto) {
-    const inventory = await this.inventoryRepository.findOne({
-      where: { id },
+    const inventory = await this.findByIdOrThrow(id, {
       relations: ['organization', 'address', 'items'],
     });
 
-    if (!inventory) {
-      throw new NotFoundException('Inventory not found');
-    }
-
-    if (dto.description) {
-      inventory.description = dto.description;
-    }
-
-    if (dto.name) {
-      inventory.name = dto.name;
-    }
+    Object.assign(inventory, {
+      ...(dto.name && { name: dto.name }),  // Only update name if it's in the DTO
+      ...(dto.description && { description: dto.description }),  // Only update description if it's in the DTO
+    });
 
     return await this.inventoryRepository.save(inventory);
   }
 
-  async findById(
+  async findByIdOrThrow(
     id: number,
     options: Partial<{
       where: FindOptionsWhere<Omit<Inventory, 'id'>>;
@@ -157,12 +130,19 @@ export class InventoryService {
   ) {
     const { where = {}, relations } = options;
 
-    return this.inventoryRepository.findOne({
+    const inventory = await this.inventoryRepository.findOne({
       where: {
         ...where,
         id,
       },
       relations: relations as string[],
     });
+
+    if (inventory){
+      return inventory;
+    }
+    else{
+      throw new NotFoundException('Inventory not found');
+    }
   }
 }
