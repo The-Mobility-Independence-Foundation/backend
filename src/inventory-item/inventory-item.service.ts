@@ -3,14 +3,12 @@ import { InventoryItem } from './inventory-item.entity';
 import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Inventory } from '../inventory/inventory.entity';
-import { Model } from '../model/model.entity';
-import { Part } from '../part/part.entity';
 import { CreateInventoryItemDto } from './dto/create-inventory-item.dto';
 import { UpdateInventoryItemDto } from './dto/update-inventory-item.dto';
 //import { GetInventoryItemsDto } from './dto/get-inventory-item.dto';
 import { PartService } from '../part/part.service';
 import { ModelService } from '../model/model.service';
-import { PaginationService } from '../common/services/pagination.service';
+//import { PaginationService } from '../common/services/pagination.service';
 
 @Injectable()
 export class InventoryItemService {
@@ -21,13 +19,7 @@ export class InventoryItemService {
     @InjectRepository(Inventory)
     private readonly inventoryRepository: Repository<Inventory>,
 
-    @InjectRepository(Model)
-    private readonly modelRepository: Repository<Model>,
-
-    @InjectRepository(Part)
-    private readonly partRepository: Repository<Part>,
-
-    private readonly paginationService: PaginationService,
+    //private readonly paginationService: PaginationService,
     private readonly partService: PartService,
     private readonly modelService: ModelService,
   ) {}

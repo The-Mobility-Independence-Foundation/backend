@@ -9,6 +9,7 @@ import { Model } from '../model/model.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Part, PartType, Tag, Model])],
   providers: [PartService],
+  exports: [PartService],
   controllers: [PartController],
 })
 export class PartModule {}
