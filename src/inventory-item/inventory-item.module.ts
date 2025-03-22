@@ -10,11 +10,7 @@ import { PartModule } from 'src/part/part.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      InventoryItem,
-      Inventory,
-      Manufacturer,
-    ]),
+    TypeOrmModule.forFeature([InventoryItem, Inventory, Manufacturer]),
     ModelModule,
     PartModule,
   ],
