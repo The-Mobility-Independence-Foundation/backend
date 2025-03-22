@@ -46,10 +46,9 @@ export class AddressService {
       relations: relations as string[],
     });
 
-    if(address){
+    if (address) {
       return address;
-    }
-    else{
+    } else {
       throw new NotFoundException('Address not found.');
     }
   }

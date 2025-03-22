@@ -70,10 +70,9 @@ export class OrganizationService {
       relations: relations as string[],
     });
 
-    if (organization){
+    if (organization) {
       return organization;
-    }
-    else{
+    } else {
       throw new NotFoundException('Organization not found.');
     }
   }

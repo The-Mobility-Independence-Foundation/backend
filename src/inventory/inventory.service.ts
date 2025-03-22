@@ -91,13 +91,13 @@ export class InventoryService {
     const { where = {}, relations = ['organization', 'address', 'items'] } =
       options;
 
-      const inventory = await this.findByIdOrThrow(id, {
-        where: {
-          organization: { id: organizationId },
-          ...where,  // Spread other conditions from the 'where' object
-        },
-        relations,
-      });
+    const inventory = await this.findByIdOrThrow(id, {
+      where: {
+        organization: { id: organizationId },
+        ...where, // Spread other conditions from the 'where' object
+      },
+      relations,
+    });
 
     return inventory;
   }
@@ -114,8 +114,8 @@ export class InventoryService {
     });
 
     Object.assign(inventory, {
-      ...(dto.name && { name: dto.name }),  // Only update name if it's in the DTO
-      ...(dto.description && { description: dto.description }),  // Only update description if it's in the DTO
+      ...(dto.name && { name: dto.name }), // Only update name if it's in the DTO
+      ...(dto.description && { description: dto.description }), // Only update description if it's in the DTO
     });
 
     return await this.inventoryRepository.save(inventory);
@@ -138,10 +138,9 @@ export class InventoryService {
       relations: relations as string[],
     });
 
-    if (inventory){
+    if (inventory) {
       return inventory;
-    }
-    else{
+    } else {
       throw new NotFoundException('Inventory not found');
     }
   }

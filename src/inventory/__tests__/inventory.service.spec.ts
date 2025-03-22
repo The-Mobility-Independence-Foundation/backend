@@ -230,14 +230,16 @@ describe('InventoryService', () => {
       });
 
       when(organizationService.findByIdOrThrow)
-      .calledWith(createDto.organizationId, expect.any(Object)) 
-      .mockRejectedValue(new NotFoundException('Organization not found.'));
+        .calledWith(createDto.organizationId, expect.any(Object))
+        .mockRejectedValue(new NotFoundException('Organization not found.'));
 
-      await expect(service.create(createDto)).rejects.toThrow(NotFoundException);
+      await expect(service.create(createDto)).rejects.toThrow(
+        NotFoundException,
+      );
 
       expect(organizationService.findByIdOrThrow).toHaveBeenCalledWith(
         createDto.organizationId,
-        expect.any(Object)
+        expect.any(Object),
       );
     });
 
