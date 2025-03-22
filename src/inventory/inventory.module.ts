@@ -11,7 +11,7 @@ import { AddressService } from '../address/address.service';
 import { User } from '../user/entities/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Inventory, Organization, Address ,User])],
+  imports: [TypeOrmModule.forFeature([Inventory, Organization, Address, User])],
   controllers: [InventoryController],
   providers: [
     InventoryService,
