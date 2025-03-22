@@ -4,28 +4,21 @@ import { InventoryItemController } from './inventory-item.controller';
 import { InventoryItemService } from './inventory-item.service';
 import { InventoryItem } from './inventory-item.entity';
 import { Inventory } from '../inventory/inventory.entity';
-import { Manufacturer, Model } from '../model/model.entity';
-import { Part } from '../part/part.entity';
-import { PaginationService } from '../common/services/pagination.service';
-import { PartService } from '../part/part.service';
-import { ModelService } from '../model/model.service';
+import { Manufacturer } from '../model/model.entity';
+import { ModelModule } from 'src/model/model.module';
+import { PartModule } from 'src/part/part.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       InventoryItem,
       Inventory,
-      Model,
-      Part,
       Manufacturer,
     ]),
+    ModelModule,
+    PartModule,
   ],
   controllers: [InventoryItemController],
-  providers: [
-    InventoryItemService,
-    PaginationService,
-    PartService,
-    ModelService,
-  ],
+  providers: [InventoryItemService],
 })
 export class InventoryItemModule {}
