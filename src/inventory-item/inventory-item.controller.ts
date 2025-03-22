@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Patch,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
@@ -15,6 +16,8 @@ import { CreateInventoryItemDto } from './dto/create-inventory-item.dto';
 import { UpdateInventoryItemDto } from './dto/update-inventory-item.dto';
 import { InventoryItem } from './inventory-item.entity';
 import { InventoryItemService } from './inventory-item.service';
+import { GetInventoryItemsDto } from './dto/get-inventory-item.dto';
+import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
 
 @ApiTags('inventoryItem')
 @ApiBearerAuth()
@@ -47,8 +50,13 @@ export class InventoryItemController {
   findAll(
     @Param('organizationId', ParseIntPipe) organizationId: number,
     @Param('inventoryId', ParseIntPipe) inventoryId: number,
-  ): Promise<InventoryItem[]> {
-    return this.inventoryItemService.findAll(organizationId, inventoryId);
+    @Query() query: GetInventoryItemsDto,
+  ): Promise<BaseApiCursorPaginationResponse<InventoryItem>> {
+    return this.inventoryItemService.findAll(
+      organizationId,
+      inventoryId,
+      query,
+    );
   }
 
   /**
@@ -66,7 +74,7 @@ export class InventoryItemController {
     @Param('inventoryId', ParseIntPipe) inventoryId: number,
     @Param('itemId', ParseIntPipe) itemId: number,
   ): Promise<InventoryItem | null> {
-    return this.inventoryItemService.findOne(
+    return this.inventoryItemService.findWithOrgInv(
       organizationId,
       inventoryId,
       itemId,

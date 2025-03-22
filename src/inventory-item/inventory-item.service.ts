@@ -2,26 +2,24 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InventoryItem } from './inventory-item.entity';
 import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Inventory } from '../inventory/inventory.entity';
 import { CreateInventoryItemDto } from './dto/create-inventory-item.dto';
 import { UpdateInventoryItemDto } from './dto/update-inventory-item.dto';
-//import { GetInventoryItemsDto } from './dto/get-inventory-item.dto';
 import { PartService } from '../part/part.service';
 import { ModelService } from '../model/model.service';
-//import { PaginationService } from '../common/services/pagination.service';
+import { PaginationService } from '../common/services/pagination.service';
+import { InventoryService } from '../inventory/inventory.service';
+import { GetInventoryItemsDto } from './dto/get-inventory-item.dto';
+import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 
 @Injectable()
 export class InventoryItemService {
   constructor(
     @InjectRepository(InventoryItem)
     private readonly inventoryItemRepository: Repository<InventoryItem>,
-
-    @InjectRepository(Inventory)
-    private readonly inventoryRepository: Repository<Inventory>,
-
-    //private readonly paginationService: PaginationService,
+    private readonly paginationService: PaginationService,
     private readonly partService: PartService,
     private readonly modelService: ModelService,
+    private readonly inventoryService: InventoryService,
   ) {}
 
   /**
@@ -32,27 +30,20 @@ export class InventoryItemService {
   async create(dto: CreateInventoryItemDto) {
     const inventoryItem = new InventoryItem();
 
-    const model = await this.modelService.findByIdOrThrow(dto.model, {
+    inventoryItem.model = await this.modelService.findByIdOrThrow(dto.model, {
       relations: ['manufacturer', 'types'],
     });
 
-    const part = await this.partService.findByIdOrThrow(dto.part, {
+    inventoryItem.part = await this.partService.findByIdOrThrow(dto.part, {
       relations: ['model', 'types'],
     });
 
-    //Change to inventory.findByIdOrThrow when PR merged
-    const inventory = await this.inventoryRepository.findOneBy({
-      id: dto.inventory,
-    });
-
-    if (!inventory) {
-      throw new NotFoundException('Inventory not found');
-    }
-    inventoryItem.inventory = inventory;
-
-    inventoryItem.model = model;
-
-    inventoryItem.part = part;
+    inventoryItem.inventory = await this.inventoryService.findByIdOrThrow(
+      dto.part,
+      {
+        relations: ['organization', 'address', 'items'],
+      },
+    );
 
     inventoryItem.notes = dto.notes;
     inventoryItem.attributes = dto.attributes;
@@ -68,24 +59,45 @@ export class InventoryItemService {
    * @param inventoryId : The iventory where the items are being held
    * @returns : A list of items stored in the inventory
    */
-  async findAll(organizationId: number, inventoryId: number) {
-    return this.inventoryItemRepository.find({
-      where: {
-        inventory: {
-          id: inventoryId,
-          organization: { id: organizationId },
-        },
+  async findAll(
+    organizationId: number,
+    inventoryId: number,
+    query: GetInventoryItemsDto,
+  ) {
+    const findWhere: any = {
+      inventory: {
+        id: inventoryId,
+        organization: { id: organizationId },
       },
-      relations: [
-        'inventory',
-        'inventory.organization',
-        'inventory.address',
-        'part.name',
-        'model.name',
-        'listings',
-        'tags.name',
-      ],
+    };
+
+    const paginationDto = new CursorPaginationDto();
+    Object.assign(paginationDto, {
+      cursor: query.cursor,
+      limit: query.limit,
+      direction: query.direction,
     });
+
+    const relations: FindOptionsRelations<InventoryItem> = {
+      inventory: {
+        organization: true,
+        address: true,
+      },
+      part: {},
+      model: {},
+      listings: true,
+      tags: true,
+    };
+
+    return this.paginationService.paginateWithCursor(
+      this.inventoryItemRepository,
+      paginationDto,
+      {
+        cursorColumn: 'id',
+        where: findWhere,
+        relations: relations,
+      },
+    );
   }
 
   /**
@@ -95,7 +107,11 @@ export class InventoryItemService {
    * @param itemId : The item being looked for
    * @returns : All date of the specific item
    */
-  async findOne(organizationId: number, inventoryId: number, itemId: number) {
+  async findWithOrgInv(
+    organizationId: number,
+    inventoryId: number,
+    itemId: number,
+  ) {
     const item = await this.inventoryItemRepository.findOne({
       where: {
         id: itemId,
@@ -131,17 +147,14 @@ export class InventoryItemService {
    * @param dto : All the information to be changed
    * @returns : The updated item being saved in the repository
    */
-  //Update to use object assign
   async update(
     organizationId: number,
     inventoryId: number,
     id: number,
     dto: UpdateInventoryItemDto,
   ) {
-    //Change to use find ..
-    const item = await this.inventoryItemRepository.findOne({
+    const item = await this.findByIdOrThrow(id, {
       where: {
-        id: id,
         inventory: {
           id: inventoryId,
           organization: { id: organizationId },
@@ -158,45 +171,27 @@ export class InventoryItemService {
       ],
     });
 
-    if (!item) {
-      throw new NotFoundException('Item not found');
-    }
+    Object.assign(item, {
+      ...(dto.attributes && { attributes: dto.attributes }),
+      ...(dto.notes && { notes: dto.notes }),
+      ...(dto.publicCount && { publicCount: dto.publicCount }),
+      ...(dto.quantity && { quantity: dto.quantity }),
+    });
 
-    if (dto.attributes) {
-      item.attributes = dto.attributes;
-    }
-
-    const model = await this.modelService.findByIdOrThrow(dto.model, {
+    item.model = await this.modelService.findByIdOrThrow(dto.model, {
       relations: ['manufacturer', 'types'],
     });
 
-    const part = await this.partService.findByIdOrThrow(dto.part, {
+    item.part = await this.partService.findByIdOrThrow(dto.part, {
       relations: ['model', 'types'],
     });
 
-    item.model = model;
-    item.part = part;
-
-    const inventory = await this.inventoryRepository.findOneBy({
-      id: dto.inventory,
-    });
-    if (!inventory) {
-      throw new NotFoundException('Inventory not found');
-    }
-    item.inventory = inventory;
-
-    if (dto.notes) {
-      item.notes = dto.notes;
-    }
-
-    if (dto.publicCount) {
-      item.publicCount = dto.publicCount;
-    }
-
-    if (dto.quantity) {
-      item.quantity = dto.quantity;
-    }
-
+    item.inventory = await this.inventoryService.findByIdOrThrow(
+      dto.inventory,
+      {
+        relations: ['organization', 'address', 'items'],
+      },
+    );
     return await this.inventoryItemRepository.save(item);
   }
 

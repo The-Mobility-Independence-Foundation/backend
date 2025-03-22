@@ -19,5 +19,6 @@ import { User } from '../user/entities/user.entity';
     OrganizationService,
     AddressService,
   ],
+  exports: [InventoryService],
 })
 export class InventoryModule {}
