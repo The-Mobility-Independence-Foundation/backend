@@ -1,11 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { OrganizationController } from './organization.controller';
+import { OrganizationService } from '../organization.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Organization } from './organization.entity';
-import { User } from '../user/entities/user.entity';
-import { Inventory } from '../inventory/inventory.entity';
-import { OrganizationService } from './organization.service';
-import { Address } from '../address/address.entity';
+import { User } from '../../user/entities/user.entity';
+import { Inventory } from '../../inventory/inventory.entity';
+import { Organization } from '../organization.entity';
+import { Address } from '../../address/address.entity';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -14,12 +13,11 @@ export const mockRepository = jest.fn(() => ({
   },
 }));
 
-describe('OrganizationController', () => {
-  let controller: OrganizationController;
+describe('OrganizationService', () => {
+  let service: OrganizationService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [OrganizationController],
       providers: [
         OrganizationService,
         {
@@ -41,10 +39,10 @@ describe('OrganizationController', () => {
       ],
     }).compile();
 
-    controller = module.get<OrganizationController>(OrganizationController);
+    service = module.get<OrganizationService>(OrganizationService);
   });
 
   it('should be defined', () => {
-    expect(controller).toBeDefined();
+    expect(service).toBeDefined();
   });
 });
