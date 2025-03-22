@@ -19,7 +19,9 @@ export class getInventoryItemDto {
   inventory?: number;
 
   @IsOptional()
-  @ApiPropertyOptional({ description: 'The quantity of the item in inventory.' })
+  @ApiPropertyOptional({
+    description: 'The quantity of the item in inventory.',
+  })
   @IsPositive()
   quantity?: number;
 
@@ -33,12 +35,14 @@ export class getInventoryItemDto {
   notes?: string;
 
   @IsOptional()
-  @ApiPropertyOptional({ description: 'Additional attributes of the inventory item.' })
+  @ApiPropertyOptional({
+    description: 'Additional attributes of the inventory item.',
+  })
   @IsObject()
   attributes?: Record<string, any>;
 }
 
 export class GetInventoryItemsDto extends IntersectionType(
-    CursorPaginationDto,
-    getInventoryItemDto,
-  ) {}
+  CursorPaginationDto,
+  getInventoryItemDto,
+) {}
