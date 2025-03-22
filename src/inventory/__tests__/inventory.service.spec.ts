@@ -1,0 +1,380 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { InventoryService } from '../inventory.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Inventory } from '../inventory.entity';
+import { Organization } from '../../organization/organization.entity';
+import { Address } from '../../address/address.entity';
+import { Repository } from 'typeorm';
+import { createMock } from '@golevelup/ts-jest';
+import { NotFoundException } from '@nestjs/common';
+import { CreateInventoryDto } from '../dto/create-inventory.dto';
+import { UpdateInventoryDto } from '../dto/update-inventory.dto';
+import { when } from 'jest-when';
+import { PaginationService } from '../../common/services/pagination.service';
+import { GetInventoriesDto } from '../dto/get-inventory.dto';
+import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
+import { AddressService } from '../../address/address.service';
+import { OrganizationService } from '../../organization/organization.service';
+
+describe('InventoryService', () => {
+  let service: InventoryService;
+  let inventoryRepository: Repository<Inventory>;
+  let paginationService: PaginationService;
+  let organizationService: OrganizationService;
+  let addressService: AddressService;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        InventoryService,
+        {
+          provide: getRepositoryToken(Inventory),
+          useValue: createMock<Repository<Inventory>>(),
+        },
+      ],
+    })
+      .useMocker(createMock)
+      .compile();
+
+    service = module.get(InventoryService);
+    paginationService = module.get(PaginationService);
+    organizationService = module.get(OrganizationService);
+    addressService = module.get(AddressService);
+    inventoryRepository = module.get(getRepositoryToken(Inventory));
+  });
+
+  describe('findOne', () => {
+    it('should return an inventory if an inventory with the id exists', async () => {
+      const address = new Address();
+      Object.assign(address, {
+        id: 1,
+        addressLine1: '42 West Street',
+        city: 'Rochester',
+        state: 'NY',
+        zipCode: '10573',
+      });
+
+      const organization = new Organization();
+      Object.assign(organization, {
+        id: 1,
+        name: 'Acme Corp',
+        address,
+      });
+
+      const inventory = new Inventory();
+      Object.assign(inventory, {
+        id: 1,
+        organization,
+        name: '42 West Inventory',
+        description: 'Inventory on 42 West',
+        address,
+      });
+
+      when(inventoryRepository.findOne)
+        .calledWith({
+          where: { id: inventory.id, organization: { id: 1 } },
+          relations: ['organization', 'address', 'items'],
+        })
+        .mockResolvedValue(inventory);
+
+      const result = await service.findWithOrganization(inventory.id, 1);
+
+      expect(result).toBeDefined();
+      expect(result).toEqual(inventory);
+    });
+
+    it('should return an error if an inventory without the id exists', async () => {
+      const bad_id = 999999999;
+
+      when(inventoryRepository.findOne)
+        .calledWith({
+          where: { id: bad_id, organization: { id: 1 } },
+          relations: ['organization', 'address', 'items'],
+        })
+        .mockResolvedValue(null);
+
+      await expect(service.findWithOrganization(bad_id, 1)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
+
+  describe('findAll', () => {
+    it('should use name when name is specified', async () => {
+      const dto = new GetInventoriesDto();
+      Object.assign(dto, {
+        name: 'Sample Inventory',
+      });
+
+      service.findAll(1, dto);
+
+      expect(paginationService.paginateWithCursor).toHaveBeenCalledWith(
+        inventoryRepository,
+        expect.any(CursorPaginationDto),
+        expect.objectContaining({
+          where: {
+            name: dto.name,
+            organization: { id: 1 },
+          },
+          cursorColumn: 'id',
+        }),
+      );
+    });
+
+    it('should apply pagination parameters correctly', async () => {
+      const dto = new GetInventoriesDto();
+      Object.assign(dto, {
+        cursor: '12345',
+        limit: 10,
+        direction: 'forward',
+      });
+
+      service.findAll(1, dto);
+
+      expect(paginationService.paginateWithCursor).toHaveBeenCalledWith(
+        inventoryRepository,
+        expect.objectContaining({
+          cursor: dto.cursor,
+          limit: dto.limit,
+          direction: dto.direction,
+        }),
+        expect.objectContaining({
+          where: { organization: { id: 1 } },
+        }),
+      );
+    });
+
+    it('should handle both filters and pagination together', async () => {
+      const dto = new GetInventoriesDto();
+      Object.assign(dto, {
+        name: 'Sample Inventory',
+        cursor: '12345',
+        limit: 10,
+        direction: 'forward',
+      });
+
+      service.findAll(1, dto);
+
+      expect(paginationService.paginateWithCursor).toHaveBeenCalledWith(
+        inventoryRepository,
+        expect.objectContaining({
+          cursor: dto.cursor,
+          limit: dto.limit,
+          direction: dto.direction,
+        }),
+        expect.objectContaining({
+          where: {
+            name: dto.name,
+            organization: { id: 1 },
+          },
+        }),
+      );
+    });
+  });
+  describe('create', () => {
+    it('should create a new inventory with a create inventory DTO', async () => {
+      const createDto = new CreateInventoryDto();
+      Object.assign(createDto, {
+        organizationId: 1,
+        name: '42 West Inventory',
+        description: 'Main inventory',
+        address: 1,
+      });
+
+      const address = new Address();
+      Object.assign(address, { id: 1 });
+
+      const organization = new Organization();
+      Object.assign(organization, { id: 1 });
+
+      const savedInventory = new Inventory();
+      Object.assign(savedInventory, {
+        id: 1,
+        organization,
+        name: createDto.name,
+        description: createDto.description,
+        address,
+      });
+
+      when(organizationService.findByIdOrThrow)
+        .calledWith(createDto.organizationId, {
+          relations: ['address', 'user', 'inventory'],
+        })
+        .mockResolvedValue(organization);
+
+      when(addressService.findByIdOrThrow)
+        .calledWith(createDto.address)
+        .mockResolvedValue(address);
+
+      when(inventoryRepository.save)
+        .calledWith(expect.any(Inventory))
+        .mockResolvedValue(savedInventory);
+
+      const result = await service.create(createDto);
+
+      expect(result).toBeDefined();
+      expect(result.id).toBe(1);
+      expect(result.organization.id).toBe(createDto.organizationId);
+      expect(result.name).toBe(createDto.name);
+      expect(result.description).toBe(createDto.description);
+      expect(result.address.id).toBe(createDto.address);
+    });
+
+    it('should throw NotFoundException if organization is not found', async () => {
+      const createDto = new CreateInventoryDto();
+      Object.assign(createDto, {
+        organizationId: 1,
+        name: '42 West Inventory',
+        description: 'Main inventory',
+        address: 1,
+      });
+
+      when(organizationService.findByIdOrThrow)
+        .calledWith(createDto.organizationId, expect.any(Object))
+        .mockRejectedValue(new NotFoundException('Organization not found.'));
+
+      await expect(service.create(createDto)).rejects.toThrow(
+        NotFoundException,
+      );
+
+      expect(organizationService.findByIdOrThrow).toHaveBeenCalledWith(
+        createDto.organizationId,
+        expect.any(Object),
+      );
+    });
+
+    it('should throw NotFoundException if address is not found', async () => {
+      const createDto = new CreateInventoryDto();
+      Object.assign(createDto, {
+        organizationId: 1,
+        name: '42 West Inventory',
+        description: 'Main inventory',
+        address: 1,
+      });
+
+      when(organizationService.findByIdOrThrow)
+        .calledWith(createDto.organizationId, expect.any(Object))
+        .mockResolvedValue({
+          id: 1,
+          name: 'Test Organization',
+        } as Organization);
+
+      when(addressService.findByIdOrThrow)
+        .calledWith(createDto.address)
+        .mockRejectedValue(new NotFoundException('Address not found.'));
+
+      await expect(service.create(createDto)).rejects.toThrow(
+        new NotFoundException('Address not found.'),
+      );
+    });
+  });
+  describe('update', () => {
+    it('should update the name of an inventory with a update inventory DTO', async () => {
+      const address = new Address();
+      Object.assign(address, {
+        id: 2,
+        addressLine1: '56 Highland Street',
+        city: 'Binghamton',
+        state: 'NY',
+        zipCode: '14627',
+      });
+
+      const organization = new Organization();
+      Object.assign(organization, {
+        id: 1,
+        name: 'Acme Corp',
+        address,
+      });
+
+      const inventory = new Inventory();
+      Object.assign(inventory, {
+        id: 1,
+        organization,
+        name: '42 West Inventory',
+        description: 'Inventory on 42 West',
+        address,
+      });
+
+      const dto = new UpdateInventoryDto();
+      Object.assign(dto, {
+        name: '53 West Inventory',
+      });
+
+      when(inventoryRepository.findOne)
+        .calledWith(expect.objectContaining({ where: { id: inventory.id } }))
+        .mockResolvedValue(Promise.resolve(inventory));
+
+      when(inventoryRepository.save)
+        .calledWith(expect.any(Inventory))
+        .mockResolvedValue({
+          ...inventory,
+          name: dto.name,
+        });
+
+      const result = await service.update(
+        inventory.organization.id,
+        inventory.id,
+        dto,
+      );
+
+      expect(result).toBeDefined();
+      expect(result.organization.id).toBe(inventory.organization.id);
+      expect(result.name).toBe(dto.name);
+      expect(result.address.id).toBe(inventory.address.id);
+    });
+    it('should update the description of an inventory with a update inventory DTO', async () => {
+      const address = new Address();
+      Object.assign(address, {
+        id: 2,
+        addressLine1: '56 Highland Street',
+        city: 'Binghamton',
+        state: 'NY',
+        zipCode: '14627',
+      });
+
+      const organization = new Organization();
+      Object.assign(organization, {
+        id: 1,
+        name: 'Acme Corp',
+        address,
+      });
+
+      const inventory = new Inventory();
+      Object.assign(inventory, {
+        id: 1,
+        organization,
+        name: '42 West Inventory',
+        description: 'Inventory on 42 West',
+        address,
+      });
+
+      const dto = new UpdateInventoryDto();
+      Object.assign(dto, {
+        description: 'Main Inventory',
+      });
+
+      when(inventoryRepository.findOne)
+        .calledWith(expect.objectContaining({ where: { id: inventory.id } }))
+        .mockResolvedValue(Promise.resolve(inventory));
+
+      when(inventoryRepository.save)
+        .calledWith(expect.any(Inventory))
+        .mockResolvedValue({
+          ...inventory,
+          description: dto.description,
+        });
+
+      const result = await service.update(
+        inventory.organization.id,
+        inventory.id,
+        dto,
+      );
+
+      expect(result).toBeDefined();
+      expect(result.organization.id).toBe(inventory.organization.id);
+      expect(result.name).toBe(inventory.name);
+      expect(result.description).toBe(dto.description);
+      expect(result.address.id).toBe(inventory.address.id);
+    });
+  });
+});

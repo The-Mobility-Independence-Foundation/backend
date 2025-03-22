@@ -8,7 +8,17 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  DeleteDateColumn,
 } from 'typeorm';
+import { IsEnum } from 'class-validator';
+
+/**
+ * The current status of an inventory
+ */
+export enum InventoryStatus {
+  ACTIVE = 'active',
+  ARCHIVED = 'archived',
+}
 
 @Entity()
 export class Inventory {
@@ -24,6 +34,17 @@ export class Inventory {
 
   @Column({ type: 'varchar', length: 200 })
   description: string;
+
+  @IsEnum(InventoryStatus)
+  @Column({
+    type: 'enum',
+    enum: InventoryStatus,
+    default: InventoryStatus.ACTIVE,
+  })
+  type: InventoryStatus;
+
+  @DeleteDateColumn()
+  archivedAt?: Date;
 
   @JoinColumn()
   @ManyToOne(() => Address, (address) => address.inventories)
