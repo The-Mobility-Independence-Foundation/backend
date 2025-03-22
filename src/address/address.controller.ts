@@ -1,23 +1,23 @@
-import { Controller, Get, Param, Post } from '@nestjs/common';
-import { Address } from './address.entity';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { AddressService } from './address.service';
+import { CreateAddressDto } from './dto/create-address.dto';
 
 @Controller('address')
 export class AddressController {
   constructor(private readonly commentService: AddressService) {}
 
   @Post()
-  create(): Promise<Address> {
-    return this.commentService.create();
+  create(@Body() dto: CreateAddressDto) {
+    return this.commentService.create(dto);
   }
 
   @Get()
-  findAll(): Promise<Address[]> {
+  findAll() {
     return this.commentService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number): Promise<Address | null> {
-    return this.commentService.findOne(id);
+  findOne(@Param('id') id: number) {
+    return this.commentService.findByIdOrThrow(id);
   }
 }

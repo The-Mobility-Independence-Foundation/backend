@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Address } from './address.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
+import { CreateAddressDto } from './dto/create-address.dto';
 
 @Injectable()
 export class AddressService {
@@ -10,19 +11,12 @@ export class AddressService {
     private readonly addressRepository: Repository<Address>,
   ) {}
 
-  async create(): Promise<Address> {
+  async create(dto: CreateAddressDto) {
     const address = new Address();
 
-    address.addressLine1 = '1789 State Highway 8';
-    address.city = 'Mount Upton';
-    address.state = 'New York';
-    address.zipCode = '13809';
+    Object.assign(address, dto);
 
     return this.addressRepository.save(address);
-  }
-
-  async findOne(id: number): Promise<Address | null> {
-    return this.addressRepository.findOneBy({ id: id });
   }
 
   async findAll(): Promise<Address[]> {
