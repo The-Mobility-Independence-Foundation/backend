@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Manufacturer, Model } from './model.entity';
 import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -53,7 +53,7 @@ export class ModelService {
    * @param options : Any specific options needed to search
    * @returns : The model and any information
    */
-  async findById(
+  async findByIdOrThrow(
     id: number,
     options: Partial<{
       where: FindOptionsWhere<Omit<Model, 'id'>>;
@@ -62,12 +62,18 @@ export class ModelService {
   ) {
     const { where = {}, relations } = options;
 
-    return this.modelRepository.findOne({
+    const model = await this.modelRepository.findOne({
       where: {
         ...where,
         id,
       },
       relations: relations as string[],
     });
+
+    if (model) {
+      return model;
+    } else {
+      throw new NotFoundException('Model not found');
+    }
   }
 }

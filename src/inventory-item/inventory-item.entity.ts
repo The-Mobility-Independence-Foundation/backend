@@ -13,6 +13,7 @@ import {
 import { Tag } from '../tag/tag.entity';
 import { Model } from '../model/model.entity';
 import { Part } from '../part/part.entity';
+import { IsOptional } from 'class-validator';
 
 @Entity()
 export class InventoryItem {
@@ -37,11 +38,13 @@ export class InventoryItem {
   @Column({ default: 0 })
   publicCount: number;
 
-  @Column({ type: 'varchar', length: 500 })
-  notes: string;
+  @IsOptional()
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  notes?: string | null;
 
-  @Column({ type: 'jsonb' })
-  attributes: object;
+  @IsOptional()
+  @Column({ type: 'jsonb', nullable: true })
+  attributes?: object | null;
 
   @OneToMany(() => Listing, (listing) => listing.inventoryItem)
   listings: Listing[];

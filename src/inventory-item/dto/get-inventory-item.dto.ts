@@ -1,21 +1,30 @@
 import { ApiPropertyOptional, IntersectionType } from '@nestjs/swagger';
-import { IsObject, IsOptional, IsPositive } from 'class-validator';
+import {
+  IsInt,
+  IsObject,
+  IsOptional,
+  IsPositive,
+  IsString,
+} from 'class-validator';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 
-export class getInventoryItemDto {
+export class SearchInventoryItemDto {
   @IsOptional()
   @ApiPropertyOptional({ description: 'The ID of the part.' })
   @IsPositive()
+  @IsInt()
   part?: number;
 
   @IsOptional()
   @ApiPropertyOptional({ description: 'The ID of the model.' })
   @IsPositive()
+  @IsInt()
   model?: number;
 
   @IsOptional()
   @ApiPropertyOptional({ description: 'The ID of the inventory.' })
   @IsPositive()
+  @IsInt()
   inventory?: number;
 
   @IsOptional()
@@ -23,15 +32,18 @@ export class getInventoryItemDto {
     description: 'The quantity of the item in inventory.',
   })
   @IsPositive()
+  @IsInt()
   quantity?: number;
 
   @IsOptional()
   @ApiPropertyOptional({ description: 'The public count of the item.' })
   @IsPositive()
+  @IsInt()
   publicCount?: number;
 
   @IsOptional()
   @ApiPropertyOptional({ description: 'Notes related to the inventory item.' })
+  @IsString()
   notes?: string;
 
   @IsOptional()
@@ -44,5 +56,5 @@ export class getInventoryItemDto {
 
 export class GetInventoryItemsDto extends IntersectionType(
   CursorPaginationDto,
-  getInventoryItemDto,
+  SearchInventoryItemDto,
 ) {}

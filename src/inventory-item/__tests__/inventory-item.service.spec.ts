@@ -5,7 +5,7 @@ import { InventoryItem } from '../inventory-item.entity';
 import { Inventory } from '../../inventory/inventory.entity';
 import { Model } from '../../model/model.entity';
 import { Part } from '../../part/part.entity';
-//import { PaginationService } from '../../common/services/pagination.service';
+//mport { PaginationService } from '../../common/services/pagination.service';
 //import { ModelService } from '../../model/model.service';
 //import { PartService } from '../../part/part.service';
 import { createMock } from '@golevelup/ts-jest';
