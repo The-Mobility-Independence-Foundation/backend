@@ -9,13 +9,7 @@ import { Address } from '../../address/address.entity';
 //import { OrganizationService } from '../../organization/organization.service';
 //import { AddressService } from '../../address/address.service';
 import { createMock } from '@golevelup/ts-jest';
-
-export const mockRepository = jest.fn(() => ({
-  metadata: {
-    columns: [],
-    relations: [],
-  },
-}));
+import { Repository } from 'typeorm';
 
 describe('InventoryController', () => {
   let controller: InventoryController;
@@ -30,15 +24,15 @@ describe('InventoryController', () => {
         InventoryService,
         {
           provide: getRepositoryToken(Inventory),
-          useClass: mockRepository,
+          useValue: createMock<Repository<Inventory>>(),
         },
         {
           provide: getRepositoryToken(Organization),
-          useClass: mockRepository,
+          useValue: createMock<Repository<Organization>>(),
         },
         {
           provide: getRepositoryToken(Address),
-          useClass: mockRepository,
+          useValue: createMock<Repository<Address>>(),
         },
       ],
     })
