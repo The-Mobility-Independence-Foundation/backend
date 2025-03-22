@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  NotImplementedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { Organization } from './organization.entity';
@@ -6,27 +10,33 @@ import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UserService } from '../user/user.service';
 import { CreateAddressDto } from '../address/dto/create-address.dto';
 import { AddressService } from '../address/address.service';
+import { GetOrganizationsDto } from './dto/get-organizations.dto';
+import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
+import { PaginationService } from '../common/services/pagination.service';
 
 @Injectable()
 export class OrganizationService {
   constructor(
     @InjectRepository(Organization)
-    private organizationRepository: Repository<Organization>,
+    private readonly organizationRepository: Repository<Organization>,
 
     private readonly userService: UserService,
     private readonly addressService: AddressService,
+    private readonly paginationService: PaginationService,
   ) {}
 
+  // TODO: return an actual error message when someone tries to own two organizations
+  // if not here then add a decorator somewhere maybe?
   async create(dto: CreateOrganizationDto) {
     const organization = new Organization();
-    const owner = await this.userService.findById(dto.ownerId);
+    const owner = await this.userService.findById(dto.ownerId); // TODO: update when reports-api merged in
 
     const addressData = new CreateAddressDto();
     Object.assign(addressData, {
-      addressLine1: dto.addressLine1, 
-      addressLine2: dto.addressLine2, 
-      city: dto.city, 
-      state: dto.state, 
+      addressLine1: dto.addressLine1,
+      addressLine2: dto.addressLine2,
+      city: dto.city,
+      state: dto.state,
       zipCode: dto.zipCode,
     });
 
@@ -43,12 +53,41 @@ export class OrganizationService {
     return this.organizationRepository.save(organization);
   }
 
-  async findAll() {
-    return this.organizationRepository.find();
-  }
+  async findAll(query: GetOrganizationsDto) {
+    const findWhere: any = {};
+    const paginationDto = new CursorPaginationDto();
 
-  async findOne(id: number) {
-    return this.organizationRepository.findOneBy({ id: id });
+    Object.assign(findWhere, {
+      name: query.name,
+      inactive: !query.active,
+    });
+
+    if (query.radius) {
+      throw new NotImplementedException(
+        'Radius search is not implemented yet.',
+      );
+    }
+
+    if (query.services) {
+      throw new NotImplementedException(
+        'Services search is not implemented yet.',
+      );
+    }
+
+    Object.assign(paginationDto, {
+      cursor: query.cursor,
+      limit: query.limit,
+      direction: query.direction,
+    });
+
+    return this.paginationService.paginateWithCursor(
+      this.organizationRepository,
+      paginationDto,
+      {
+        cursorColumn: 'id',
+        where: findWhere,
+      },
+    );
   }
 
   async findByIdOrThrow(
