@@ -126,11 +126,11 @@ describe('ReportsService', () => {
         reportType: ReportType.COMMENT,
       });
 
-      when(userService.findById)
+      when(userService.findByIdOrThrow)
         .calledWith(dto.reporterId)
         .mockResolvedValue(reporter);
 
-      when(userService.findById)
+      when(userService.findByIdOrThrow)
         .calledWith(dto.reportedUserId)
         .mockResolvedValue(offender);
 
@@ -146,11 +146,11 @@ describe('ReportsService', () => {
         reportType: ReportType.LISTING,
       });
 
-      when(userService.findById)
+      when(userService.findByIdOrThrow)
         .calledWith(dto.reporterId)
         .mockResolvedValue(reporter);
 
-      when(userService.findById)
+      when(userService.findByIdOrThrow)
         .calledWith(dto.reportedUserId)
         .mockResolvedValue(offender);
 
@@ -166,11 +166,11 @@ describe('ReportsService', () => {
         reportType: ReportType.POST,
       });
 
-      when(userService.findById)
+      when(userService.findByIdOrThrow)
         .calledWith(dto.reporterId)
         .mockResolvedValue(reporter);
 
-      when(userService.findById)
+      when(userService.findByIdOrThrow)
         .calledWith(dto.reportedUserId)
         .mockResolvedValue(offender);
 
@@ -185,11 +185,11 @@ describe('ReportsService', () => {
         reason: "I'm reporting this guy's ??????!",
       });
 
-      when(userService.findById)
+      when(userService.findByIdOrThrow)
         .calledWith(dto.reporterId)
         .mockResolvedValue(reporter);
 
-      when(userService.findById)
+      when(userService.findByIdOrThrow)
         .calledWith(dto.reportedUserId)
         .mockResolvedValue(offender);
 
@@ -208,15 +208,15 @@ describe('ReportsService', () => {
 
       dto.commentId = 1; // error handler wants to be super sure this isn't undefined
 
-      when(userService.findById)
+      when(userService.findByIdOrThrow)
         .calledWith(dto.reporterId)
         .mockResolvedValue(reporter);
 
-      when(userService.findById)
+      when(userService.findByIdOrThrow)
         .calledWith(dto.reportedUserId)
         .mockResolvedValue(offender);
 
-      when(commentService.findById)
+      when(commentService.findByIdOrThrow)
         .calledWith(dto.commentId)
         .mockResolvedValue(comment);
 
@@ -235,15 +235,15 @@ describe('ReportsService', () => {
 
       dto.listingId = 1; // error handler wants to be super sure this isn't undefined
 
-      when(userService.findById)
+      when(userService.findByIdOrThrow)
         .calledWith(dto.reporterId)
         .mockResolvedValue(reporter);
 
-      when(userService.findById)
+      when(userService.findByIdOrThrow)
         .calledWith(dto.reportedUserId)
         .mockResolvedValue(offender);
 
-      when(listingService.findById)
+      when(listingService.findByIdOrThrow)
         .calledWith(dto.listingId)
         .mockResolvedValue(listing);
 
@@ -262,15 +262,17 @@ describe('ReportsService', () => {
 
       dto.postId = 1; // error handler wants to be super sure this isn't undefined
 
-      when(userService.findById)
+      when(userService.findByIdOrThrow)
         .calledWith(dto.reporterId)
         .mockResolvedValue(reporter);
 
-      when(userService.findById)
+      when(userService.findByIdOrThrow)
         .calledWith(dto.reportedUserId)
         .mockResolvedValue(offender);
 
-      when(postService.findById).calledWith(dto.postId).mockResolvedValue(post);
+      when(postService.findByIdOrThrow)
+        .calledWith(dto.postId)
+        .mockResolvedValue(post);
 
       await expect(service.create(dto)).resolves.not.toThrow();
       expect(reportRepository.save).toHaveBeenCalled();
@@ -284,11 +286,11 @@ describe('ReportsService', () => {
         reportType: ReportType.PROFILE,
       });
 
-      when(userService.findById)
+      when(userService.findByIdOrThrow)
         .calledWith(dto.reporterId)
         .mockResolvedValue(reporter);
 
-      when(userService.findById)
+      when(userService.findByIdOrThrow)
         .calledWith(dto.reportedUserId)
         .mockResolvedValue(offender);
 
@@ -400,7 +402,7 @@ describe('ReportsService', () => {
         .calledWith({ where: { id: report.id } })
         .mockResolvedValue(report);
 
-      const result = await service.findById(report.id);
+      const result = await service.findByIdOrThrow(report.id);
 
       expect(result).toBeDefined();
       expect(result).toBe(report);
@@ -413,7 +415,7 @@ describe('ReportsService', () => {
         .calledWith({ where: { id: bad_id } })
         .mockResolvedValue(null);
 
-      await expect(service.findById(bad_id)).rejects.toThrow(NotFoundException);
+      await expect(service.findByIdOrThrow(bad_id)).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -470,7 +472,7 @@ describe('ReportsService', () => {
         .calledWith({ where: { id: bad_id } })
         .mockResolvedValue(null);
 
-      when(userService.findById)
+      when(userService.findByIdOrThrow)
         .calledWith(moderator.id)
         .mockResolvedValue(moderator);
 
@@ -490,7 +492,7 @@ describe('ReportsService', () => {
         .calledWith({ id: report.id })
         .mockResolvedValue(report);
 
-      when(userService.findById)
+      when(userService.findByIdOrThrow)
         .calledWith(moderator.id)
         .mockResolvedValue(moderator);
 

@@ -53,7 +53,7 @@ export class CommentService {
   }
 
   async findOne(id: number) {
-    return this.findById(id);
+    return this.findByIdOrThrow(id);
   }
 
   /**
@@ -62,7 +62,7 @@ export class CommentService {
    * @param options - Optional query options
    * @returns The comment record
    */
-  async findById(
+  async findByIdOrThrow(
     id: number,
     options: Partial<{
       where: FindOptionsWhere<Omit<Comment, 'id'>>;

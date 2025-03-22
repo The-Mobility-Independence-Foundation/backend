@@ -56,7 +56,7 @@ export class ListingService {
    * @param options - Optional query options
    * @returns The listing record
    */
-  async findById(
+  async findByIdOrThrow(
     id: number,
     options: Partial<{
       where: FindOptionsWhere<Omit<Listing, 'id'>>;

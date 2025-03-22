@@ -71,7 +71,7 @@ export class ReportsController {
     description: 'Returns the report record',
   })
   findOneBy(@Param('id') id: number) {
-    return this.reportService.findById(id);
+    return this.reportService.findByIdOrThrow(id);
   }
 
   /**

@@ -60,7 +60,7 @@ export class PostService {
    * @param options - Optional query options
    * @returns The post record
    */
-  async findById(
+  async findByIdOrThrow(
     id: number,
     options: Partial<{
       where: FindOptionsWhere<Omit<Post, 'id'>>;

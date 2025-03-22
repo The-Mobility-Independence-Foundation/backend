@@ -48,8 +48,10 @@ export class ReportsService {
       throw new BadRequestException('You cannot report yourself.');
     }
 
-    report.reporter = await this.userService.findById(dto.reporterId);
-    report.offender = await this.userService.findById(dto.reportedUserId);
+    report.reporter = await this.userService.findByIdOrThrow(dto.reporterId);
+    report.offender = await this.userService.findByIdOrThrow(
+      dto.reportedUserId,
+    );
 
     switch (dto.reportType) {
       case ReportType.COMMENT:
@@ -59,7 +61,9 @@ export class ReportsService {
           );
         }
 
-        report.comment = await this.commentService.findById(dto.commentId);
+        report.comment = await this.commentService.findByIdOrThrow(
+          dto.commentId,
+        );
         break;
       case ReportType.LISTING:
         if (!dto.listingId) {
@@ -68,7 +72,9 @@ export class ReportsService {
           );
         }
 
-        report.listing = await this.listingService.findById(dto.listingId);
+        report.listing = await this.listingService.findByIdOrThrow(
+          dto.listingId,
+        );
         break;
       case ReportType.POST:
         if (!dto.postId) {
@@ -77,7 +83,7 @@ export class ReportsService {
           );
         }
 
-        report.post = await this.postService.findById(dto.postId);
+        report.post = await this.postService.findByIdOrThrow(dto.postId);
         break;
       case ReportType.PROFILE:
         // no validation needed
@@ -137,7 +143,7 @@ export class ReportsService {
    * @param options - Optional query options
    * @returns The report record
    */
-  async findById(
+  async findByIdOrThrow(
     id: number,
     options: Partial<{
       where: FindOptionsWhere<Omit<Report, 'id'>>;
@@ -168,9 +174,9 @@ export class ReportsService {
    * @returns The updated report record
    */
   async update(id: number, dto: UpdateReportDto) {
-    const report = await this.findById(id);
+    const report = await this.findByIdOrThrow(id);
 
-    report.moderator = await this.userService.findById(dto.moderatorId);
+    report.moderator = await this.userService.findByIdOrThrow(dto.moderatorId);
 
     Object.assign(report, {
       actionTaken: dto.actionTaken,
