@@ -1,23 +1,23 @@
-import { Controller, Param, Post, Get } from '@nestjs/common';
+import { Controller, Param, Post, Get, Body } from '@nestjs/common';
 import { OrganizationService } from './organization.service';
-import { Organization } from './organization.entity';
+import { CreateOrganizationDto } from './dto/create-organization.dto';
 
 @Controller('organization')
 export class OrganizationController {
   constructor(private readonly organizationService: OrganizationService) {}
 
   @Post()
-  create(): Promise<Organization> {
-    return this.organizationService.create();
+  create(@Body() dto: CreateOrganizationDto) {
+    return this.organizationService.create(dto);
   }
 
   @Get()
-  findAll(): Promise<Organization[]> {
+  findAll() {
     return this.organizationService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number): Promise<Organization | null> {
-    return this.organizationService.findOne(id);
+  findOne(@Param('id') id: number) {
+    return this.organizationService.findByIdOrThrow(id);
   }
 }

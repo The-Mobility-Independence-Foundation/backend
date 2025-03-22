@@ -2,9 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { Organization } from './organization.entity';
-import { User } from '../user/entities/user.entity';
-import { Inventory } from '../inventory/inventory.entity';
-import { Address } from '../address/address.entity';
+import { CreateOrganizationDto } from './dto/create-organization.dto';
+import { UserService } from '../user/user.service';
+import { CreateAddressDto } from '../address/dto/create-address.dto';
+import { AddressService } from '../address/address.service';
 
 @Injectable()
 export class OrganizationService {
@@ -12,35 +13,26 @@ export class OrganizationService {
     @InjectRepository(Organization)
     private organizationRepository: Repository<Organization>,
 
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
-
-    @InjectRepository(Inventory)
-    private inventoryRepository: Repository<Inventory>,
-
-    @InjectRepository(Address)
-    private addressRepository: Repository<Address>,
+    private readonly userService: UserService,
+    private readonly addressService: AddressService,
   ) {}
 
-  async create() {
+  async create(dto: CreateOrganizationDto) {
     const organization = new Organization();
+    const owner = this.userService.findById(dto.ownerId);
 
-    const owner = await this.userRepository.findOneBy({ id: 1 });
-    const inventory = await this.inventoryRepository.findOneBy({ id: 1 });
-    const address = await this.addressRepository.findOneBy({ id: 1 });
+    const addressData = new CreateAddressDto();
+    Object.assign(addressData, dto);
 
-    if (inventory) {
-      organization.inventories = [inventory];
-    }
-    if (owner) {
-      organization.owner = owner;
-    }
-    if (address) {
-      organization.address = address;
-    }
+    const address = this.addressService.create(addressData);
 
-    organization.name = 'The Mobility Independence Foundation';
-    organization.ein = '92-0887459';
+    Object.assign(organization, {
+      owner: owner,
+      name: dto.name,
+      phonenumber: dto.phone,
+      ein: dto.ein,
+      address: address,
+    });
 
     return this.organizationRepository.save(organization);
   }

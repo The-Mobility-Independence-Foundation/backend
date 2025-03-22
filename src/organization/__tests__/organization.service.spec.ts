@@ -1,20 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { OrganizationService } from '../organization.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from '../../user/entities/user.entity';
-import { Inventory } from '../../inventory/inventory.entity';
 import { Organization } from '../organization.entity';
-import { Address } from '../../address/address.entity';
-
-export const mockRepository = jest.fn(() => ({
-  metadata: {
-    columns: [],
-    relations: [],
-  },
-}));
+import { createMock } from '@golevelup/ts-jest';
+// import { AddressService } from '../../address/address.service';
+// import { UserService } from '../../user/user.service';
+import { Repository } from 'typeorm';
 
 describe('OrganizationService', () => {
   let service: OrganizationService;
+  // let userService: UserService;
+  // let addressService: AddressService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -22,24 +18,16 @@ describe('OrganizationService', () => {
         OrganizationService,
         {
           provide: getRepositoryToken(Organization),
-          useClass: mockRepository,
-        },
-        {
-          provide: getRepositoryToken(User),
-          useClass: mockRepository,
-        },
-        {
-          provide: getRepositoryToken(Inventory),
-          useClass: mockRepository,
-        },
-        {
-          provide: getRepositoryToken(Address),
-          useClass: mockRepository,
+          useValue: createMock<Repository<Organization>>(),
         },
       ],
-    }).compile();
+    })
+      .useMocker(createMock)
+      .compile();
 
-    service = module.get<OrganizationService>(OrganizationService);
+    service = module.get(OrganizationService);
+    // userService = module.get(UserService);
+    // addressService = module.get(AddressService);
   });
 
   it('should be defined', () => {
