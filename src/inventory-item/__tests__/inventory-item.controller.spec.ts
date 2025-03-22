@@ -6,6 +6,10 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { InventoryItemService } from '../inventory-item.service';
 import { Model } from '../../model/model.entity';
 import { Part } from '../../part/part.entity';
+import { createMock } from '@golevelup/ts-jest';
+//import { PaginationService } from '../../common/services/pagination.service';
+//import { ModelService } from '../../model/model.service';
+//import { PartService } from '../../part/part.service';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -16,6 +20,9 @@ export const mockRepository = jest.fn(() => ({
 
 describe('InventoryItemController', () => {
   let controller: InventoryItemController;
+  //let paginationService: PaginationService;
+  //let partService: PartService;
+  //let modelService: ModelService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -39,9 +46,14 @@ describe('InventoryItemController', () => {
           useClass: mockRepository,
         },
       ],
-    }).compile();
+    })
+      .useMocker(createMock)
+      .compile();
 
     controller = module.get<InventoryItemController>(InventoryItemController);
+    //paginationService = module.get(PaginationService);
+    //partService = module.get(PartService);
+    //modelService = module.get(ModelService);
   });
 
   it('should be defined', () => {
