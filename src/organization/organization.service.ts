@@ -19,12 +19,18 @@ export class OrganizationService {
 
   async create(dto: CreateOrganizationDto) {
     const organization = new Organization();
-    const owner = this.userService.findById(dto.ownerId);
+    const owner = await this.userService.findById(dto.ownerId);
 
     const addressData = new CreateAddressDto();
-    Object.assign(addressData, dto);
+    Object.assign(addressData, {
+      addressLine1: dto.addressLine1, 
+      addressLine2: dto.addressLine2, 
+      city: dto.city, 
+      state: dto.state, 
+      zipCode: dto.zipCode,
+    });
 
-    const address = this.addressService.create(addressData);
+    const address = await this.addressService.create(addressData);
 
     Object.assign(organization, {
       owner: owner,
