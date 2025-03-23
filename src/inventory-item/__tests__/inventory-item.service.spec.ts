@@ -292,9 +292,9 @@ describe('InventoryItemService', () => {
       Object.assign(part, { id: 1 });
       Object.assign(model, { id: 1 });
       Object.assign(itemTag, { id: 1 });
-      Object.assign(newinventory, { id: 2});
-      Object.assign(item, { 
-        id: 1 ,
+      Object.assign(newinventory, { id: 2 });
+      Object.assign(item, {
+        id: 1,
         part: 5,
         model: 6,
         inventory: 1,
@@ -302,7 +302,7 @@ describe('InventoryItemService', () => {
         publicCount: 1,
         notes: 'Bike be bitching',
         attributes: {
-          color: 'red', 
+          color: 'red',
           size: 'M',
           weight: 15,
         },
@@ -326,8 +326,10 @@ describe('InventoryItemService', () => {
         .calledWith(part.id)
         .mockResolvedValue(part);
 
-      await expect(service.update(1, 1, item.id, updateDto)).resolves.not.toThrow();
-        expect(inventoryItemRepository.save).toHaveBeenCalled();
+      await expect(
+        service.update(1, 1, item.id, updateDto),
+      ).resolves.not.toThrow();
+      expect(inventoryItemRepository.save).toHaveBeenCalled();
     });
     it('Should update the model of an inventory item if specified', async () => {
       Object.assign(updateDto, {
@@ -342,8 +344,10 @@ describe('InventoryItemService', () => {
         .calledWith(model.id)
         .mockResolvedValue(model);
 
-      await expect(service.update(1, 1, item.id, updateDto)).resolves.not.toThrow();
-        expect(inventoryItemRepository.save).toHaveBeenCalled();
+      await expect(
+        service.update(1, 1, item.id, updateDto),
+      ).resolves.not.toThrow();
+      expect(inventoryItemRepository.save).toHaveBeenCalled();
     });
 
     it('Should update the inventory of an inventory item if specified', async () => {
@@ -359,7 +363,9 @@ describe('InventoryItemService', () => {
         .calledWith(newinventory.id)
         .mockResolvedValue(newinventory);
 
-      await expect(service.update(1, 1, item.id, updateDto)).resolves.not.toThrow();
+      await expect(
+        service.update(1, 1, item.id, updateDto),
+      ).resolves.not.toThrow();
       expect(inventoryItemRepository.save).toHaveBeenCalled();
     });
 
@@ -372,8 +378,10 @@ describe('InventoryItemService', () => {
         .calledWith({ id: item.id })
         .mockResolvedValue(item);
 
-      await expect(service.update(1, 1, item.id, updateDto)).resolves.not.toThrow();
-        expect(inventoryItemRepository.save).toHaveBeenCalled();
+      await expect(
+        service.update(1, 1, item.id, updateDto),
+      ).resolves.not.toThrow();
+      expect(inventoryItemRepository.save).toHaveBeenCalled();
     });
 
     it('Should update the public count quantity of an inventory item if specified', async () => {
@@ -385,8 +393,10 @@ describe('InventoryItemService', () => {
         .calledWith({ id: item.id })
         .mockResolvedValue(item);
 
-      await expect(service.update(1, 1, item.id, updateDto)).resolves.not.toThrow();
-        expect(inventoryItemRepository.save).toHaveBeenCalled();
+      await expect(
+        service.update(1, 1, item.id, updateDto),
+      ).resolves.not.toThrow();
+      expect(inventoryItemRepository.save).toHaveBeenCalled();
     });
 
     it('Should update the notes of an inventory item if specified', async () => {
@@ -398,21 +408,25 @@ describe('InventoryItemService', () => {
         .calledWith({ id: item.id })
         .mockResolvedValue(item);
 
-      await expect(service.update(1, 1, item.id, updateDto)).resolves.not.toThrow();
-        expect(inventoryItemRepository.save).toHaveBeenCalled();
+      await expect(
+        service.update(1, 1, item.id, updateDto),
+      ).resolves.not.toThrow();
+      expect(inventoryItemRepository.save).toHaveBeenCalled();
     });
 
     it('Should update the attributes of an inventory item if specified', async () => {
       Object.assign(updateDto, {
-        attributes: {height: 13, width: 10, gearCount: 6},
+        attributes: { height: 13, width: 10, gearCount: 6 },
       });
 
       when(inventoryItemRepository.findOneBy)
         .calledWith({ id: item.id })
         .mockResolvedValue(item);
 
-      await expect(service.update(1, 1, item.id, updateDto)).resolves.not.toThrow();
-        expect(inventoryItemRepository.save).toHaveBeenCalled();
+      await expect(
+        service.update(1, 1, item.id, updateDto),
+      ).resolves.not.toThrow();
+      expect(inventoryItemRepository.save).toHaveBeenCalled();
     });
   });
 });
