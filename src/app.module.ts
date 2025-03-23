@@ -6,7 +6,7 @@ import { ApiExceptionFilter } from './common/filters/api-exception.filter';
 import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
-
+import { ResourceAccessModule } from './common/resource-access/resource-access.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -15,6 +15,7 @@ import { CommonModule } from './common/common.module';
     DatabaseModule,
     AuthModule,
     CommonModule,
+    ResourceAccessModule,
   ],
   providers: [
     {
