@@ -17,6 +17,7 @@ import { when } from 'jest-when';
 import { NotFoundException } from '@nestjs/common';
 import { GetInventoryItemsDto } from '../dto/get-inventory-item.dto';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
+import { UpdateInventoryItemDto } from '../dto/update-inventory-item.dto';
 
 describe('InventoryItemService', () => {
   let service: InventoryItemService;
@@ -162,6 +163,7 @@ describe('InventoryItemService', () => {
       );
     });
   });
+
   describe('findAll', () => {
     let getDto = new GetInventoryItemsDto();
     const part = new Part();
@@ -275,6 +277,142 @@ describe('InventoryItemService', () => {
           },
         }),
       );
+    });
+  });
+
+  describe('update', () => {
+    let updateDto = new UpdateInventoryItemDto();
+    const item = new InventoryItem();
+    const part = new Part();
+    const model = new Model();
+    const itemTag = new Tag();
+    const newinventory = new Inventory();
+
+    beforeAll(() => {
+      Object.assign(part, { id: 1 });
+      Object.assign(model, { id: 1 });
+      Object.assign(itemTag, { id: 1 });
+      Object.assign(newinventory, { id: 2});
+      Object.assign(item, { 
+        id: 1 ,
+        part: 5,
+        model: 6,
+        inventory: 1,
+        quantity: 2,
+        publicCount: 1,
+        notes: 'Bike be bitching',
+        attributes: {
+          color: 'red', 
+          size: 'M',
+          weight: 15,
+        },
+      });
+    });
+
+    beforeEach(() => {
+      updateDto = new UpdateInventoryItemDto();
+    });
+
+    it('Should update the part of an inventory item if specified', async () => {
+      Object.assign(updateDto, {
+        part: part,
+      });
+
+      when(inventoryItemRepository.findOneBy)
+        .calledWith({ id: item.id })
+        .mockResolvedValue(item);
+
+      when(partService.findByIdOrThrow)
+        .calledWith(part.id)
+        .mockResolvedValue(part);
+
+      await expect(service.update(1, 1, item.id, updateDto)).resolves.not.toThrow();
+        expect(inventoryItemRepository.save).toHaveBeenCalled();
+    });
+    it('Should update the model of an inventory item if specified', async () => {
+      Object.assign(updateDto, {
+        model: model,
+      });
+
+      when(inventoryItemRepository.findOneBy)
+        .calledWith({ id: item.id })
+        .mockResolvedValue(item);
+
+      when(modelService.findByIdOrThrow)
+        .calledWith(model.id)
+        .mockResolvedValue(model);
+
+      await expect(service.update(1, 1, item.id, updateDto)).resolves.not.toThrow();
+        expect(inventoryItemRepository.save).toHaveBeenCalled();
+    });
+
+    it('Should update the inventory of an inventory item if specified', async () => {
+      Object.assign(updateDto, {
+        inventory: newinventory,
+      });
+
+      when(inventoryItemRepository.findOneBy)
+        .calledWith({ id: item.id })
+        .mockResolvedValue(item);
+
+      when(inventoryService.findByIdOrThrow)
+        .calledWith(newinventory.id)
+        .mockResolvedValue(newinventory);
+
+      await expect(service.update(1, 1, item.id, updateDto)).resolves.not.toThrow();
+      expect(inventoryItemRepository.save).toHaveBeenCalled();
+    });
+
+    it('Should update the total quantity of an inventory item if specified', async () => {
+      Object.assign(updateDto, {
+        quantity: 4,
+      });
+
+      when(inventoryItemRepository.findOneBy)
+        .calledWith({ id: item.id })
+        .mockResolvedValue(item);
+
+      await expect(service.update(1, 1, item.id, updateDto)).resolves.not.toThrow();
+        expect(inventoryItemRepository.save).toHaveBeenCalled();
+    });
+
+    it('Should update the public count quantity of an inventory item if specified', async () => {
+      Object.assign(updateDto, {
+        publicCount: 3,
+      });
+
+      when(inventoryItemRepository.findOneBy)
+        .calledWith({ id: item.id })
+        .mockResolvedValue(item);
+
+      await expect(service.update(1, 1, item.id, updateDto)).resolves.not.toThrow();
+        expect(inventoryItemRepository.save).toHaveBeenCalled();
+    });
+
+    it('Should update the notes of an inventory item if specified', async () => {
+      Object.assign(updateDto, {
+        notes: 'This bike is cool',
+      });
+
+      when(inventoryItemRepository.findOneBy)
+        .calledWith({ id: item.id })
+        .mockResolvedValue(item);
+
+      await expect(service.update(1, 1, item.id, updateDto)).resolves.not.toThrow();
+        expect(inventoryItemRepository.save).toHaveBeenCalled();
+    });
+
+    it('Should update the attributes of an inventory item if specified', async () => {
+      Object.assign(updateDto, {
+        attributes: {height: 13, width: 10, gearCount: 6},
+      });
+
+      when(inventoryItemRepository.findOneBy)
+        .calledWith({ id: item.id })
+        .mockResolvedValue(item);
+
+      await expect(service.update(1, 1, item.id, updateDto)).resolves.not.toThrow();
+        expect(inventoryItemRepository.save).toHaveBeenCalled();
     });
   });
 });
