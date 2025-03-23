@@ -7,16 +7,10 @@ import { InventoryItemService } from '../inventory-item.service';
 import { Model } from '../../model/model.entity';
 import { Part } from '../../part/part.entity';
 import { createMock } from '@golevelup/ts-jest';
+import { Repository } from 'typeorm';
 //import { PaginationService } from '../../common/services/pagination.service';
 //import { ModelService } from '../../model/model.service';
 //import { PartService } from '../../part/part.service';
-
-export const mockRepository = jest.fn(() => ({
-  metadata: {
-    columns: [],
-    relations: [],
-  },
-}));
 
 describe('InventoryItemController', () => {
   let controller: InventoryItemController;
@@ -31,19 +25,19 @@ describe('InventoryItemController', () => {
         InventoryItemService,
         {
           provide: getRepositoryToken(InventoryItem),
-          useClass: mockRepository,
+          useValue: createMock<Repository<InventoryItem>>(),
         },
         {
           provide: getRepositoryToken(Inventory),
-          useClass: mockRepository,
+          useValue: createMock<Repository<Inventory>>(),
         },
         {
           provide: getRepositoryToken(Model),
-          useClass: mockRepository,
+          useValue: createMock<Repository<Model>>(),
         },
         {
           provide: getRepositoryToken(Part),
-          useClass: mockRepository,
+          useValue: createMock<Repository<Part>>(),
         },
       ],
     })
