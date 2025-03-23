@@ -39,7 +39,7 @@ export class InventoryItemService {
     });
 
     inventoryItem.inventory = await this.inventoryService.findByIdOrThrow(
-      dto.part,
+      dto.inventory,
       {
         relations: ['organization', 'address', 'items'],
       },
@@ -69,6 +69,9 @@ export class InventoryItemService {
         id: inventoryId,
         organization: { id: organizationId },
       },
+      part: query.part,
+      model: query.model,
+      tags: {some: {id: {in: query.tag}}},
     };
 
     const paginationDto = new CursorPaginationDto();
