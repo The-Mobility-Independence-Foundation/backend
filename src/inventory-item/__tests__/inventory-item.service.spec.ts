@@ -442,115 +442,115 @@ describe('InventoryItemService', () => {
       });
     });
 
-    it('Should return an item if the item exists',async () => {
+    it('Should return an item if the item exists', async () => {
       when(inventoryItemRepository.findOne)
-      .calledWith({
-        where: {
-          id: item.id,
-          inventory: {
-            id: 1,
-            organization: { id: 1 },
+        .calledWith({
+          where: {
+            id: item.id,
+            inventory: {
+              id: 1,
+              organization: { id: 1 },
+            },
           },
-        },
-        relations: [
-          'inventory',
-          'inventory.organization',
-          'inventory.address',
-          'part.name',
-          'part.partNumber',
-          'model.name',
-          'listings',
-          'tags.name',
-        ],
-      })
-      .mockResolvedValue(item);
+          relations: [
+            'inventory',
+            'inventory.organization',
+            'inventory.address',
+            'part.name',
+            'part.partNumber',
+            'model.name',
+            'listings',
+            'tags.name',
+          ],
+        })
+        .mockResolvedValue(item);
 
       const result = await service.findWithOrgInv(1, 1, item.id);
 
       expect(result).toBeDefined();
     });
 
-    it('Should throw a NotFoundException if the item does not exist',async () => {
+    it('Should throw a NotFoundException if the item does not exist', async () => {
       const bad_id = 999999999;
 
       when(inventoryItemRepository.findOne)
-      .calledWith({
-        where: {
-          id: bad_id,
-          inventory: {
-            id: 1,
-            organization: { id: 1 },
+        .calledWith({
+          where: {
+            id: bad_id,
+            inventory: {
+              id: 1,
+              organization: { id: 1 },
+            },
           },
-        },
-        relations: [
-          'inventory',
-          'inventory.organization',
-          'inventory.address',
-          'part.name',
-          'part.partNumber',
-          'model.name',
-          'listings',
-          'tags.name',
-        ],
-      })
-      .mockResolvedValue(null);
+          relations: [
+            'inventory',
+            'inventory.organization',
+            'inventory.address',
+            'part.name',
+            'part.partNumber',
+            'model.name',
+            'listings',
+            'tags.name',
+          ],
+        })
+        .mockResolvedValue(null);
 
-      await expect(service.findWithOrgInv(1,1, bad_id)).rejects.toThrow(
+      await expect(service.findWithOrgInv(1, 1, bad_id)).rejects.toThrow(
         NotFoundException,
       );
     });
 
-    it('Should throw a NotFoundException if the inventory does not exist',async () => {
+    it('Should throw a NotFoundException if the inventory does not exist', async () => {
       when(inventoryItemRepository.findOne)
-      .calledWith({
-        where: {
-          id: item.id,
-          inventory: {
-            id: 2,
-            organization: { id: 1 },
+        .calledWith({
+          where: {
+            id: item.id,
+            inventory: {
+              id: 2,
+              organization: { id: 1 },
+            },
           },
-        },
-        relations: [
-          'inventory',
-          'inventory.organization',
-          'inventory.address',
-          'part.name',
-          'part.partNumber',
-          'model.name',
-          'listings',
-          'tags.name',
-        ],
-      })
-      .mockResolvedValue(null);
+          relations: [
+            'inventory',
+            'inventory.organization',
+            'inventory.address',
+            'part.name',
+            'part.partNumber',
+            'model.name',
+            'listings',
+            'tags.name',
+          ],
+        })
+        .mockResolvedValue(null);
 
       await expect(service.findWithOrgInv(1, 2, item.id)).rejects.toThrow(
         NotFoundException,
       );
     });
 
-    it('Should throw a NotFoundException if the organization does not exist',async () => {
+    it('Should throw a NotFoundException if the organization does not exist', async () => {
       when(inventoryItemRepository.findOne)
-      .calledWith({
-        where: {
-          id: item.id,
-          inventory: {
-            id: 1,
-            organization: { id: 2 },
+        .calledWith({
+          where: {
+            id: item.id,
+            inventory: {
+              id: 1,
+              organization: { id: 2 },
+            },
           },
-        },
-        relations: [
-          'inventory',
-          'inventory.organization',
-          'inventory.address',
-          'part.name',
-          'part.partNumber',
-          'model.name',
-          'listings',
-          'tags.name',
-        ],
-      })
-      .mockResolvedValue(null);
-      
+          relations: [
+            'inventory',
+            'inventory.organization',
+            'inventory.address',
+            'part.name',
+            'part.partNumber',
+            'model.name',
+            'listings',
+            'tags.name',
+          ],
+        })
+        .mockResolvedValue(null);
+
       await expect(service.findWithOrgInv(2, 1, item.id)).rejects.toThrow(
         NotFoundException,
       );
