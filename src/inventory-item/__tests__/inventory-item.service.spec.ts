@@ -25,11 +25,11 @@ export const mockRepository = jest.fn(() => ({
 
 describe('InventoryItemService', () => {
   let service: InventoryItemService;
-  let inventoryItemRepository : Repository<InventoryItem>;
+  let inventoryItemRepository: Repository<InventoryItem>;
   //let paginationService: PaginationService;
   let partService: PartService;
   let modelService: ModelService;
-  let inventoryService: InventoryService
+  let inventoryService: InventoryService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -54,30 +54,30 @@ describe('InventoryItemService', () => {
 
   describe('create', () => {
     let createDto = new CreateInventoryItemDto();
-    let part = new Part();
-    let model = new Model();
-    let tag = new Tag();
-    let inventory = new Inventory();
+    const part = new Part();
+    const model = new Model();
+    const tag = new Tag();
+    const inventory = new Inventory();
 
     beforeAll(() => {
       Object.assign(part, { id: 1 });
       Object.assign(model, { id: 1 });
       Object.assign(tag, { id: 1 });
       Object.assign(inventory, { id: 1 });
-    })
+    });
 
-    beforeEach(()=> {
+    beforeEach(() => {
       createDto = new CreateInventoryItemDto();
     });
 
     it('should create a new inventory with a create inventory DTO', async () => {
-      Object.assign(createDto,{
+      Object.assign(createDto, {
         part: 1,
         model: 1,
         inventory: 1,
         quantity: 3,
         publicCount: 2,
-        notes: 'nice wheel'
+        notes: 'nice wheel',
       });
 
       when(inventoryService.findByIdOrThrow)
@@ -98,13 +98,13 @@ describe('InventoryItemService', () => {
       expect(inventoryItemRepository.save).toHaveBeenCalled();
     });
     it('should throw NotFoundException if Part is not found', async () => {
-      Object.assign(createDto,{
+      Object.assign(createDto, {
         part: 999,
         model: 1,
         inventory: 1,
         quantity: 3,
         publicCount: 2,
-        notes: 'nice wheel'
+        notes: 'nice wheel',
       });
 
       when(partService.findByIdOrThrow)
@@ -121,13 +121,13 @@ describe('InventoryItemService', () => {
       );
     });
     it('should throw NotFoundException if Model is not found', async () => {
-      Object.assign(createDto,{
+      Object.assign(createDto, {
         part: 1,
         model: 999,
         inventory: 1,
         quantity: 3,
         publicCount: 2,
-        notes: 'nice wheel'
+        notes: 'nice wheel',
       });
 
       when(modelService.findByIdOrThrow)
@@ -144,13 +144,13 @@ describe('InventoryItemService', () => {
       );
     });
     it('should throw NotFoundException if Inventory is not found', async () => {
-      Object.assign(createDto,{
+      Object.assign(createDto, {
         part: 1,
         model: 1,
         inventory: 878,
         quantity: 3,
         publicCount: 2,
-        notes: 'nice wheel'
+        notes: 'nice wheel',
       });
 
       when(inventoryService.findByIdOrThrow)
