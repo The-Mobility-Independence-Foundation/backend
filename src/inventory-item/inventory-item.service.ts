@@ -69,10 +69,17 @@ export class InventoryItemService {
         id: inventoryId,
         organization: { id: organizationId },
       },
-      part: query.part,
-      model: query.model,
-      tags: { some: { id: { in: query.tag } } },
     };
+
+    if (query.part) {
+      findWhere.part = query.part;
+    }
+    if (query.model) {
+      findWhere.model = query.model;
+    }
+    if (query.tag) {
+      findWhere.tags = { some: { id: query.tag } }; 
+    }
 
     const paginationDto = new CursorPaginationDto();
     Object.assign(paginationDto, {

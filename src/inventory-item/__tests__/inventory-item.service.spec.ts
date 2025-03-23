@@ -5,7 +5,7 @@ import { InventoryItem } from '../inventory-item.entity';
 import { Inventory } from '../../inventory/inventory.entity';
 import { Model } from '../../model/model.entity';
 import { Part } from '../../part/part.entity';
-//import { PaginationService } from '../../common/services/pagination.service';
+import { PaginationService } from '../../common/services/pagination.service';
 import { ModelService } from '../../model/model.service';
 import { PartService } from '../../part/part.service';
 import { createMock } from '@golevelup/ts-jest';
@@ -15,18 +15,13 @@ import { Tag } from '../../tag/tag.entity';
 import { Repository } from 'typeorm';
 import { when } from 'jest-when';
 import { NotFoundException } from '@nestjs/common';
-
-export const mockRepository = jest.fn(() => ({
-  metadata: {
-    columns: [],
-    relations: [],
-  },
-}));
+import { GetInventoryItemsDto } from '../dto/get-inventory-item.dto';
+import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 
 describe('InventoryItemService', () => {
   let service: InventoryItemService;
   let inventoryItemRepository: Repository<InventoryItem>;
-  //let paginationService: PaginationService;
+  let paginationService: PaginationService;
   let partService: PartService;
   let modelService: ModelService;
   let inventoryService: InventoryService;
@@ -46,7 +41,7 @@ describe('InventoryItemService', () => {
 
     service = module.get<InventoryItemService>(InventoryItemService);
     inventoryItemRepository = module.get(getRepositoryToken(InventoryItem));
-    //paginationService = module.get(PaginationService);
+    paginationService = module.get(PaginationService);
     partService = module.get(PartService);
     modelService = module.get(ModelService);
     inventoryService = module.get(InventoryService);
@@ -54,10 +49,10 @@ describe('InventoryItemService', () => {
 
   describe('create', () => {
     let createDto = new CreateInventoryItemDto();
-    const part = new Part();
-    const model = new Model();
-    const tag = new Tag();
-    const inventory = new Inventory();
+    let part = new Part();
+    let model = new Model();
+    let tag = new Tag();
+    let inventory = new Inventory();
 
     beforeAll(() => {
       Object.assign(part, { id: 1 });
@@ -164,6 +159,121 @@ describe('InventoryItemService', () => {
       expect(inventoryService.findByIdOrThrow).toHaveBeenCalledWith(
         createDto.inventory,
         expect.any(Object),
+      );
+    });
+  });
+  describe('findAll', () => {
+    let getDto = new GetInventoryItemsDto();
+    let part = new Part();
+    let model = new Model();
+    let itemTag = new Tag();
+
+    beforeAll(() => {
+      Object.assign(part, { id: 1 });
+      Object.assign(model, { id: 1 });
+      Object.assign(itemTag, { id: 1 });
+    });
+
+    beforeEach(() => {
+      getDto = new GetInventoryItemsDto();
+    });
+
+    it('should use tag search when a tag is specified',async () => {
+      Object.assign(getDto, {
+        tag: itemTag.id,
+      })
+
+      service.findAll(1, 1, getDto);
+
+      expect(paginationService.paginateWithCursor).toHaveBeenCalledWith(
+        inventoryItemRepository,
+        expect.any(CursorPaginationDto),
+        expect.objectContaining({
+          where: {
+            inventory: {
+              id: 1,
+              organization: { id: 1 },
+            },
+            tags: { some: { id: getDto.tag } },
+          },
+          cursorColumn: 'id',
+          relations: expect.any(Object), 
+        }),
+      );
+    });
+
+    it('should use part search when a part is specified',async () => {
+      Object.assign(getDto, {
+        part: part.id,
+      })
+
+      service.findAll(1, 1, getDto);
+
+      expect(paginationService.paginateWithCursor).toHaveBeenCalledWith(
+        inventoryItemRepository,
+        expect.any(CursorPaginationDto),
+        expect.objectContaining({
+          where: {
+            inventory: {
+              id: 1,
+              organization: { id: 1 },
+            },
+            part: getDto.part,
+          },
+          cursorColumn: 'id',
+          relations: expect.any(Object), 
+        }),
+      );
+    });
+
+    it('should use model search when a model is specified',async () => {
+      Object.assign(getDto, {
+        model: model.id,
+      })
+
+      service.findAll(1, 1, getDto);
+
+      expect(paginationService.paginateWithCursor).toHaveBeenCalledWith(
+        inventoryItemRepository,
+        expect.any(CursorPaginationDto),
+        expect.objectContaining({
+          where: {
+            inventory: {
+              id: 1,
+              organization: { id: 1 },
+            },
+            model: getDto.model,
+          },
+          cursorColumn: 'id',
+          relations: expect.any(Object), 
+        }),
+      );
+    });
+
+    it('should apply pagination parameters correctly', async () => {
+      Object.assign(getDto, {
+        cursor: '12345',
+        limit: 10,
+        direction: 'forward',
+      });
+
+      service.findAll(1, 1, getDto);
+
+      expect(paginationService.paginateWithCursor).toHaveBeenCalledWith(
+        inventoryItemRepository,
+        expect.objectContaining({
+          cursor: getDto.cursor,
+          limit: getDto.limit,
+          direction: getDto.direction,
+        }),
+        expect.objectContaining({
+          where: {
+            inventory: {
+              id: 1,
+              organization: { id: 1 },
+            },
+          },
+        }),
       );
     });
   });
