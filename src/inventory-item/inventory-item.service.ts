@@ -71,7 +71,7 @@ export class InventoryItemService {
       },
       part: query.part,
       model: query.model,
-      tags: {some: {id: {in: query.tag}}},
+      tags: { some: { id: { in: query.tag } } },
     };
 
     const paginationDto = new CursorPaginationDto();
