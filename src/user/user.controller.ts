@@ -18,8 +18,6 @@ import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { UseStrategy } from '../common/resource-access/decorators/resource-access.decorator';
 import { ResourceAccessStrategyToken } from '../common/resource-access/interfaces/strategy-provider.interface';
 import { Request } from 'express';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { UseGuards } from '@nestjs/common';
 import { GetUsersDto } from './dto/get-users.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
