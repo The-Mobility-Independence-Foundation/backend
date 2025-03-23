@@ -40,15 +40,13 @@ export class CreateInventoryItemDto {
   publicCount: number;
 
   @ApiProperty()
-  @IsNotEmpty({ message: 'Notes cannot be blank.' })
   @MaxLength(500, {
     message: 'Notes is too long. Maximum length is $constraint1 characters.',
   })
   @IsString()
-  notes: string;
+  notes?: string;
 
   @ApiProperty()
-  @IsNotEmpty({ message: 'Attributes cannot be blank.' })
   @IsObject()
-  attributes: Record<string, any>;
+  attributes?: Record<string, any>;
 }
