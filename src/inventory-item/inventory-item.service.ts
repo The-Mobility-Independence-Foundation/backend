@@ -78,7 +78,7 @@ export class InventoryItemService {
       findWhere.model = query.model;
     }
     if (query.tag) {
-      findWhere.tags = { some: { id: query.tag } }; 
+      findWhere.tags = { some: { id: query.tag } };
     }
 
     const paginationDto = new CursorPaginationDto();

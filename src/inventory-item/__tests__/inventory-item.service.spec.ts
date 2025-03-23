@@ -49,10 +49,10 @@ describe('InventoryItemService', () => {
 
   describe('create', () => {
     let createDto = new CreateInventoryItemDto();
-    let part = new Part();
-    let model = new Model();
-    let tag = new Tag();
-    let inventory = new Inventory();
+    const part = new Part();
+    const model = new Model();
+    const tag = new Tag();
+    const inventory = new Inventory();
 
     beforeAll(() => {
       Object.assign(part, { id: 1 });
@@ -164,9 +164,9 @@ describe('InventoryItemService', () => {
   });
   describe('findAll', () => {
     let getDto = new GetInventoryItemsDto();
-    let part = new Part();
-    let model = new Model();
-    let itemTag = new Tag();
+    const part = new Part();
+    const model = new Model();
+    const itemTag = new Tag();
 
     beforeAll(() => {
       Object.assign(part, { id: 1 });
@@ -178,10 +178,10 @@ describe('InventoryItemService', () => {
       getDto = new GetInventoryItemsDto();
     });
 
-    it('should use tag search when a tag is specified',async () => {
+    it('should use tag search when a tag is specified', async () => {
       Object.assign(getDto, {
         tag: itemTag.id,
-      })
+      });
 
       service.findAll(1, 1, getDto);
 
@@ -197,15 +197,15 @@ describe('InventoryItemService', () => {
             tags: { some: { id: getDto.tag } },
           },
           cursorColumn: 'id',
-          relations: expect.any(Object), 
+          relations: expect.any(Object),
         }),
       );
     });
 
-    it('should use part search when a part is specified',async () => {
+    it('should use part search when a part is specified', async () => {
       Object.assign(getDto, {
         part: part.id,
-      })
+      });
 
       service.findAll(1, 1, getDto);
 
@@ -221,15 +221,15 @@ describe('InventoryItemService', () => {
             part: getDto.part,
           },
           cursorColumn: 'id',
-          relations: expect.any(Object), 
+          relations: expect.any(Object),
         }),
       );
     });
 
-    it('should use model search when a model is specified',async () => {
+    it('should use model search when a model is specified', async () => {
       Object.assign(getDto, {
         model: model.id,
-      })
+      });
 
       service.findAll(1, 1, getDto);
 
@@ -245,7 +245,7 @@ describe('InventoryItemService', () => {
             model: getDto.model,
           },
           cursorColumn: 'id',
-          relations: expect.any(Object), 
+          relations: expect.any(Object),
         }),
       );
     });
