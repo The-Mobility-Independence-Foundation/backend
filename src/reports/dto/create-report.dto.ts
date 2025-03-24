@@ -13,11 +13,13 @@ export class CreateReportDto {
   @ApiProperty({ description: 'The id of the user who made the report.' })
   @IsPositive()
   @IsInt()
+  @IsNotEmpty()
   reporterId: number;
 
   @ApiProperty({ description: 'The id of the user who is being reported.' })
   @IsPositive()
   @IsInt()
+  @IsNotEmpty()
   reportedUserId: number;
 
   @IsOptional()

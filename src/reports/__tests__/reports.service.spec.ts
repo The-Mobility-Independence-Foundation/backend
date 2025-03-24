@@ -362,7 +362,7 @@ describe('ReportsService', () => {
     });
   });
 
-  describe('findOne', () => {
+  describe('findByIdOrThrow', () => {
     let report = new Report();
     const reporter = new User();
     const offender = new User();
@@ -415,7 +415,9 @@ describe('ReportsService', () => {
         .calledWith({ where: { id: bad_id } })
         .mockResolvedValue(null);
 
-      await expect(service.findByIdOrThrow(bad_id)).rejects.toThrow(NotFoundException);
+      await expect(service.findByIdOrThrow(bad_id)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
