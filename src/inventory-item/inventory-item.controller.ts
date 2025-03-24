@@ -22,7 +22,7 @@ import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cu
 @ApiTags('inventoryItem')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
-@Controller('inventoryItem')
+@Controller('organization/:organizationId')
 export class InventoryItemController {
   constructor(private readonly inventoryItemService: InventoryItemService) {}
 
@@ -31,7 +31,7 @@ export class InventoryItemController {
    * @param dto : All necessary information to create a new item
    * @returns : A message of successful creation
    */
-  @Post()
+  @Post('/inventory/:inventoryId/items')
   @ApiOperation({ summary: 'Initiate creation of an inventory item' })
   @ResponseMessage('Successfully created inventory item')
   create(@Body() dto: CreateInventoryItemDto): Promise<InventoryItem> {
@@ -44,7 +44,7 @@ export class InventoryItemController {
    * @param inventoryId : The ID of the specific inventory
    * @returns : A list of items stored within that inventory
    */
-  @Get('organization/:organizationId/inventory/:inventoryId/items')
+  @Get('/inventory/:inventoryId/items')
   @ApiOperation({ summary: 'Retrieve all items in a specific inventory' })
   @ResponseMessage('Successfully found all inventory item')
   findAll(
@@ -66,7 +66,7 @@ export class InventoryItemController {
    * @param itemId : The ID of the inventory item
    * @returns : The data of the item
    */
-  @Get('organization/:organizationId/inventory/:inventoryId/items/:itemId')
+  @Get('/inventory/:inventoryId/items/:itemId')
   @ApiOperation({ summary: 'Retrieve a specific item in a specific inventory' })
   @ResponseMessage('Successfully found a specific inventory item')
   findOne(
@@ -81,7 +81,7 @@ export class InventoryItemController {
     );
   }
 
-  @Patch('organization/:organizationId/inventory/:inventoryId/items/:itemId')
+  @Patch('/inventory/:inventoryId/items/:itemId')
   @ApiOperation({ summary: 'Update information about an inventory item' })
   @ResponseMessage('Successfully updated inventory item')
   update(

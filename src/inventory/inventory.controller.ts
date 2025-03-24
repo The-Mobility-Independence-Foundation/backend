@@ -1,5 +1,4 @@
 import {
-  Controller,
   Get,
   Post,
   Param,
@@ -8,6 +7,7 @@ import {
   ParseIntPipe,
   Query,
   UseGuards,
+  Controller,
 } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
 import { Inventory } from './inventory.entity';
@@ -21,7 +21,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 @ApiTags('inventory')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
-@Controller('inventory')
+@Controller('organization/:organizationId')
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
 
@@ -29,7 +29,7 @@ export class InventoryController {
    * Create a new inventory
    * @param dto : All the inforamtion to create a new inventory
    */
-  @Post()
+  @Post('/inventory')
   @ApiOperation({ summary: 'Initiate creation of an inventory' })
   create(@Body() dto: CreateInventoryDto): Promise<Inventory> {
     return this.inventoryService.create(dto);
@@ -40,7 +40,7 @@ export class InventoryController {
    * @param organizationId : The ID of the organization
    * @returns : A list of all of an organization's inventory
    */
-  @Get('organization/:organizationId/inventory')
+  @Get('/inventory')
   @ApiOperation({ summary: 'Retrieve an organizations inventories' })
   findAll(
     @Param('organizationId', ParseIntPipe) organizationId: number,
@@ -55,7 +55,7 @@ export class InventoryController {
    * @param organizationId : ID of the organization
    * @returns : The specific inventory
    */
-  @Get('organization/:organizationId/inventory/:id')
+  @Get('/inventory/:id')
   @ApiOperation({
     summary: 'Retrieve a specific inventory from an organization',
   })
@@ -71,7 +71,7 @@ export class InventoryController {
    * @param organizationId : ID of the organization
    * @param id : ID of the inventory wished to update
    */
-  @Patch('organization/:organizationId/inventory/:id')
+  @Patch('/inventory/:id')
   @ApiOperation({ summary: 'Update information about an inventory' })
   update(
     @Param('organizationId', ParseIntPipe) organizationId: number,
