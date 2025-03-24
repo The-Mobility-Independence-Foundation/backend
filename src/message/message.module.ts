@@ -6,6 +6,7 @@ import { Message } from './message.entity';
 import { CommonModule } from 'src/common/common.module';
 import { ConversationsModule } from 'src/conversations/conversations.module';
 import { UserModule } from 'src/user/user.module';
+import { AttachmentsModule } from 'src/attachments/attachments.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { UserModule } from 'src/user/user.module';
     CommonModule,
     ConversationsModule,
     UserModule,
+    AttachmentsModule,
   ],
   controllers: [ConversationsMessagesController],
   providers: [MessageService],

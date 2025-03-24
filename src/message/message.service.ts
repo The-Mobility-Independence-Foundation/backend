@@ -13,7 +13,7 @@ import { ConversationsService } from '../conversations/conversations.service';
 import { ConversationType } from '../conversations/entities/conversation.entity';
 import { UserService } from '../user/user.service';
 import { UpdateMessageDto } from './dto/update-message.dto';
-
+import { AttachmentsService } from '../attachments/attachments.service';
 @Injectable()
 export class MessageService {
   constructor(
@@ -22,23 +22,45 @@ export class MessageService {
     private conversationService: ConversationsService,
     private paginationService: PaginationService,
     private userService: UserService,
+    private attachmentsService: AttachmentsService,
   ) {}
 
   /**
-   * Find all messages for a conversation
+   * Find all messages for a conversation with their attachments
    * @param conversationId - The id of the conversation
    * @param paginationDto - The pagination dto
    * @returns The paginated messages
    */
   async findAll(conversationId: number, paginationDto: CursorPaginationDto) {
-    return this.paginationService.paginateWithCursor(
+    const paginated = await this.paginationService.paginateWithCursor(
       this.messageRepository,
       paginationDto,
       {
         cursorColumn: 'id',
         where: { conversationId },
+        order: {
+          createdAt: 'DESC',
+        },
       },
     );
+
+    return paginated;
+    // const formattedMessages = await Promise.all(
+    //   paginated.results.map(async (message) => {
+    //     return {
+    //       ...message,
+    //       attachments: await this.attachmentsService.findByTypeAndId(
+    //         AttachmentEntityType.MESSAGE,
+    //         message.id,
+    //       ),
+    //     };
+    //   }),
+    // );
+
+    // return {
+    //   ...paginated,
+    //   results: formattedMessages,
+    // };
   }
 
   /**
@@ -61,42 +83,24 @@ export class MessageService {
       );
     }
 
-    const author = await this.userService.findById(authorId);
-    if (!author) {
-      throw new NotFoundException('Author not found');
-    }
-
     const conversation =
       await this.conversationService.findById(conversationId);
     if (!conversation) {
       throw new NotFoundException('Conversation not found');
     }
 
-    if (conversation.type === ConversationType.DIRECT) {
-      if (
-        conversation.initiator.id !== authorId &&
-        conversation.participant?.id !== authorId
-      ) {
-        throw new BadRequestException(
-          'You are not a participant of this conversation',
-        );
-      }
-    }
-
-    if (conversation.type === ConversationType.INQUIRY) {
-      if (
-        conversation.initiator.id !== authorId &&
-        conversation.participant?.id !== authorId
-      ) {
-        throw new BadRequestException(
-          'You are not a participant of this conversation',
-        );
-      }
+    if (
+      conversation.initiator.id !== authorId &&
+      conversation.participant?.id !== authorId
+    ) {
+      throw new BadRequestException(
+        'You are not a participant of this conversation',
+      );
     }
 
     const message = this.messageRepository.create({
-      author,
-      conversation,
+      authorId,
+      conversationId,
       messageContent: content,
     });
 

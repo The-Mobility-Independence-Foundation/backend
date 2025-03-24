@@ -10,7 +10,6 @@ import {
   Delete,
   Req,
 } from '@nestjs/common';
-import { ResourceAccess } from '../common/resource-access/decorators/resource-access.decorator';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
@@ -19,10 +18,12 @@ import { UpdateMessageDto } from './dto/update-message.dto';
 import { MessageService } from './message.service';
 import { User } from '../user/entities/user.entity';
 import { Request } from 'express';
+import { UseStrategy } from '../common/resource-access/decorators/resource-access.decorator';
+import { ResourceAccessStrategyToken } from '../common/resource-access/interfaces/strategy-provider.interface';
 
 @ApiTags('conversations')
 @Controller('conversations/:conversationId/messages')
-@ResourceAccess()
+@UseStrategy(ResourceAccessStrategyToken.CONVERSATION)
 export class ConversationsMessagesController {
   constructor(private readonly messageService: MessageService) {}
 
@@ -56,7 +57,6 @@ export class ConversationsMessagesController {
   @ResponseMessage('Successfully updated a message')
   @ApiOperation({ summary: 'Update a message' })
   async updateMessage(
-    // Can we just use the user id from the parameter?
     @Req() req: Request,
     @Param('messageId', ParseIntPipe) messageId: number,
     @Body() updateMessageDto: UpdateMessageDto,
