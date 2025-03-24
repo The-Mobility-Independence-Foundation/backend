@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CreateAddressDto } from '../../address/dto/create-address.dto';
 import {
+  IsInt,
   IsNotEmpty,
   IsNumberString,
   IsPositive,
@@ -13,6 +14,7 @@ export class CreateOrganizationDto extends CreateAddressDto {
   @ApiProperty()
   @IsPositive({ message: 'Invalid ownerId' })
   @IsNotEmpty({ message: 'No ownerId provided' })
+  @IsInt()
   ownerId: number;
 
   @ApiProperty()

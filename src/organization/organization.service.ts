@@ -13,6 +13,7 @@ import { AddressService } from '../address/address.service';
 import { GetOrganizationsDto } from './dto/get-organizations.dto';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { PaginationService } from '../common/services/pagination.service';
+import { UpdateOrganizationDto } from './dto/update-organization.dto';
 
 @Injectable()
 export class OrganizationService {
@@ -112,5 +113,33 @@ export class OrganizationService {
     } else {
       throw new NotFoundException('Organization not found.');
     }
+  }
+
+  async update(id: number, dto: UpdateOrganizationDto) {
+    const organization = await this.findByIdOrThrow(id);
+    // const address = organization.address;
+
+    if (
+      dto.addressLine1 ||
+      dto.addressLine2 ||
+      dto.city ||
+      dto.zipCode ||
+      dto.state
+    ) {
+      throw new NotImplementedException('Address update not implemented');
+    }
+
+    if (dto.ownerId) {
+      organization.owner = await this.userService.findById(dto.ownerId); // TODO: update when reports merged in
+    }
+
+    Object.assign(organization, {
+      name: dto.name,
+      phoneNumber: dto.phonenumber,
+      services: dto.services,
+      socials: dto.socials,
+    });
+
+    return await this.organizationRepository.save(organization);
   }
 }
