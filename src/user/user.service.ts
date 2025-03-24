@@ -12,7 +12,6 @@ import { AuthProviderProfile } from '../auth/entities/auth-provider-profile.enti
 import { UserAuthService } from './user-auth.service';
 import { validateDto } from '../common/utils/validate-dto';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
-import { ConnectionsService } from '../connections/connections.service';
 import { GetUsersDto } from './dto/get-users.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationService } from '../common/services/pagination.service';
@@ -23,7 +22,6 @@ export class UserService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private userAuthService: UserAuthService,
-    private connectionsService: ConnectionsService,
     private paginationService: PaginationService,
   ) {}
 
@@ -91,36 +89,6 @@ export class UserService {
     user = await validateDto(user, User);
 
     return this.userRepository.save(user);
-  }
-
-  /**
-   * Get the connections of a user through pagination
-   * @param userId - The id of the user
-   * @param paginationDto - The pagination dto
-   * @returns The paginated list of user connections
-   */
-  async getConnections(userId: number, paginationDto: CursorPaginationDto) {
-    return this.connectionsService.findAll(userId, paginationDto);
-  }
-
-  /**
-   * Create a connection between two users
-   * @param userId - The id of the user
-   * @param recipientId - The id of the recipient
-   * @returns The recipient user
-   */
-  async createConnection(userId: number, recipientId: number) {
-    return this.connectionsService.create(userId, recipientId);
-  }
-
-  /**
-   * Delete a connection between two users
-   * @param userId - The id of the user
-   * @param recipientId - The id of the recipient
-   * @returns The recipient user
-   */
-  async deleteConnection(userId: number, recipientId: number) {
-    return this.connectionsService.delete(userId, recipientId);
   }
 
   /**

@@ -10,9 +10,7 @@ describe('UserResourceAccessStrategy', () => {
       providers: [UserResourceAccessStrategy],
     }).compile();
 
-    strategy = module.get<UserResourceAccessStrategy>(
-      UserResourceAccessStrategy,
-    );
+    strategy = module.get(UserResourceAccessStrategy);
   });
 
   describe('canAccess', () => {
@@ -65,7 +63,7 @@ describe('UserResourceAccessStrategy', () => {
     it('should return the default forbidden message', () => {
       const message = strategy.getForbiddenMessage();
       expect(message).toBe(
-        'You do not have permission to access this resource',
+        "You do not have permission to access this user's data",
       );
     });
   });

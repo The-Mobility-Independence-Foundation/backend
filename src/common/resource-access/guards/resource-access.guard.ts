@@ -53,12 +53,14 @@ export class ResourceAccessGuard implements CanActivate {
     const isModerator = user.type === UserRole.MODERATOR;
     const hasModeratorAccess = moderatorAccess && isModerator;
 
-    // If admin-only, only allow admins
-    if (adminOnly) {
-      if (!isAdmin) {
-        throw new ForbiddenException(forbiddenMessage);
-      }
+    // If admin, allow access
+    if (isAdmin) {
       return true;
+    }
+
+    // If admin-only, only allow admins
+    if (adminOnly && !isAdmin) {
+      throw new ForbiddenException(forbiddenMessage);
     }
 
     // If moderator access is allowed and user is moderator, allow access

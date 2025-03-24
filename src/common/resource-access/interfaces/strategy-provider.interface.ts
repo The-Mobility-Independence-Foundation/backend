@@ -10,8 +10,10 @@ export const STRATEGY_PROVIDERS_TOKEN = 'STRATEGY_PROVIDERS';
  * Enum for resource access strategy tokens
  */
 export enum ResourceAccessStrategyToken {
+  ANY_USER = 'ANY_USER_STRATEGY',
+  GUEST = 'GUEST_STRATEGY',
   USER = 'USER_STRATEGY',
-  USER_ME = 'USER_ME_STRATEGY',
+  PUBLIC_USER = 'PUBLIC_USER_STRATEGY',
   CONVERSATION = 'CONVERSATION_STRATEGY',
 }
 
