@@ -41,8 +41,9 @@ import {
 } from '../../common/decorators/user.decorators';
 import { UserValidation } from '../../common/validation/user.validation';
 import { UserAuth } from './user-auth.entity';
-import { Connection } from '../../connections/connection.entity';
 
+import { Connection } from '../../connections/connection.entity';
+import { ConversationHistory } from '../../conversations/entities/conversation-history.entity';
 /**
  * The role of a user
  */
@@ -86,7 +87,7 @@ export class User {
   displayName: string;
 
   @IsEnum(UserRole)
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.GUEST })
   type: UserRole;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
@@ -147,8 +148,8 @@ export class User {
   @OneToMany(() => Conversation, (conversation) => conversation.initiator)
   initiatedConversations: Conversation[];
 
-  @OneToMany(() => Conversation, (conversation) => conversation.handler)
-  handledConversations: Conversation[];
+  @OneToMany(() => ConversationHistory, (history) => history.participant)
+  handledConversations: ConversationHistory[];
 
   @OneToMany(() => Conversation, (conversation) => conversation.participant)
   participantConversations: Conversation[];

@@ -1,5 +1,6 @@
 import { IsNumber, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+
 /**
  * DTO for initiating a conversation
  */

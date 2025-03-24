@@ -3,10 +3,9 @@ import {
   Get,
   Query,
   Param,
-  BadRequestException,
   Body,
   Post,
-  ParseIntPipe,
+  BadRequestException,
 } from '@nestjs/common';
 import { ConversationsService } from './conversations.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -26,23 +25,24 @@ export class UsersConversationsController {
   @ResponseMessage('Successfully retrieved conversations')
   @ApiOperation({ summary: 'Get conversations for the current user' })
   async findAll(
-    @Param('userId', ParseIntPipe) userId: number,
+    @Param('userId') userId: number,
     @Query() paginationDto: CursorPaginationDto,
   ) {
     return this.conversationsService.findAll(userId, paginationDto);
   }
+
   @Post()
   @ResponseMessage('Successfully initiated a new conversation')
   @ApiOperation({ summary: 'Initiate a new conversation' })
   async initiate(
-    @Param('userId', ParseIntPipe) userId: number,
+    @Param('userId') userId: number,
     @Body() initiateConversationDto: InitiateConversationDto,
   ) {
     const { participantId, listingId } = initiateConversationDto;
 
-    if ((participantId && listingId) || (!participantId && !listingId)) {
+    if (participantId && listingId) {
       throw new BadRequestException(
-        'Either participantId or listingId needs to be provided, but not both',
+        'Both participantId and listingId cannot be provided',
       );
     }
 
@@ -51,11 +51,17 @@ export class UsersConversationsController {
         userId,
         participantId,
       );
-    } else if (listingId) {
+    }
+
+    if (listingId) {
       return this.conversationsService.initiateListingConversation(
         userId,
         listingId,
       );
     }
+
+    throw new BadRequestException(
+      'Either participantId or listingId needs to be provided',
+    );
   }
 }

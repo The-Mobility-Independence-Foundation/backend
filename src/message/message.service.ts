@@ -86,7 +86,7 @@ export class MessageService {
     if (conversation.type === ConversationType.INQUIRY) {
       if (
         conversation.initiator.id !== authorId &&
-        conversation.handler?.id !== authorId
+        conversation.participant?.id !== authorId
       ) {
         throw new BadRequestException(
           'You are not a participant of this conversation',
@@ -156,7 +156,7 @@ export class MessageService {
     if (message.conversation.type === ConversationType.INQUIRY) {
       if (
         message.conversation.initiator.id !== authorId &&
-        message.conversation.handler?.id !== authorId
+        message.conversation.participant?.id !== authorId
       ) {
         throw new BadRequestException(
           'You are not a participant of this conversation',
@@ -213,7 +213,7 @@ export class MessageService {
     if (message.conversation.type === ConversationType.INQUIRY) {
       if (
         message.conversation.initiator.id !== userId &&
-        message.conversation.handler?.id !== userId
+        message.conversation.participant?.id !== userId
       ) {
         throw new BadRequestException(
           'You are not a participant of this conversation',

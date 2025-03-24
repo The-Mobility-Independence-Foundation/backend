@@ -1,7 +1,7 @@
 import { User } from '../../user/entities/user.entity';
 import { Listing } from '../../listing/listing.entity';
 import { Message } from '../../message/message.entity';
-import { ConversationHandlerHistory } from './conversation-handler-history.entity';
+import { ConversationHistory } from './conversation-history.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -55,23 +55,11 @@ export class Conversation {
   @Column({ nullable: true })
   participantId: number | null;
 
-  @JoinColumn({ name: 'handlerId' })
-  @ManyToOne(() => User, (user) => user.handledConversations, {
-    nullable: true,
-  })
-  handler: User | null;
-
-  @Column({ nullable: true })
-  handlerId: number | null;
-
   @OneToMany(() => Message, (message) => message.conversation)
   messages: Message[];
 
-  @OneToMany(
-    () => ConversationHandlerHistory,
-    (history) => history.conversation,
-  )
-  handlerHistory: ConversationHandlerHistory[];
+  @OneToMany(() => ConversationHistory, (history) => history.conversation)
+  history: ConversationHistory[];
 
   @CreateDateColumn()
   createdAt: Date;

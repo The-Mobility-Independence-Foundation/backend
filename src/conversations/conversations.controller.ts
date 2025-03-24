@@ -2,17 +2,18 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ConversationsService } from './conversations.service';
 import {
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
   Post,
   Req,
 } from '@nestjs/common';
-import { ResponseMessage } from 'src/common/decorators/response-message.decorator';
-import { UseStrategy } from 'src/common/resource-access/decorators/resource-access.decorator';
-import { ResourceAccessStrategyToken } from 'src/common/resource-access/interfaces/strategy-provider.interface';
+import { ResponseMessage } from '../common/decorators/response-message.decorator';
+import { UseStrategy } from '../common/resource-access/decorators/resource-access.decorator';
+import { ResourceAccessStrategyToken } from '../common/resource-access/interfaces/strategy-provider.interface';
 import { Request } from 'express';
-import { User } from 'src/user/entities/user.entity';
+import { User } from '../user/entities/user.entity';
 
 @ApiTags('conversations')
 @Controller('conversations')
@@ -35,7 +36,10 @@ export class ConversationsController {
     @Param('conversationId', ParseIntPipe) conversationId: number,
   ) {
     const user = req.user as User;
-    return this.conversationsService.enterConversation(user.id, conversationId);
+    return this.conversationsService.enterListingConversation(
+      user.id,
+      conversationId,
+    );
   }
 
   @Post(':conversationId/leave')
@@ -46,6 +50,25 @@ export class ConversationsController {
     @Param('conversationId', ParseIntPipe) conversationId: number,
   ) {
     const user = req.user as User;
-    return this.conversationsService.leaveConversation(user.id, conversationId);
+    return this.conversationsService.leaveListingConversation(
+      user.id,
+      conversationId,
+    );
+  }
+
+  @Delete(':conversationId/participants/:participantId')
+  @ResponseMessage('Successfully removed participant from conversation')
+  @ApiOperation({ summary: 'Remove a participant from a conversation' })
+  async removeParticipantFromConversation(
+    @Req() req: Request,
+    @Param('conversationId', ParseIntPipe) conversationId: number,
+    @Param('participantId', ParseIntPipe) participantId: number,
+  ) {
+    const user = req.user as User;
+    return this.conversationsService.removeParticipantFromListingConversation(
+      user.id,
+      participantId,
+      conversationId,
+    );
   }
 }

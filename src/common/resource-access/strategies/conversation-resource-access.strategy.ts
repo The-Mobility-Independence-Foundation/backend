@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '../../../user/entities/user.entity';
-import { ResourceAccessStrategy } from './resource-access.strategy';
+import { User, UserRole } from '../../../user/entities/user.entity';
 import { ConversationsService } from '../../../conversations/conversations.service';
 import { ConversationType } from '../../../conversations/entities/conversation.entity';
+import { ResourceAccessStrategy } from './generic/resource-access.strategy';
 
 /**
  * Strategy for conversation resource access
@@ -28,6 +28,11 @@ export class ConversationResourceAccessStrategy extends ResourceAccessStrategy {
       return false;
     }
 
+    // If the user is a guest, they can't access the conversation
+    if (user.type === UserRole.GUEST) {
+      return false;
+    }
+
     // If the conversation doesn't exist, the user can't access it
     const conversation = await this.conversationsService.findById(
       conversationId,
@@ -48,16 +53,21 @@ export class ConversationResourceAccessStrategy extends ResourceAccessStrategy {
       );
     }
 
-    // If the conversation is an inquiry conversation,
-    // the user can access it if they are part of the organization that owns the listing or the initiator
+    // If the conversation is an inquiry conversation, the user can access it if they are part of the organization that owns the listing or the initiator
     if (conversation.type === ConversationType.INQUIRY) {
-      // We can/will perform more narrow checks in the service layer
-      // for when the user is part of the organization that owns the listing
-      if (user.organizationId === conversation.listing?.ownerId) {
+      // This should never happen, but we'll check anyway
+      if (!user.organizationId || !conversation.listing) {
+        return false;
+      }
+
+      if (user.organizationId === conversation.listing.ownerId) {
         return true;
       }
 
-      return conversation.initiatorId === user.id;
+      return (
+        conversation.initiatorId === user.id ||
+        conversation.participantId === user.id
+      );
     }
 
     return false;

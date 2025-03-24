@@ -10,25 +10,27 @@ import { UserService } from '../user/user.service';
 import { PaginationService } from '../common/services/pagination.service';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { ListingService } from '../listing/listing.service';
-import { ConversationHandlerHistory } from './entities/conversation-handler-history.entity';
+import { ConversationHistory } from './entities/conversation-history.entity';
+import { ListingStatus } from '../listing/listing.entity';
+import { UserRole } from '../user/entities/user.entity';
 
 @Injectable()
 export class ConversationsService {
   constructor(
     @InjectRepository(Conversation)
     private readonly conversationRepository: Repository<Conversation>,
-    @InjectRepository(ConversationHandlerHistory)
-    private readonly handlerHistoryRepository: Repository<ConversationHandlerHistory>,
+    @InjectRepository(ConversationHistory)
+    private readonly conversationHistoryRepository: Repository<ConversationHistory>,
     private readonly userService: UserService,
     private readonly listingService: ListingService,
     private readonly paginationService: PaginationService,
   ) {}
 
   /**
-   * Find a listing by id
-   * @param id - The id of the listing
+   * Find a conversation by id
+   * @param id - The id of the conversation
    * @param options - Optional query options
-   * @returns The listing record
+   * @returns The conversation record
    */
   async findById(
     id: number,
@@ -60,9 +62,27 @@ export class ConversationsService {
       paginationDto,
       {
         cursorColumn: 'id',
-        // where: [{ initiatorId: userId }, { participantId: userId }],
+        where: [{ initiatorId: userId }, { participantId: userId }],
       },
     );
+  }
+
+  /**
+   * Get the latest participant history record for a conversation
+   * @param conversationId - The id of the conversation
+   * @param participantId - The id of the participant
+   * @returns The latest participant history record
+   */
+  async getLatestParticipantHistory(
+    conversationId: number,
+    participantId?: number,
+  ) {
+    return this.conversationHistoryRepository.findOne({
+      where: { conversationId, participantId },
+      order: {
+        assignedAt: 'DESC',
+      },
+    });
   }
 
   /**
@@ -77,11 +97,23 @@ export class ConversationsService {
   ): Promise<Conversation> {
     if (initiatorId === participantId) {
       throw new BadRequestException(
-        'Initiator and recipient cannot be the same',
+        'Initiator and participant cannot be the same',
       );
     }
 
-    if (await this.doesConversationExist({ initiatorId, participantId })) {
+    const existingConversation = await this.conversationRepository.findOne({
+      where: [
+        {
+          initiatorId,
+          participantId,
+        },
+        {
+          initiatorId: participantId,
+          participantId: initiatorId,
+        },
+      ],
+    });
+    if (existingConversation) {
       throw new BadRequestException('Conversation already exists');
     }
 
@@ -108,6 +140,7 @@ export class ConversationsService {
 
   /**
    * Initiate a listing conversation with an organization
+   * This will power the conversation pooling system
    * @param initiatorId - The id of the initiator
    * @param listingId - The id of the listing
    * @returns The created conversation
@@ -116,13 +149,14 @@ export class ConversationsService {
     initiatorId: number,
     listingId: number,
   ): Promise<Conversation> {
-    if (await this.doesConversationExist({ initiatorId, listingId })) {
+    const existingConversation = await this.conversationRepository.findOne({
+      where: {
+        initiatorId,
+        listingId,
+      },
+    });
+    if (existingConversation) {
       throw new BadRequestException('Conversation already exists');
-    }
-
-    const initiator = await this.userService.findById(initiatorId);
-    if (!initiator) {
-      throw new NotFoundException('Initiator not found');
     }
 
     const listing = await this.listingService.findById(listingId);
@@ -130,7 +164,20 @@ export class ConversationsService {
       throw new NotFoundException('Listing not found');
     }
 
-    // TODO: Check if the listing is a valid state
+    if (listing.state !== ListingStatus.ACTIVE) {
+      throw new BadRequestException('Listing is not active');
+    }
+
+    const initiator = await this.userService.findById(initiatorId);
+    if (!initiator) {
+      throw new NotFoundException('Initiator not found');
+    }
+
+    if (listing.ownerId === initiator.organizationId) {
+      throw new BadRequestException(
+        'Initiator cannot initiate a conversation with their own organization',
+      );
+    }
 
     const conversation = this.conversationRepository.create({
       initiatorId,
@@ -144,52 +191,18 @@ export class ConversationsService {
   }
 
   /**
-   * Check if a conversation exists
-   * @param where - The where clause
-   * @returns True if the conversation exists, false otherwise
-   */
-  async doesConversationExist(
-    where:
-      | { initiatorId: number; listingId: number }
-      | { initiatorId: number; participantId: number },
-  ): Promise<boolean> {
-    if ('listingId' in where) {
-      const conversation = await this.conversationRepository.findOne({
-        where: {
-          initiatorId: where.initiatorId,
-          listingId: where.listingId,
-        },
-      });
-
-      return Boolean(conversation);
-    }
-
-    const conversation = await this.conversationRepository.findOne({
-      where: [
-        {
-          initiatorId: where.initiatorId,
-          participantId: where.participantId,
-        },
-        {
-          initiatorId: where.participantId,
-          participantId: where.initiatorId,
-        },
-      ],
-    });
-
-    return Boolean(conversation);
-  }
-
-  /**
-   * Enter a conversation as a handler (for conversations that are 'inquiries' on listings)
-   * @param handlerId - The id of the handler
+   * Enter a listing conversation as a participant
+   * Must be part of the organization that owns the listing
+   * @param participantId - The id of the participant
    * @param conversationId - The id of the conversation
+   * @returns The updated conversation
    */
-  async enterConversation(handlerId: number, conversationId: number) {
+  async enterListingConversation(
+    participantId: number,
+    conversationId: number,
+  ): Promise<Conversation> {
     const conversation = await this.findById(conversationId, {
       relations: {
-        initiator: true,
-        participant: true,
         listing: true,
       },
     });
@@ -201,41 +214,94 @@ export class ConversationsService {
       throw new BadRequestException('Conversation is not an inquiry');
     }
 
-    const handler = await this.userService.findById(handlerId);
-    if (!handler) {
-      throw new NotFoundException('Handler not found');
+    const participant = await this.userService.findById(participantId);
+    if (!participant) {
+      throw new NotFoundException('Participant not found');
     }
 
-    if (conversation.handlerId) {
-      throw new BadRequestException('Conversation already has a handler');
-    }
-
-    if (conversation.listing?.ownerId !== handler.organizationId) {
+    if (conversation.participantId === participantId) {
       throw new BadRequestException(
-        'Handler is not part of the organization that owns the listing',
+        'User is already a participant of the conversation',
       );
     }
 
-    const handlerHistory = this.handlerHistoryRepository.create({
-      conversation,
-      handler,
-    });
-    await this.handlerHistoryRepository.insert(handlerHistory);
+    if (conversation.participantId) {
+      throw new BadRequestException('Conversation already has a participant');
+    }
 
-    conversation.handler = handler;
+    if (conversation.listing?.ownerId !== participant.organizationId) {
+      throw new BadRequestException(
+        'Participant is not part of the organization that owns the listing',
+      );
+    }
+
+    const participantHistory = this.conversationHistoryRepository.create({
+      conversation,
+      participant,
+    });
+    await this.conversationHistoryRepository.insert(participantHistory);
+
+    conversation.participant = participant;
     return await this.conversationRepository.save(conversation);
   }
 
   /**
-   * Leave a conversation as a handler (for conversations that are 'inquiries' on listings)
-   * @param handlerId - The id of the handler
+   * Leave a listing conversation as a participant
+   * Must be part of the organization that owns the listing
+   * @param participantId - The id of the participant
    * @param conversationId - The id of the conversation
+   * @returns The updated conversation
    */
-  async leaveConversation(handlerId: number, conversationId: number) {
+  async leaveListingConversation(
+    participantId: number,
+    conversationId: number,
+  ): Promise<Conversation> {
+    const conversation = await this.findById(conversationId);
+    if (!conversation) {
+      throw new NotFoundException('Conversation not found');
+    }
+
+    if (conversation.type !== ConversationType.INQUIRY) {
+      throw new BadRequestException('Conversation is not an inquiry');
+    }
+
+    if (conversation.participantId !== participantId) {
+      throw new BadRequestException(
+        'User is not the participant of the conversation',
+      );
+    }
+
+    const participantHistory = await this.getLatestParticipantHistory(
+      conversationId,
+      participantId,
+    );
+    if (!participantHistory) {
+      throw new NotFoundException('Participant history record not found');
+    }
+
+    participantHistory.unassignedAt = new Date();
+    await this.conversationHistoryRepository.save(participantHistory);
+
+    conversation.participant = null;
+    return await this.conversationRepository.save(conversation);
+  }
+
+  /**
+   * Remove a participant from a listing conversation
+   * Must be admin or part of the organization that owns the listing
+   * @param executorId - The id of the executor
+   * @param participantId - The id of the participant
+   * @param conversationId - The id of the conversation
+   * @returns The updated conversation
+   */
+  async removeParticipantFromListingConversation(
+    executorId: number,
+    participantId: number,
+    conversationId: number,
+  ): Promise<Conversation> {
     const conversation = await this.findById(conversationId, {
       relations: {
-        initiator: true,
-        participant: true,
+        listing: true,
       },
     });
     if (!conversation) {
@@ -246,27 +312,37 @@ export class ConversationsService {
       throw new BadRequestException('Conversation is not an inquiry');
     }
 
-    // Check if the user is the handler of the conversation
-    if (conversation.handlerId !== handlerId) {
+    if (conversation.participantId !== participantId) {
       throw new BadRequestException(
-        'User is not the handler of the conversation',
+        'Specified user is not the participant of the conversation',
       );
     }
 
-    // Get the handler history record
-    const handlerHistory = await this.handlerHistoryRepository.findOne({
-      where: { conversationId: conversation.id, handlerId },
-    });
-    if (!handlerHistory) {
-      throw new NotFoundException('Handler history record not found');
+    const executor = await this.userService.findById(executorId);
+    if (!executor) {
+      throw new NotFoundException('Executor not found');
     }
 
-    // Update the handler history record to unassigned
-    handlerHistory.unassignedAt = new Date();
-    await this.handlerHistoryRepository.save(handlerHistory);
+    if (executor.type !== UserRole.ADMIN) {
+      if (executor.organizationId !== conversation.listing?.ownerId) {
+        throw new BadRequestException(
+          'Executor is not part of the organization that owns the listing',
+        );
+      }
+    }
 
-    // Update the conversation with the new handler
-    conversation.handler = null;
-    await this.conversationRepository.save(conversation);
+    const participantHistory = await this.getLatestParticipantHistory(
+      conversationId,
+      participantId,
+    );
+    if (!participantHistory) {
+      throw new NotFoundException('Participant history record not found');
+    }
+
+    participantHistory.unassignedAt = new Date();
+    await this.conversationHistoryRepository.save(participantHistory);
+
+    conversation.participant = null;
+    return await this.conversationRepository.save(conversation);
   }
 }

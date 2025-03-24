@@ -8,9 +8,11 @@ import {
   Column,
   JoinColumn,
 } from 'typeorm';
+import { Index } from 'typeorm/decorator/Index';
 
 @Entity()
-export class ConversationHandlerHistory {
+@Index(['conversationId', 'participantId'])
+export class ConversationHistory {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -21,16 +23,16 @@ export class ConversationHandlerHistory {
   unassignedAt: Date | null;
 
   @JoinColumn({ name: 'conversationId' })
-  @ManyToOne(() => Conversation, (conversation) => conversation.handlerHistory)
+  @ManyToOne(() => Conversation, (conversation) => conversation.history)
   conversation: Conversation;
 
   @Column()
   conversationId: number;
 
-  @JoinColumn({ name: 'handlerId' })
+  @JoinColumn({ name: 'participantId' })
   @ManyToOne(() => User)
-  handler: User;
+  participant: User;
 
   @Column()
-  handlerId: number;
+  participantId: number;
 }
