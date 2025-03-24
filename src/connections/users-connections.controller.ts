@@ -30,7 +30,7 @@ export class UsersConnectionsController {
     return this.connectionsService.findAll(userId, paginationDto);
   }
 
-  @Post()
+  @Post(':recipientId')
   @ResponseMessage('Successfully created user connection')
   @ApiOperation({ summary: 'Create a user connection' })
   async createConnection(
