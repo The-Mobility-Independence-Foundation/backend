@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   NotImplementedException,
@@ -31,11 +32,13 @@ export class OrganizationService {
     private readonly paginationService: PaginationService,
   ) {}
 
-  // TODO: return an actual error message when someone tries to own two organizations
-  // if not here then add a decorator somewhere maybe?
   async create(dto: CreateOrganizationDto) {
     const organization = new Organization();
     const owner = await this.userService.findById(dto.ownerId); // TODO: update when reports-api merged in
+
+    if (owner.organization) {
+      throw new BadRequestException('This user already has an organization.');
+    }
 
     const addressData = new CreateAddressDto();
     Object.assign(addressData, {
