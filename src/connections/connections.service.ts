@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Connection } from './connection.entity';
-import { User } from '../user/entities/user.entity';
+import { User, UserRole } from '../user/entities/user.entity';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { PaginationService } from '../common/services/pagination.service';
 import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
@@ -69,6 +69,10 @@ export class ConnectionsService {
       throw new BadRequestException('Cannot create a connection with yourself');
     }
 
+    if (await this.doesConnectionExist(followerId, followingId)) {
+      throw new BadRequestException('Connection already exists');
+    }
+
     const following = await this.userRepository.findOne({
       where: { id: followingId },
     });
@@ -76,8 +80,10 @@ export class ConnectionsService {
       throw new NotFoundException(`Following user not found`);
     }
 
-    if (await this.doesConnectionExist(followerId, followingId)) {
-      throw new BadRequestException('Connection already exists');
+    if (following.type === UserRole.GUEST) {
+      throw new BadRequestException(
+        'Cannot create a connection with a guest user',
+      );
     }
 
     return this.connectionRepository.save({

@@ -82,6 +82,18 @@ describe('ResourceAccessGuard', () => {
       expect(result).toBe(true);
     });
 
+    it('should allow access if user is admin and route is not admin-only', async () => {
+      Object.assign(user, { type: UserRole.ADMIN });
+
+      when(reflector.getAllAndOverride)
+        .calledWith(RESOURCE_ACCESS, [context.getHandler(), context.getClass()])
+        .mockReturnValue({});
+
+      const result = await guard.canActivate(context);
+
+      expect(result).toBe(true);
+    });
+
     it('should deny access when user is not admin and route is admin-only', async () => {
       Object.assign(user, { type: UserRole.USER });
 

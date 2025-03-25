@@ -7,17 +7,27 @@ import {
   ResourceAccessStrategyRegistry,
   STRATEGY_PROVIDERS_TOKEN,
 } from './interfaces/strategy-provider.interface';
-import { UserMeResourceAccessStrategy } from './strategies/user-me-resource-access.strategy';
 import { ConversationModule } from '../../conversation/conversation.module';
+import { PublicUserResourceAccessStrategy } from './strategies/public-user-resource-access.strategy';
+import { GuestResourceAccessStrategy } from './strategies/guest-resource-access.strategy';
+import { AnyUserResourceAccessStrategy } from './strategies/any-user-resource-access.strategy';
 
 const STRATEGY_PROVIDERS = [
+  {
+    provide: ResourceAccessStrategyToken.ANY_USER,
+    useClass: AnyUserResourceAccessStrategy,
+  },
+  {
+    provide: ResourceAccessStrategyToken.GUEST,
+    useClass: GuestResourceAccessStrategy,
+  },
   {
     provide: ResourceAccessStrategyToken.USER,
     useClass: UserResourceAccessStrategy,
   },
   {
-    provide: ResourceAccessStrategyToken.USER_ME,
-    useClass: UserMeResourceAccessStrategy,
+    provide: ResourceAccessStrategyToken.PUBLIC_USER,
+    useClass: PublicUserResourceAccessStrategy,
   },
   {
     provide: ResourceAccessStrategyToken.CONVERSATION,
@@ -33,14 +43,19 @@ const STRATEGY_PROVIDERS = [
     ...STRATEGY_PROVIDERS,
     {
       provide: STRATEGY_PROVIDERS_TOKEN,
+      // Ensure the order matches the STRATEGY_PROVIDERS array order
       useFactory: (
+        anyUserStrategy: AnyUserResourceAccessStrategy,
+        guestStrategy: GuestResourceAccessStrategy,
         userStrategy: UserResourceAccessStrategy,
+        publicUserStrategy: PublicUserResourceAccessStrategy,
         conversationStrategy: ConversationResourceAccessStrategy,
-        userMeStrategy: UserMeResourceAccessStrategy,
       ): ResourceAccessStrategyRegistry => ({
+        [ResourceAccessStrategyToken.ANY_USER]: anyUserStrategy,
+        [ResourceAccessStrategyToken.GUEST]: guestStrategy,
         [ResourceAccessStrategyToken.USER]: userStrategy,
+        [ResourceAccessStrategyToken.PUBLIC_USER]: publicUserStrategy,
         [ResourceAccessStrategyToken.CONVERSATION]: conversationStrategy,
-        [ResourceAccessStrategyToken.USER_ME]: userMeStrategy,
       }),
       inject: STRATEGY_PROVIDERS.map((provider) => provider.provide),
     },

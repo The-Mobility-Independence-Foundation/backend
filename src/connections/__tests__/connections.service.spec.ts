@@ -9,7 +9,7 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 import { PaginationService } from '../../common/services/pagination.service';
 import { BaseApiCursorPaginationResponse } from '../../common/responses/base-api-cursor-pagination.response';
-import { User } from '../../user/entities/user.entity';
+import { User, UserRole } from '../../user/entities/user.entity';
 
 describe('ConnectionsService', () => {
   let service: ConnectionsService;
@@ -144,23 +144,14 @@ describe('ConnectionsService', () => {
       const followerId = 1;
       const followingId = 1;
 
-      await expect(service.create(followerId, followingId)).rejects.toThrow(
-        BadRequestException,
-      );
-    });
-
-    it('should throw NotFoundException if following user not found', async () => {
-      const followerId = 1;
-      const followingId = 2;
-
-      when(userRepository.findOne)
+      when(connectionRepository.exists)
         .calledWith({
-          where: { id: followingId },
+          where: { followerId, followingId },
         })
-        .mockResolvedValue(null);
+        .mockResolvedValue(false);
 
       await expect(service.create(followerId, followingId)).rejects.toThrow(
-        NotFoundException,
+        new BadRequestException('Cannot create a connection with yourself'),
       );
     });
 
@@ -175,7 +166,54 @@ describe('ConnectionsService', () => {
         .mockResolvedValue(true);
 
       await expect(service.create(followerId, followingId)).rejects.toThrow(
-        BadRequestException,
+        new BadRequestException('Connection already exists'),
+      );
+    });
+
+    it('should throw NotFoundException if following user not found', async () => {
+      const followerId = 1;
+      const followingId = 2;
+
+      when(connectionRepository.exists)
+        .calledWith({
+          where: { followerId, followingId },
+        })
+        .mockResolvedValue(false);
+
+      when(userRepository.findOne)
+        .calledWith({
+          where: { id: followingId },
+        })
+        .mockResolvedValue(null);
+
+      await expect(service.create(followerId, followingId)).rejects.toThrow(
+        new NotFoundException(`Following user not found`),
+      );
+    });
+
+    it('should throw BadRequestException if following user is a guest', async () => {
+      const followerId = 1;
+      const followingId = 2;
+
+      const following = new User();
+      Object.assign(following, {
+        type: UserRole.GUEST,
+      });
+
+      when(connectionRepository.exists)
+        .calledWith({
+          where: { followerId, followingId },
+        })
+        .mockResolvedValue(false);
+
+      when(userRepository.findOne)
+        .calledWith({
+          where: { id: followingId },
+        })
+        .mockResolvedValue(following);
+
+      await expect(service.create(followerId, followingId)).rejects.toThrow(
+        new BadRequestException('Cannot create a connection with a guest user'),
       );
     });
   });
@@ -222,7 +260,7 @@ describe('ConnectionsService', () => {
         .mockResolvedValue(false);
 
       await expect(service.delete(followerId, followingId)).rejects.toThrow(
-        NotFoundException,
+        new NotFoundException('Connection does not exist'),
       );
     });
   });
