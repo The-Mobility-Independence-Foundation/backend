@@ -3,6 +3,7 @@ import { Address } from './address.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { CreateAddressDto } from './dto/create-address.dto';
+import { UpdateAddressDto } from './dto/update-address.dto';
 
 @Injectable()
 export class AddressService {
@@ -13,6 +14,14 @@ export class AddressService {
 
   async create(dto: CreateAddressDto) {
     const address = new Address();
+
+    Object.assign(address, dto);
+
+    return this.addressRepository.save(address);
+  }
+
+  async update(id: number, dto: UpdateAddressDto) {
+    const address = await this.findByIdOrThrow(id);
 
     Object.assign(address, dto);
 

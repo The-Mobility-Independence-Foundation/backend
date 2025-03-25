@@ -13,6 +13,7 @@ import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { GetOrganizationsDto } from './dto/get-organizations.dto';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
 import { ApiOperation } from '@nestjs/swagger';
+import { UpdateOrganizationDto } from './dto/update-organization.dto';
 
 @Controller('organization')
 export class OrganizationController {
@@ -44,8 +45,8 @@ export class OrganizationController {
   @Patch(':id')
   @ResponseMessage('Successfully updated organization')
   @ApiOperation({ summary: 'Update an organization' })
-  update(@Param('id') id: number) {
-    return this.organizationService.findByIdOrThrow(id);
+  update(@Param('id') id: number, @Body() dto: UpdateOrganizationDto) {
+    return this.organizationService.update(id, dto);
   }
 
   @Get(':id/users')

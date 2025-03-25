@@ -1,4 +1,4 @@
-import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsInt,
   IsOptional,
@@ -7,9 +7,9 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { CreateAddressDto } from '../../address/dto/create-address.dto';
+import { UpdateAddressDto } from '../../address/dto/update-address.dto';
 
-export class UpdateOrganizationDto extends PartialType(CreateAddressDto) {
+export class UpdateOrganizationDto extends UpdateAddressDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsInt({ message: 'Invalid ownerId' })
@@ -40,6 +40,5 @@ export class UpdateOrganizationDto extends PartialType(CreateAddressDto) {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @MaxLength(50, { message: 'Name must be less than 50 characters' })
   socials?: string[];
 }

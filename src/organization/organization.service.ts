@@ -14,6 +14,7 @@ import { GetOrganizationsDto } from './dto/get-organizations.dto';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { PaginationService } from '../common/services/pagination.service';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
+import { UpdateAddressDto } from '../address/dto/update-address.dto';
 
 @Injectable()
 export class OrganizationService {
@@ -116,18 +117,21 @@ export class OrganizationService {
   }
 
   async update(id: number, dto: UpdateOrganizationDto) {
-    const organization = await this.findByIdOrThrow(id);
-    // const address = organization.address;
+    const organization = await this.findByIdOrThrow(id, {
+      relations: { address: true },
+    });
+    const address = organization.address;
+    const addressDto = new UpdateAddressDto();
 
-    if (
-      dto.addressLine1 ||
-      dto.addressLine2 ||
-      dto.city ||
-      dto.zipCode ||
-      dto.state
-    ) {
-      throw new NotImplementedException('Address update not implemented');
-    }
+    Object.assign(addressDto, {
+      addressLine1: dto.addressLine1,
+      addressLine2: dto.addressLine2,
+      city: dto.city,
+      state: dto.state,
+      zipCode: dto.zipCode,
+    });
+
+    await this.addressService.update(address.id, addressDto);
 
     if (dto.ownerId) {
       organization.owner = await this.userService.findById(dto.ownerId); // TODO: update when reports merged in
@@ -140,6 +144,6 @@ export class OrganizationService {
       socials: dto.socials,
     });
 
-    return await this.organizationRepository.save(organization);
+    return this.organizationRepository.save(organization);
   }
 }
