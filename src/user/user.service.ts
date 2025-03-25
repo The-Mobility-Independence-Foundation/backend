@@ -145,7 +145,6 @@ export class UserService {
     });
 
     if (user) {
-      console.log('im being hit!');
       return user;
     } else {
       throw new NotFoundException('User does not exist.');
