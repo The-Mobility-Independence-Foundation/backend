@@ -18,7 +18,7 @@ import { AttachmentsService } from './attachments.service';
 
 @ApiTags('conversations')
 @Controller('conversations')
-@UseStrategy(ResourceAccessStrategyToken.USER_ME)
+@UseStrategy(ResourceAccessStrategyToken.USER)
 export class ConversationsAttachmentsController {
   constructor(private readonly attachmentsService: AttachmentsService) {}
 
