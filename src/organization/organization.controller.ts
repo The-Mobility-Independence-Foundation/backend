@@ -5,7 +5,6 @@ import {
   Get,
   Body,
   Query,
-  NotImplementedException,
   Patch,
 } from '@nestjs/common';
 import { OrganizationService } from './organization.service';
@@ -23,8 +22,11 @@ export class OrganizationController {
   @Post()
   @ResponseMessage('Successfully created organization')
   @ApiOperation({ summary: 'Create an organization' })
-  create(@Body() dto: CreateOrganizationDto) {
-    return this.organizationService.create(dto);
+  async create(@Body() dto: CreateOrganizationDto) {
+    const result = await this.organizationService.create(dto);
+    this.organizationService.addUser(result.id, dto.ownerId);
+
+    return result;
   }
 
   @Get()
@@ -53,6 +55,6 @@ export class OrganizationController {
   @ResponseMessage('Successfully found users')
   @ApiOperation({ summary: 'Get all users in an organization' })
   findUsers(@Param('id') id: number) {
-    throw new NotImplementedException(id);
+    return this.organizationService.getUsers(id);
   }
 }

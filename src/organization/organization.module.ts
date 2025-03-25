@@ -6,10 +6,11 @@ import { Organization } from './organization.entity';
 import { AddressModule } from '../address/address.module';
 import { UserModule } from '../user/user.module';
 import { CommonModule } from '../common/common.module';
+import { User } from '../user/entities/user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Organization]),
+    TypeOrmModule.forFeature([Organization, User]),
     UserModule,
     AddressModule,
     CommonModule,

@@ -6,6 +6,7 @@ import { createMock } from '@golevelup/ts-jest';
 // import { AddressService } from '../../address/address.service';
 // import { UserService } from '../../user/user.service';
 import { Repository } from 'typeorm';
+import { User } from '../../user/entities/user.entity';
 
 describe('OrganizationService', () => {
   let service: OrganizationService;
@@ -19,6 +20,10 @@ describe('OrganizationService', () => {
         {
           provide: getRepositoryToken(Organization),
           useValue: createMock<Repository<Organization>>(),
+        },
+        {
+          provide: getRepositoryToken(User),
+          useValue: createMock<Repository<User>>(),
         },
       ],
     })

@@ -15,12 +15,16 @@ import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { PaginationService } from '../common/services/pagination.service';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { UpdateAddressDto } from '../address/dto/update-address.dto';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class OrganizationService {
   constructor(
     @InjectRepository(Organization)
     private readonly organizationRepository: Repository<Organization>,
+
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
 
     private readonly userService: UserService,
     private readonly addressService: AddressService,
@@ -135,6 +139,7 @@ export class OrganizationService {
 
     if (dto.ownerId) {
       organization.owner = await this.userService.findById(dto.ownerId); // TODO: update when reports merged in
+      this.addUser(id, dto.ownerId);
     }
 
     Object.assign(organization, {
@@ -145,5 +150,35 @@ export class OrganizationService {
     });
 
     return this.organizationRepository.save(organization);
+  }
+
+  /**
+   * Add a user to an organization
+   * @param orgId - The id of the org to add to
+   * @param userId - The id of the user to add to
+   * @returns The updated user record
+   */
+  async addUser(orgId: number, userId: number) {
+    const organization = await this.findByIdOrThrow(orgId);
+    const user = await this.userService.findById(userId); // TODO: update when reports merged
+
+    user.organization = organization;
+
+    return this.userRepository.save(user);
+  }
+
+  /**
+   * Gets all users in a specified organization, without pagination
+   * @param id - The id of the organization to search
+   * @returns An array of user records
+   */
+  async getUsers(id: number) {
+    const users = await this.userRepository.find({
+      where: {
+        organization: { id: id },
+      },
+    });
+
+    return users;
   }
 }
