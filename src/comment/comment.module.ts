@@ -11,5 +11,6 @@ import { Forum } from '../forum/forum.entity';
   imports: [TypeOrmModule.forFeature([Comment, User, Post, Forum])],
   providers: [CommentService],
   controllers: [CommentController],
+  exports: [CommentService],
 })
 export class CommentModule {}

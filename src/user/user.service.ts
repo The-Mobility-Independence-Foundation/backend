@@ -127,7 +127,7 @@ export class UserService {
    * @param options - Optional query options
    * @returns The user record
    */
-  async findById(
+  async findByIdOrThrow(
     id: number,
     options: Partial<{
       where: FindOptionsWhere<Omit<User, 'id'>>;
@@ -158,7 +158,7 @@ export class UserService {
    * @returns The updated user, if they existed, otherwise a BadRequestException
    */
   async update(id: number, dto: UpdateUserDto) {
-    const user = await this.findById(id);
+    const user = await this.findByIdOrThrow(id);
 
     Object.assign(user, {
       firstName: dto.firstName,
