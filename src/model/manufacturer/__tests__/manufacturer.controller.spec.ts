@@ -20,8 +20,8 @@ describe('ModelController', () => {
         },
       ],
     })
-    .useMocker(createMock)
-    .compile();
+      .useMocker(createMock)
+      .compile();
 
     controller = module.get<ManufacturerController>(ManufacturerController);
   });

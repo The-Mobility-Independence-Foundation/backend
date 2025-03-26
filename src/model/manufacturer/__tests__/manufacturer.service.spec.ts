@@ -18,8 +18,8 @@ describe('ModelService', () => {
         },
       ],
     })
-    .useMocker(createMock)
-    .compile();
+      .useMocker(createMock)
+      .compile();
 
     service = module.get<ManufacturerService>(ManufacturerService);
   });
