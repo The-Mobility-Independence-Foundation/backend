@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { OrganizationController } from '../organization.controller';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Organization } from '../organization.entity';
 import { createMock } from '@golevelup/ts-jest';
-import { Repository } from 'typeorm';
+import {
+  ResourceAccessStrategyRegistry,
+  STRATEGY_PROVIDERS_TOKEN,
+} from '../../common/resource-access/interfaces/strategy-provider.interface';
 
 describe('OrganizationController', () => {
   let controller: OrganizationController;
@@ -13,8 +14,8 @@ describe('OrganizationController', () => {
       controllers: [OrganizationController],
       providers: [
         {
-          provide: getRepositoryToken(Organization),
-          useValue: createMock<Repository<Organization>>(),
+          provide: STRATEGY_PROVIDERS_TOKEN,
+          useValue: createMock<ResourceAccessStrategyRegistry>(),
         },
       ],
     })
