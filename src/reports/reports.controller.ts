@@ -6,25 +6,19 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import { ReportsService } from './reports.service';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateReportDto } from './dto/create-report.dto';
 import { GetReportsDto } from './dto/get-reports.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
+import { UseStrategy } from '../common/resource-access/decorators/resource-access.decorator';
+import { ResourceAccessStrategyToken } from '../common/resource-access/interfaces/strategy-provider.interface';
 
 @ApiTags('reports')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('reports')
+@UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER)
 export class ReportsController {
   constructor(private readonly reportService: ReportsService) {}
 
@@ -39,6 +33,7 @@ export class ReportsController {
     status: 200,
     description: 'Returns paginated list of reports',
   })
+  @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: true })
   findAll(@Query() query: GetReportsDto) {
     return this.reportService.findAll(query);
   }
@@ -70,6 +65,7 @@ export class ReportsController {
     status: 200,
     description: 'Returns the report record',
   })
+  @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: true })
   findOneBy(@Param('id') id: number) {
     return this.reportService.findByIdOrThrow(id);
   }
@@ -86,6 +82,7 @@ export class ReportsController {
     status: 200,
     description: 'Returns updated report record',
   })
+  @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: true })
   update(@Param('id') id: number, @Body() dto: UpdateReportDto) {
     return this.reportService.update(id, dto);
   }

@@ -10,5 +10,6 @@ import { Organization } from '../organization/organization.entity';
   imports: [TypeOrmModule.forFeature([Listing, Organization, InventoryItem])],
   controllers: [ListingController],
   providers: [ListingService],
+  exports: [ListingService],
 })
 export class ListingModule {}
