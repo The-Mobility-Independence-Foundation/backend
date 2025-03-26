@@ -7,20 +7,26 @@ import { AddressService } from '../../address/address.service';
 import { UserService } from '../../user/user.service';
 import { Repository } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
-// import { PaginationService } from '../../common/services/pagination.service';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { PaginationService } from '../../common/services/pagination.service';
+import {
+  BadRequestException,
+  NotFoundException,
+  NotImplementedException,
+} from '@nestjs/common';
 import { when } from 'jest-when';
 import { CreateOrganizationDto } from '../dto/create-organization.dto';
 import { Address } from '../../address/address.entity';
 import { CreateAddressDto } from '../../address/dto/create-address.dto';
 import { UpdateOrganizationDto } from '../dto/update-organization.dto';
 import { UpdateAddressDto } from '../../address/dto/update-address.dto';
+import { GetOrganizationsDto } from '../dto/get-organizations.dto';
+import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 
 describe('OrganizationService', () => {
   let service: OrganizationService;
   let userService: UserService;
   let addressService: AddressService;
-  // let paginationService: PaginationService;
+  let paginationService: PaginationService;
   let organizationRepository: Repository<Organization>;
   let userRepository: Repository<User>;
 
@@ -44,7 +50,7 @@ describe('OrganizationService', () => {
     service = module.get(OrganizationService);
     userService = module.get(UserService);
     addressService = module.get(AddressService);
-    // paginationService = module.get(PaginationService);
+    paginationService = module.get(PaginationService);
     organizationRepository = module.get(getRepositoryToken(Organization));
     userRepository = module.get(getRepositoryToken(User));
   });
@@ -113,11 +119,41 @@ describe('OrganizationService', () => {
   });
 
   describe('findAll', () => {
-    it('should return the organizations when they are found', async () => {});
+    it('should return the organizations when they are found', async () => {
+      const dto = new GetOrganizationsDto();
 
-    it('should throw an error when services search is used', async () => {});
+      service.findAll(dto);
 
-    it('should throw an error when location search is used', async () => {});
+      expect(paginationService.paginateWithCursor).toHaveBeenCalledWith(
+        organizationRepository,
+        new CursorPaginationDto(),
+        expect.anything(),
+      );
+    });
+
+    it('should throw an error when services search is used', async () => {
+      const dto = new GetOrganizationsDto();
+
+      Object.assign(dto, {
+        services: 'asd',
+      });
+
+      await expect(service.findAll(dto)).rejects.toThrow(
+        NotImplementedException,
+      );
+    });
+
+    it('should throw an error when location search is used', async () => {
+      const dto = new GetOrganizationsDto();
+
+      Object.assign(dto, {
+        radius: 10,
+      });
+
+      await expect(service.findAll(dto)).rejects.toThrow(
+        NotImplementedException,
+      );
+    });
   });
 
   describe('findByIdOrThrow', () => {
