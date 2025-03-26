@@ -225,7 +225,7 @@ describe('UserService', () => {
     });
   });
 
-  describe('findOne', () => {
+  describe('findByIdOrThrow', () => {
     it('should return a user if a user with the id exists', async () => {
       const user = new User();
       Object.assign(user, {
@@ -240,7 +240,7 @@ describe('UserService', () => {
         .calledWith({ where: { id: user.id } })
         .mockResolvedValue(user);
 
-      const result = await service.findById(user.id);
+      const result = await service.findByIdOrThrow(user.id);
 
       expect(result).toBeDefined();
       expect(result).toBe(user);
@@ -253,7 +253,9 @@ describe('UserService', () => {
         .calledWith({ where: { id: bad_id } })
         .mockResolvedValue(null);
 
-      await expect(service.findById(bad_id)).rejects.toThrow(NotFoundException);
+      await expect(service.findByIdOrThrow(bad_id)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

@@ -1,8 +1,8 @@
-import { ApiPropertyOptional, IntersectionType } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsPositive } from 'class-validator';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 
-export class getInventoryDto {
+export class GetInventoriesDto extends CursorPaginationDto {
   @IsOptional()
   @ApiPropertyOptional({ description: 'The name of the inventory.' })
   name?: string;
@@ -17,8 +17,3 @@ export class getInventoryDto {
   @IsPositive()
   address?: number;
 }
-
-export class GetInventoriesDto extends IntersectionType(
-  CursorPaginationDto,
-  getInventoryDto,
-) {}
