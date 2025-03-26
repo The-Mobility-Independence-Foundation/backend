@@ -27,6 +27,7 @@ import { ReportsModule } from '../reports/reports.module';
 import { AttachmentsModule } from '../attachments/attachments.module';
 import { ConnectionsModule } from '../connections/connections.module';
 import { AddressModule } from '../address/address.module';
+import { ManufacturerModule } from '../model/manufacturer/manufacturer.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { AddressModule } from '../address/address.module';
     AttachmentsModule,
     ConnectionsModule,
     AddressModule,
+    ManufacturerModule,
   ],
 })
 export class DatabaseModule {}
