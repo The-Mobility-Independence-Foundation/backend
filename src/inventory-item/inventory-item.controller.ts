@@ -6,22 +6,21 @@ import {
   Body,
   ParseIntPipe,
   Patch,
-  UseGuards,
   Query,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateInventoryItemDto } from './dto/create-inventory-item.dto';
 import { UpdateInventoryItemDto } from './dto/update-inventory-item.dto';
 import { InventoryItem } from './inventory-item.entity';
 import { InventoryItemService } from './inventory-item.service';
 import { GetInventoryItemsDto } from './dto/get-inventory-item.dto';
 import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
+import { UseStrategy } from '../common/resource-access/decorators/resource-access.decorator';
+import { ResourceAccessStrategyToken } from '../common/resource-access/interfaces/strategy-provider.interface';
 
 @ApiTags('inventoryItem')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER)
 @Controller('organization/:organizationId')
 export class InventoryItemController {
   constructor(private readonly inventoryItemService: InventoryItemService) {}
@@ -34,6 +33,7 @@ export class InventoryItemController {
   @Post('/inventory/:inventoryId/items')
   @ApiOperation({ summary: 'Initiate creation of an inventory item' })
   @ResponseMessage('Successfully created inventory item')
+  @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: true })
   create(@Body() dto: CreateInventoryItemDto): Promise<InventoryItem> {
     return this.inventoryItemService.create(dto);
   }
@@ -84,6 +84,7 @@ export class InventoryItemController {
   @Patch('/inventory/:inventoryId/items/:itemId')
   @ApiOperation({ summary: 'Update information about an inventory item' })
   @ResponseMessage('Successfully updated inventory item')
+  @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: true })
   update(
     @Param('organizationId', ParseIntPipe) organizationId: number,
     @Param('inventoryId', ParseIntPipe) inventoryId: number,

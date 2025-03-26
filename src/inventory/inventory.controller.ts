@@ -6,21 +6,20 @@ import {
   Patch,
   ParseIntPipe,
   Query,
-  UseGuards,
   Controller,
 } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
 import { Inventory } from './inventory.entity';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
 import { GetInventoriesDto } from './dto/get-inventory.dto';
 import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { UseStrategy } from '../common/resource-access/decorators/resource-access.decorator';
+import { ResourceAccessStrategyToken } from '../common/resource-access/interfaces/strategy-provider.interface';
 
 @ApiTags('inventory')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER)
 @Controller('organization/:organizationId')
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
@@ -31,6 +30,7 @@ export class InventoryController {
    */
   @Post('/inventory')
   @ApiOperation({ summary: 'Initiate creation of an inventory' })
+  @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: false })
   create(@Body() dto: CreateInventoryDto): Promise<Inventory> {
     return this.inventoryService.create(dto);
   }
@@ -42,6 +42,7 @@ export class InventoryController {
    */
   @Get('/inventory')
   @ApiOperation({ summary: 'Retrieve an organizations inventories' })
+  @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: false })
   findAll(
     @Param('organizationId', ParseIntPipe) organizationId: number,
     @Query() query: GetInventoriesDto,
@@ -59,6 +60,7 @@ export class InventoryController {
   @ApiOperation({
     summary: 'Retrieve a specific inventory from an organization',
   })
+  @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: false })
   findOne(
     @Param('id', ParseIntPipe) id: number,
     @Param('organizationId', ParseIntPipe) organizationId: number,
@@ -73,6 +75,7 @@ export class InventoryController {
    */
   @Patch('/inventory/:id')
   @ApiOperation({ summary: 'Update information about an inventory' })
+  @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: false })
   update(
     @Param('organizationId', ParseIntPipe) organizationId: number,
     @Param('id', ParseIntPipe) id: number,
