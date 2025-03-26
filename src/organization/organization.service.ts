@@ -34,7 +34,7 @@ export class OrganizationService {
 
   async create(dto: CreateOrganizationDto) {
     const organization = new Organization();
-    const owner = await this.userService.findById(dto.ownerId); // TODO: update when reports-api merged in
+    const owner = await this.userService.findByIdOrThrow(dto.ownerId);
 
     if (owner.organization) {
       throw new BadRequestException('This user already has an organization.');
@@ -141,7 +141,7 @@ export class OrganizationService {
     await this.addressService.update(address.id, addressDto);
 
     if (dto.ownerId) {
-      organization.owner = await this.userService.findById(dto.ownerId); // TODO: update when reports merged in
+      organization.owner = await this.userService.findByIdOrThrow(dto.ownerId);
       this.addUser(id, dto.ownerId);
     }
 
@@ -163,7 +163,7 @@ export class OrganizationService {
    */
   async addUser(orgId: number, userId: number) {
     const organization = await this.findByIdOrThrow(orgId);
-    const user = await this.userService.findById(userId); // TODO: update when reports merged
+    const user = await this.userService.findByIdOrThrow(userId);
 
     user.organization = organization;
 
