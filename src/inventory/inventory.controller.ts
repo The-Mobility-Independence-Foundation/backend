@@ -42,7 +42,6 @@ export class InventoryController {
    */
   @Get('/inventory')
   @ApiOperation({ summary: 'Retrieve an organizations inventories' })
-  @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: false })
   findAll(
     @Param('organizationId', ParseIntPipe) organizationId: number,
     @Query() query: GetInventoriesDto,
@@ -60,7 +59,6 @@ export class InventoryController {
   @ApiOperation({
     summary: 'Retrieve a specific inventory from an organization',
   })
-  @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: false })
   findOne(
     @Param('id', ParseIntPipe) id: number,
     @Param('organizationId', ParseIntPipe) organizationId: number,

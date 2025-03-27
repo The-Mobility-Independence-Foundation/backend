@@ -20,8 +20,8 @@ import { UseStrategy } from '../common/resource-access/decorators/resource-acces
 import { ResourceAccessStrategyToken } from '../common/resource-access/interfaces/strategy-provider.interface';
 
 @ApiTags('inventoryItem')
-@UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER)
-@Controller('organization/:organizationId')
+@UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_MEMBER)
+@Controller('organization/:orgId')
 export class InventoryItemController {
   constructor(private readonly inventoryItemService: InventoryItemService) {}
 
@@ -33,14 +33,14 @@ export class InventoryItemController {
   @Post('/inventory/:inventoryId/items')
   @ApiOperation({ summary: 'Initiate creation of an inventory item' })
   @ResponseMessage('Successfully created inventory item')
-  @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: true })
+  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_MEMBER, { adminOnly: true })
   create(@Body() dto: CreateInventoryItemDto): Promise<InventoryItem> {
     return this.inventoryItemService.create(dto);
   }
 
   /**
    * Find all items in an organizations inventory
-   * @param organizationId : The ID of the organization
+   * @param orgId : The ID of the organization
    * @param inventoryId : The ID of the specific inventory
    * @returns : A list of items stored within that inventory
    */
@@ -48,12 +48,12 @@ export class InventoryItemController {
   @ApiOperation({ summary: 'Retrieve all items in a specific inventory' })
   @ResponseMessage('Successfully found all inventory item')
   findAll(
-    @Param('organizationId', ParseIntPipe) organizationId: number,
+    @Param('orgId', ParseIntPipe) orgId: number,
     @Param('inventoryId', ParseIntPipe) inventoryId: number,
     @Query() query: GetInventoryItemsDto,
   ): Promise<BaseApiCursorPaginationResponse<InventoryItem>> {
     return this.inventoryItemService.findAll(
-      organizationId,
+      orgId,
       inventoryId,
       query,
     );
@@ -84,7 +84,7 @@ export class InventoryItemController {
   @Patch('/inventory/:inventoryId/items/:itemId')
   @ApiOperation({ summary: 'Update information about an inventory item' })
   @ResponseMessage('Successfully updated inventory item')
-  @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: true })
+  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_MEMBER, { adminOnly: true })
   update(
     @Param('organizationId', ParseIntPipe) organizationId: number,
     @Param('inventoryId', ParseIntPipe) inventoryId: number,
