@@ -82,7 +82,9 @@ describe('OrganizationService', () => {
         id: 1,
       });
 
-      when(userService.findById).calledWith(user.id).mockResolvedValue(user);
+      when(userService.findByIdOrThrow)
+        .calledWith(user.id)
+        .mockResolvedValue(user);
       when(addressService.create)
         .calledWith(addressDto)
         .mockResolvedValue(address);
@@ -112,7 +114,9 @@ describe('OrganizationService', () => {
         organization: org,
       });
 
-      when(userService.findById).calledWith(user.id).mockResolvedValue(user);
+      when(userService.findByIdOrThrow)
+        .calledWith(user.id)
+        .mockResolvedValue(user);
 
       await expect(service.create(dto)).rejects.toThrow(BadRequestException);
     });
@@ -215,7 +219,9 @@ describe('OrganizationService', () => {
         address: address,
       });
 
-      when(userService.findById).calledWith(user.id).mockResolvedValue(user);
+      when(userService.findByIdOrThrow)
+        .calledWith(user.id)
+        .mockResolvedValue(user);
       when(addressService.update)
         .calledWith(address.id, addressDto)
         .mockResolvedValue(address);
@@ -241,7 +247,9 @@ describe('OrganizationService', () => {
         id: 1,
       });
 
-      when(userService.findById).calledWith(user.id).mockResolvedValue(user);
+      when(userService.findByIdOrThrow)
+        .calledWith(user.id)
+        .mockResolvedValue(user);
       when(organizationRepository.findOne)
         .calledWith(expect.anything())
         .mockResolvedValue(organization);
