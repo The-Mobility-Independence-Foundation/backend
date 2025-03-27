@@ -6,20 +6,19 @@ import {
   Patch,
   Body,
   Query,
-  UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { BaseApiCursorPaginationResponse } from '../../common/responses/base-api-cursor-pagination.response';
 import { Manufacturer } from '../model.entity';
 import { CreateManufacturerDto } from './dto/create-manufacturer.dto';
 import { GetManufacturersDto } from './dto/get-manufacturer.dto';
 import { UpdateManufacturerDto } from './dto/update-manufacturer.dto';
 import { ManufacturerService } from './manufacturer.service';
+import { UseStrategy } from '../../common/resource-access/decorators/resource-access.decorator';
+import { ResourceAccessStrategyToken } from '../../common/resource-access/interfaces/strategy-provider.interface';
 
 @ApiTags('manufacturer')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER)
 @Controller('manufacturer')
 export class ManufacturerController {
   constructor(private readonly manufacturerService: ManufacturerService) {}
@@ -46,6 +45,7 @@ export class ManufacturerController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update information about a manufacturer' })
+  @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: true })
   update(@Param('id') id: number, @Body() dto: UpdateManufacturerDto) {
     return this.manufacturerService.update(id, dto);
   }

@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ManufacturerService } from '../manufacturer.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Manufacturer } from '../../model.entity';
 import { ManufacturerController } from '../manufacturer.controller';
 import { createMock } from '@golevelup/ts-jest';
-import { Repository } from 'typeorm';
+import {
+  ResourceAccessStrategyRegistry,
+  STRATEGY_PROVIDERS_TOKEN,
+} from '../../../common/resource-access/interfaces/strategy-provider.interface';
 
 describe('ModelController', () => {
   let controller: ManufacturerController;
@@ -13,10 +13,9 @@ describe('ModelController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ManufacturerController],
       providers: [
-        ManufacturerService,
         {
-          provide: getRepositoryToken(Manufacturer),
-          useValue: createMock<Repository<Manufacturer>>(),
+          provide: STRATEGY_PROVIDERS_TOKEN,
+          useValue: createMock<ResourceAccessStrategyRegistry>(),
         },
       ],
     })
