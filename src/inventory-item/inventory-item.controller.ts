@@ -33,7 +33,9 @@ export class InventoryItemController {
   @Post('/inventory/:inventoryId/items')
   @ApiOperation({ summary: 'Initiate creation of an inventory item' })
   @ResponseMessage('Successfully created inventory item')
-  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_MEMBER, { adminOnly: true })
+  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_MEMBER, {
+    adminOnly: true,
+  })
   create(@Body() dto: CreateInventoryItemDto): Promise<InventoryItem> {
     return this.inventoryItemService.create(dto);
   }
@@ -52,11 +54,7 @@ export class InventoryItemController {
     @Param('inventoryId', ParseIntPipe) inventoryId: number,
     @Query() query: GetInventoryItemsDto,
   ): Promise<BaseApiCursorPaginationResponse<InventoryItem>> {
-    return this.inventoryItemService.findAll(
-      orgId,
-      inventoryId,
-      query,
-    );
+    return this.inventoryItemService.findAll(orgId, inventoryId, query);
   }
 
   /**
@@ -84,7 +82,9 @@ export class InventoryItemController {
   @Patch('/inventory/:inventoryId/items/:itemId')
   @ApiOperation({ summary: 'Update information about an inventory item' })
   @ResponseMessage('Successfully updated inventory item')
-  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_MEMBER, { adminOnly: true })
+  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_MEMBER, {
+    adminOnly: true,
+  })
   update(
     @Param('organizationId', ParseIntPipe) organizationId: number,
     @Param('inventoryId', ParseIntPipe) inventoryId: number,

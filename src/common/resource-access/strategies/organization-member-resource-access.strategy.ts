@@ -12,7 +12,6 @@ export class OrganizationMemberResourceAccessStrategy extends ResourceAccessStra
   private organizationIdParam: string = 'orgId';
   private userIdParam: string = 'userId';
 
-
   constructor(private readonly userService: UserService) {
     super();
   }
