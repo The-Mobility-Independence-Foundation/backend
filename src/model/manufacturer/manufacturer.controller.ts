@@ -40,7 +40,7 @@ export class ManufacturerController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Retrieve a specific manufacturer' })
-  findOne(@Param('id') id: number): Promise<Manufacturer | null> {
+  findOne(@Param('id') id: number): Promise<Manufacturer> {
     return this.manufacturerService.findByIdOrThrow(id);
   }
 

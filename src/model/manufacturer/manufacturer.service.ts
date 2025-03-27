@@ -13,7 +13,6 @@ export class ManufacturerService {
   constructor(
     @InjectRepository(Manufacturer)
     private readonly manufacturerRepository: Repository<Manufacturer>,
-
     private readonly paginationService: PaginationService,
   ) {}
 
@@ -69,11 +68,13 @@ export class ManufacturerService {
       relations: ['models'],
     });
 
-    Object.assign(manufacturer, {
-      ...(dto.name && { name: dto.name }),
-    });
+    const updatedManufacturer = { ...manufacturer };
 
-    return await this.manufacturerRepository.save(manufacturer);
+    if (dto.name) {
+      updatedManufacturer.name = dto.name; // Directly modify the property
+    }
+
+    return await this.manufacturerRepository.save(updatedManufacturer);
   }
 
   /**
@@ -104,5 +105,20 @@ export class ManufacturerService {
     } else {
       throw new NotFoundException('Manufacturer not found');
     }
+  }
+
+  async findOne(id: number) {
+    const manufacturer = await this.manufacturerRepository.findOne({
+      where: {
+        id: id,
+      },
+      relations: ['models'],
+    });
+
+    if (!manufacturer) {
+      throw new NotFoundException('Manufacturer not found');
+    }
+
+    return manufacturer;
   }
 }
