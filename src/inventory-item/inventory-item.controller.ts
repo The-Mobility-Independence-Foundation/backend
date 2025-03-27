@@ -34,7 +34,7 @@ export class InventoryItemController {
   @ApiOperation({ summary: 'Initiate creation of an inventory item' })
   @ResponseMessage('Successfully created inventory item')
   @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_MEMBER, {
-    adminOnly: true,
+    adminOnly: false,
   })
   create(@Body() dto: CreateInventoryItemDto): Promise<InventoryItem> {
     return this.inventoryItemService.create(dto);
@@ -83,7 +83,7 @@ export class InventoryItemController {
   @ApiOperation({ summary: 'Update information about an inventory item' })
   @ResponseMessage('Successfully updated inventory item')
   @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_MEMBER, {
-    adminOnly: true,
+    adminOnly: false,
   })
   update(
     @Param('organizationId', ParseIntPipe) organizationId: number,
