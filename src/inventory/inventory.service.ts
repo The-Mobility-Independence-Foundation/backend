@@ -5,7 +5,13 @@ import {
 } from '@nestjs/common';
 import { Inventory } from './inventory.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
+import {
+  FindOptionsRelations,
+  FindOptionsWhere,
+  IsNull,
+  Not,
+  Repository,
+} from 'typeorm';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
 import { PaginationService } from '../common/services/pagination.service';
@@ -14,6 +20,7 @@ import { GetInventoriesDto } from './dto/get-inventory.dto';
 import { OrganizationService } from '../organization/organization.service';
 import { AddressService } from '../address/address.service';
 import { CreateAddressDto } from '../address/dto/create-address.dto';
+import { CursorPaginationOptions } from '../common/interfaces/cursor-pagination-options.interface';
 
 @Injectable()
 export class InventoryService {
@@ -80,22 +87,34 @@ export class InventoryService {
       name: query.name,
     });
 
+    if (query.archived === 'true') {
+      Object.assign(findWhere, {
+        archivedAt: Not(IsNull()),
+      });
+    }
+
     Object.assign(paginationDto, {
       cursor: query.cursor,
       limit: query.limit,
       direction: query.direction,
     });
 
+    const cursorOptions: CursorPaginationOptions<Inventory> = {
+      cursorColumn: 'id',
+      where: findWhere,
+      relations: {
+        address: true,
+      },
+    };
+
+    if (query.archived === undefined || query.archived === 'true') {
+      cursorOptions.withDeleted = true;
+    }
+
     return this.paginationService.paginateWithCursor(
       this.inventoryRepository,
       paginationDto,
-      {
-        cursorColumn: 'id',
-        where: findWhere,
-        relations: {
-          address: true,
-        },
-      },
+      cursorOptions,
     );
   }
 

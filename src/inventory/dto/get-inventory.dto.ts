@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsPositive } from 'class-validator';
+import { IsOptional, IsPositive, IsString } from 'class-validator';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 
 export class GetInventoriesDto extends CursorPaginationDto {
@@ -11,4 +11,9 @@ export class GetInventoriesDto extends CursorPaginationDto {
   @ApiPropertyOptional({ description: 'The ID of the address.' })
   @IsPositive()
   address?: number;
+
+  @IsOptional()
+  @ApiPropertyOptional({ description: 'The status of inventories to show' })
+  @IsString()
+  archived?: string;
 }

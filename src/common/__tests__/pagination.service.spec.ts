@@ -213,6 +213,7 @@ describe('PaginationService', () => {
           },
           take: 4,
           relations: {},
+          withDeleted: false,
         })
         .mockResolvedValue(items);
 
@@ -259,6 +260,7 @@ describe('PaginationService', () => {
           },
           take: 4,
           relations: {},
+          withDeleted: false,
         })
         .mockResolvedValue(items);
 
@@ -308,6 +310,7 @@ describe('PaginationService', () => {
           },
           relations: {},
           where: {},
+          withDeleted: false,
         })
         .mockResolvedValue(items);
 
@@ -387,6 +390,7 @@ describe('PaginationService', () => {
             id: 'ASC',
           },
           take: 4,
+          withDeleted: false,
         })
         .mockResolvedValue(items);
 
