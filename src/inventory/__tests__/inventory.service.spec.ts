@@ -13,7 +13,6 @@ import { when } from 'jest-when';
 import { PaginationService } from '../../common/services/pagination.service';
 import { GetInventoriesDto } from '../dto/get-inventory.dto';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
-import { AddressService } from '../../address/address.service';
 import { OrganizationService } from '../../organization/organization.service';
 
 describe('InventoryService', () => {
@@ -21,7 +20,6 @@ describe('InventoryService', () => {
   let inventoryRepository: Repository<Inventory>;
   let paginationService: PaginationService;
   let organizationService: OrganizationService;
-  let addressService: AddressService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -39,7 +37,6 @@ describe('InventoryService', () => {
     service = module.get(InventoryService);
     paginationService = module.get(PaginationService);
     organizationService = module.get(OrganizationService);
-    addressService = module.get(AddressService);
     inventoryRepository = module.get(getRepositoryToken(Inventory));
   });
 
@@ -178,14 +175,13 @@ describe('InventoryService', () => {
         organizationId: 1,
         name: '42 West Inventory',
         description: 'Main inventory',
-        address: 1,
       });
 
       const address = new Address();
       Object.assign(address, { id: 1 });
 
       const organization = new Organization();
-      Object.assign(organization, { id: 1 });
+      Object.assign(organization, { id: 1, address: address });
 
       const savedInventory = new Inventory();
       Object.assign(savedInventory, {
@@ -193,18 +189,15 @@ describe('InventoryService', () => {
         organization,
         name: createDto.name,
         description: createDto.description,
-        address,
       });
 
       when(organizationService.findByIdOrThrow)
         .calledWith(createDto.organizationId, {
-          relations: ['address', 'user', 'inventory'],
+          relations: {
+            address: true,
+          },
         })
         .mockResolvedValue(organization);
-
-      when(addressService.findByIdOrThrow)
-        .calledWith(createDto.address)
-        .mockResolvedValue(address);
 
       when(inventoryRepository.save)
         .calledWith(expect.any(Inventory))
@@ -217,7 +210,6 @@ describe('InventoryService', () => {
       expect(result.organization.id).toBe(createDto.organizationId);
       expect(result.name).toBe(createDto.name);
       expect(result.description).toBe(createDto.description);
-      expect(result.address.id).toBe(createDto.address);
     });
 
     it('should throw NotFoundException if organization is not found', async () => {
@@ -226,11 +218,14 @@ describe('InventoryService', () => {
         organizationId: 1,
         name: '42 West Inventory',
         description: 'Main inventory',
-        address: 1,
       });
 
       when(organizationService.findByIdOrThrow)
-        .calledWith(createDto.organizationId)
+        .calledWith(createDto.organizationId, {
+          relations: {
+            address: true,
+          },
+        })
         .mockRejectedValue(new NotFoundException('Organization not found.'));
 
       await expect(service.create(createDto)).rejects.toThrow(
@@ -239,31 +234,11 @@ describe('InventoryService', () => {
 
       expect(organizationService.findByIdOrThrow).toHaveBeenCalledWith(
         createDto.organizationId,
-      );
-    });
-
-    it('should throw NotFoundException if address is not found', async () => {
-      const createDto = new CreateInventoryDto();
-      Object.assign(createDto, {
-        organizationId: 1,
-        name: '42 West Inventory',
-        description: 'Main inventory',
-        address: 1,
-      });
-
-      when(organizationService.findByIdOrThrow)
-        .calledWith(createDto.organizationId, expect.any(Object))
-        .mockResolvedValue({
-          id: 1,
-          name: 'Test Organization',
-        } as Organization);
-
-      when(addressService.findByIdOrThrow)
-        .calledWith(createDto.address)
-        .mockRejectedValue(new NotFoundException('Address not found.'));
-
-      await expect(service.create(createDto)).rejects.toThrow(
-        new NotFoundException('Address not found.'),
+        {
+          relations: {
+            address: true,
+          },
+        },
       );
     });
   });

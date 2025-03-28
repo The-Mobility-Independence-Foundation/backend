@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Inventory } from './inventory.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
@@ -9,6 +13,7 @@ import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { GetInventoriesDto } from './dto/get-inventory.dto';
 import { OrganizationService } from '../organization/organization.service';
 import { AddressService } from '../address/address.service';
+import { CreateAddressDto } from '../address/dto/create-address.dto';
 
 @Injectable()
 export class InventoryService {
@@ -28,14 +33,35 @@ export class InventoryService {
    */
   async create(dto: CreateInventoryDto): Promise<Inventory> {
     const inventory = new Inventory();
+    const addressData = new CreateAddressDto();
 
     const organization = await this.organizationService.findByIdOrThrow(
       dto.organizationId,
+      {
+        relations: {
+          address: true,
+        },
+      },
     );
     inventory.organization = organization;
 
-    const address = await this.addressService.findByIdOrThrow(dto.address);
-    inventory.address = address;
+    Object.assign(addressData, {
+      addressLine1: dto.addressLine1,
+      addressLine2: dto.addressLine2,
+      city: dto.city,
+      state: dto.state,
+      zipCode: dto.zipCode,
+    });
+
+    if (Object.values(addressData).every((v) => v !== undefined)) {
+      // if every value is defined
+      inventory.address = await this.addressService.create(addressData);
+    } else if (Object.values(addressData).every((v) => v === undefined)) {
+      // if every value is undefined
+      inventory.address = organization.address;
+    } else {
+      throw new BadRequestException('Incomplete address data provided.');
+    }
 
     inventory.name = dto.name;
     inventory.description = dto.description;
@@ -53,8 +79,8 @@ export class InventoryService {
     const paginationDto = new CursorPaginationDto();
 
     Object.assign(findWhere, {
-        organization: { id: organizationId },
-        name: query.name,
+      organization: { id: organizationId },
+      name: query.name,
     });
 
     Object.assign(paginationDto, {

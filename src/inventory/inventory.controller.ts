@@ -20,7 +20,7 @@ import { ResourceAccessStrategyToken } from '../common/resource-access/interface
 
 @ApiTags('inventory')
 @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER)
-@Controller('organization/:orgId/inventory')
+@Controller('organizations/:orgId/inventories')
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
 
