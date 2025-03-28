@@ -13,6 +13,7 @@ import { GuestResourceAccessStrategy } from './strategies/guest-resource-access.
 import { AnyUserResourceAccessStrategy } from './strategies/any-user-resource-access.strategy';
 import { OrganizationOwnerResourceAccessStrategy } from './strategies/organization-owner-resource-access.strategy';
 import { OrganizationModule } from '../../organization/organization.module';
+import { OrganizationMemberResourceAccessStrategy } from './strategies/organization-member-resource-access.strategy';
 
 const STRATEGY_PROVIDERS = [
   {
@@ -39,6 +40,10 @@ const STRATEGY_PROVIDERS = [
     provide: ResourceAccessStrategyToken.ORGANIZATION_OWNER,
     useClass: OrganizationOwnerResourceAccessStrategy,
   },
+  {
+    provide: ResourceAccessStrategyToken.ORGANIZATION_MEMBER,
+    useClass: ConversationResourceAccessStrategy,
+  },
 ] as const;
 
 @Global()
@@ -57,6 +62,7 @@ const STRATEGY_PROVIDERS = [
         publicUserStrategy: PublicUserResourceAccessStrategy,
         conversationStrategy: ConversationResourceAccessStrategy,
         organizationOwnerStrategy: OrganizationOwnerResourceAccessStrategy,
+        organizationMemberStrategy: OrganizationMemberResourceAccessStrategy,
       ): ResourceAccessStrategyRegistry => ({
         [ResourceAccessStrategyToken.ANY_USER]: anyUserStrategy,
         [ResourceAccessStrategyToken.GUEST]: guestStrategy,
@@ -65,6 +71,8 @@ const STRATEGY_PROVIDERS = [
         [ResourceAccessStrategyToken.CONVERSATION]: conversationStrategy,
         [ResourceAccessStrategyToken.ORGANIZATION_OWNER]:
           organizationOwnerStrategy,
+        [ResourceAccessStrategyToken.ORGANIZATION_MEMBER]:
+          organizationMemberStrategy,
       }),
       inject: STRATEGY_PROVIDERS.map((provider) => provider.provide),
     },

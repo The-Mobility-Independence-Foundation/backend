@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Model } from '../model/model.entity';
 import { InventoryItem } from '../inventory-item/inventory-item.entity';
+import { IsOptional } from 'class-validator';
 
 @Entity()
 export class PartType {
@@ -37,8 +38,9 @@ export class Part {
   @JoinColumn()
   model: Model;
 
-  @Column({ type: 'varchar', length: 30 })
-  partNumber: string;
+  @IsOptional()
+  @Column({ type: 'varchar', length: 30, nullable: true })
+  partNumber?: string | null;
 
   @ManyToMany(() => PartType, (pt) => pt.parts)
   @JoinTable()
