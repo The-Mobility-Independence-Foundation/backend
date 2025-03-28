@@ -97,7 +97,7 @@ export class InventoryController {
   @Delete(':invId')
   @ApiOperation({ summary: 'Delete an inventory. This cannot be undone.' })
   @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER)
-  @ResponseMessage('Successfully deleted inventory')
+  @ResponseMessage('Successfully archived inventory')
   delete(
     @Param('orgId', ParseIntPipe) orgId: number,
     @Param('invId', ParseIntPipe) id: number,

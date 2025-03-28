@@ -6,7 +6,7 @@ import { Organization } from '../../organization/organization.entity';
 import { Address } from '../../address/address.entity';
 import { Repository } from 'typeorm';
 import { createMock } from '@golevelup/ts-jest';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CreateInventoryDto } from '../dto/create-inventory.dto';
 import { UpdateInventoryDto } from '../dto/update-inventory.dto';
 import { when } from 'jest-when';
@@ -14,6 +14,7 @@ import { PaginationService } from '../../common/services/pagination.service';
 import { GetInventoriesDto } from '../dto/get-inventory.dto';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 import { OrganizationService } from '../../organization/organization.service';
+import { InventoryItem } from '../../inventory-item/inventory-item.entity';
 
 describe('InventoryService', () => {
   let service: InventoryService;
@@ -95,7 +96,6 @@ describe('InventoryService', () => {
       );
     });
   });
-
   describe('findAll', () => {
     it('should use name when name is specified', async () => {
       const dto = new GetInventoriesDto();
@@ -343,6 +343,42 @@ describe('InventoryService', () => {
       expect(result.name).toBe(inventory.name);
       expect(result.description).toBe(dto.description);
       expect(result.address.id).toBe(inventory.address.id);
+    });
+  });
+  describe('delete', () => {
+    it('should not delete an inventory with items in it', async () => {
+      const inventory = new Inventory();
+      const inventoryItem = new InventoryItem();
+      const dummyOrgId = 1;
+
+      Object.assign(inventory, {
+        id: 1,
+        items: [inventoryItem],
+      });
+
+      when(inventoryRepository.findOne)
+        .calledWith(expect.objectContaining({ where: { id: inventory.id } }))
+        .mockResolvedValue(inventory);
+
+      expect(service.delete(dummyOrgId, inventory.id)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('should delete the inventory if its empty', async () => {
+      const inventory = new Inventory();
+      const dummyOrgId = 1;
+
+      Object.assign(inventory, {
+        id: 1,
+        items: [],
+      });
+
+      when(inventoryRepository.findOne)
+        .calledWith(expect.objectContaining({ where: { id: inventory.id } }))
+        .mockResolvedValue(inventory);
+
+      expect(service.delete(dummyOrgId, inventory.id)).resolves.not.toThrow();
     });
   });
 });
