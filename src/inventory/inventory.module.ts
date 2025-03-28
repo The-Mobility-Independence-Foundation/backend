@@ -3,21 +3,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { InventoryController } from './inventory.controller';
 import { InventoryService } from './inventory.service';
 import { Inventory } from './inventory.entity';
-import { Organization } from '../organization/organization.entity';
-import { Address } from '../address/address.entity';
-import { PaginationService } from '../common/services/pagination.service';
-import { OrganizationService } from '../organization/organization.service';
-import { AddressService } from '../address/address.service';
-import { User } from '../user/entities/user.entity';
+import { AddressModule } from '../address/address.module';
+import { OrganizationModule } from '../organization/organization.module';
+import { CommonModule } from '../common/common.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Inventory, Organization, Address, User])],
-  controllers: [InventoryController],
-  providers: [
-    InventoryService,
-    PaginationService,
-    OrganizationService,
-    AddressService,
+  imports: [
+    TypeOrmModule.forFeature([Inventory]),
+    CommonModule,
+    OrganizationModule,
+    AddressModule,
   ],
+  controllers: [InventoryController],
+  providers: [InventoryService],
 })
 export class InventoryModule {}

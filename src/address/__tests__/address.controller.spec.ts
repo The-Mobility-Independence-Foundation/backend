@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AddressService } from './address.service';
-import { Address } from './address.entity';
+import { AddressController } from '../address.controller';
+import { AddressService } from '../address.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { Address } from '../address.entity';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -10,11 +11,12 @@ export const mockRepository = jest.fn(() => ({
   },
 }));
 
-describe('AddressService', () => {
-  let service: AddressService;
+describe('AddressController', () => {
+  let controller: AddressController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      controllers: [AddressController],
       providers: [
         AddressService,
         {
@@ -24,10 +26,10 @@ describe('AddressService', () => {
       ],
     }).compile();
 
-    service = module.get<AddressService>(AddressService);
+    controller = module.get<AddressController>(AddressController);
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(controller).toBeDefined();
   });
 });

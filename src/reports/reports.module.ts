@@ -10,7 +10,14 @@ import { ListingModule } from '../listing/listing.module';
 import { PostModule } from '../post/post.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Report]), CommonModule, UserModule, CommentModule, ListingModule, PostModule],
+  imports: [
+    TypeOrmModule.forFeature([Report]),
+    CommonModule,
+    UserModule,
+    CommentModule,
+    ListingModule,
+    PostModule,
+  ],
   providers: [ReportsService],
   controllers: [ReportsController],
   exports: [ReportsService],
