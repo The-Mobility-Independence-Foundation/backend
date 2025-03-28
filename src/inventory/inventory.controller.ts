@@ -19,7 +19,7 @@ import { UseStrategy } from '../common/resource-access/decorators/resource-acces
 import { ResourceAccessStrategyToken } from '../common/resource-access/interfaces/strategy-provider.interface';
 
 @ApiTags('inventory')
-@UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER)
+@UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER)
 @Controller('organization/:orgId/inventory')
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
@@ -30,7 +30,7 @@ export class InventoryController {
    */
   @Post('')
   @ApiOperation({ summary: 'Initiate creation of an inventory' })
-  @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: false })
+  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER, { adminOnly: false })
   create(@Body() dto: CreateInventoryDto): Promise<Inventory> {
     return this.inventoryService.create(dto);
   }
@@ -73,7 +73,7 @@ export class InventoryController {
    */
   @Patch(':id')
   @ApiOperation({ summary: 'Update information about an inventory' })
-  @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: false })
+  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER, { adminOnly: false })
   update(
     @Param('orgId', ParseIntPipe) orgId: number,
     @Param('id', ParseIntPipe) id: number,
