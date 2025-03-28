@@ -68,26 +68,26 @@ describe('InventoryItemService', () => {
 
     it('should create a new inventory item with a DTO', async () => {
       Object.assign(createDto, {
-        part: 1,
-        model: 1,
-        inventory: 1,
+        partId: 1,
+        modelId: 1,
+        inventoryId: 1,
         quantity: 3,
         publicCount: 2,
         notes: 'nice wheel',
       });
 
       when(inventoryService.findByIdOrThrow)
-        .calledWith(createDto.inventory, {
+        .calledWith(createDto.inventoryId, {
           relations: ['address', 'user', 'inventory'],
         })
         .mockResolvedValue(inventory);
 
       when(partService.findByIdOrThrow)
-        .calledWith(createDto.part)
+        .calledWith(createDto.partId)
         .mockResolvedValue(part);
 
       when(modelService.findByIdOrThrow)
-        .calledWith(createDto.model)
+        .calledWith(createDto.modelId)
         .mockResolvedValue(model);
 
       await expect(service.create(createDto)).resolves.not.toThrow();
@@ -95,16 +95,16 @@ describe('InventoryItemService', () => {
     });
     it('should throw NotFoundException if Part is not found', async () => {
       Object.assign(createDto, {
-        part: 999,
-        model: 1,
-        inventory: 1,
+        partId: 999,
+        modelId: 1,
+        inventoryId: 1,
         quantity: 3,
         publicCount: 2,
         notes: 'nice wheel',
       });
 
       when(partService.findByIdOrThrow)
-        .calledWith(createDto.part, expect.any(Object))
+        .calledWith(createDto.partId, expect.any(Object))
         .mockRejectedValue(new NotFoundException('Part not found.'));
 
       await expect(service.create(createDto)).rejects.toThrow(
@@ -112,22 +112,22 @@ describe('InventoryItemService', () => {
       );
 
       expect(partService.findByIdOrThrow).toHaveBeenCalledWith(
-        createDto.part,
+        createDto.partId,
         expect.any(Object),
       );
     });
     it('should throw NotFoundException if Model is not found', async () => {
       Object.assign(createDto, {
-        part: 1,
-        model: 999,
-        inventory: 1,
+        partId: 1,
+        modelId: 999,
+        inventoryId: 1,
         quantity: 3,
         publicCount: 2,
         notes: 'nice wheel',
       });
 
       when(modelService.findByIdOrThrow)
-        .calledWith(createDto.model, expect.any(Object))
+        .calledWith(createDto.modelId, expect.any(Object))
         .mockRejectedValue(new NotFoundException('Model not found.'));
 
       await expect(service.create(createDto)).rejects.toThrow(
@@ -135,22 +135,22 @@ describe('InventoryItemService', () => {
       );
 
       expect(modelService.findByIdOrThrow).toHaveBeenCalledWith(
-        createDto.model,
+        createDto.modelId,
         expect.any(Object),
       );
     });
     it('should throw NotFoundException if Inventory is not found', async () => {
       Object.assign(createDto, {
-        part: 1,
-        model: 1,
-        inventory: 878,
+        partId: 1,
+        modelId: 1,
+        inventoryId: 878,
         quantity: 3,
         publicCount: 2,
         notes: 'nice wheel',
       });
 
       when(inventoryService.findByIdOrThrow)
-        .calledWith(createDto.inventory, expect.any(Object))
+        .calledWith(createDto.inventoryId, expect.any(Object))
         .mockRejectedValue(new NotFoundException('Inventory not found.'));
 
       await expect(service.create(createDto)).rejects.toThrow(
@@ -158,7 +158,7 @@ describe('InventoryItemService', () => {
       );
 
       expect(inventoryService.findByIdOrThrow).toHaveBeenCalledWith(
-        createDto.inventory,
+        createDto.inventoryId,
         expect.any(Object),
       );
     });
@@ -206,7 +206,7 @@ describe('InventoryItemService', () => {
 
     it('should use part search when a part is specified', async () => {
       Object.assign(getDto, {
-        part: part.id,
+        partId: part.id,
       });
 
       service.findAll(1, 1, getDto);
@@ -220,7 +220,7 @@ describe('InventoryItemService', () => {
               id: 1,
               organization: { id: 1 },
             },
-            part: getDto.part,
+            part: getDto.partId,
           },
           cursorColumn: 'id',
           relations: expect.any(Object),
@@ -230,7 +230,7 @@ describe('InventoryItemService', () => {
 
     it('should use model search when a model is specified', async () => {
       Object.assign(getDto, {
-        model: model.id,
+        modelId: model.id,
       });
 
       service.findAll(1, 1, getDto);
@@ -244,7 +244,7 @@ describe('InventoryItemService', () => {
               id: 1,
               organization: { id: 1 },
             },
-            model: getDto.model,
+            model: getDto.modelId,
           },
           cursorColumn: 'id',
           relations: expect.any(Object),
@@ -295,9 +295,9 @@ describe('InventoryItemService', () => {
       Object.assign(newinventory, { id: 2 });
       Object.assign(item, {
         id: 1,
-        part: 5,
-        model: 6,
-        inventory: 1,
+        partId: 5,
+        modelId: 6,
+        inventoryId: 1,
         quantity: 2,
         publicCount: 1,
         notes: 'Bike be bitching',
@@ -315,7 +315,7 @@ describe('InventoryItemService', () => {
 
     it('Should update the part of an inventory item if specified', async () => {
       Object.assign(updateDto, {
-        part: part,
+        partId: part,
       });
 
       when(inventoryItemRepository.findOneBy)
@@ -333,7 +333,7 @@ describe('InventoryItemService', () => {
     });
     it('Should update the model of an inventory item if specified', async () => {
       Object.assign(updateDto, {
-        model: model,
+        modelId: model,
       });
 
       when(inventoryItemRepository.findOneBy)
@@ -352,7 +352,7 @@ describe('InventoryItemService', () => {
 
     it('Should update the inventory of an inventory item if specified', async () => {
       Object.assign(updateDto, {
-        inventory: newinventory,
+        inventoryId: newinventory,
       });
 
       when(inventoryItemRepository.findOneBy)

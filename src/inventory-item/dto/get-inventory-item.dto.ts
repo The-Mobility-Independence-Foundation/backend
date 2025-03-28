@@ -13,19 +13,19 @@ export class SearchInventoryItemDto {
   @ApiPropertyOptional({ description: 'The ID of the part.' })
   @IsPositive()
   @IsInt()
-  part?: number;
+  partId?: number;
 
   @IsOptional()
   @ApiPropertyOptional({ description: 'The ID of the model.' })
   @IsPositive()
   @IsInt()
-  model?: number;
+  modelId?: number;
 
   @IsOptional()
   @ApiPropertyOptional({ description: 'The ID of the inventory.' })
   @IsPositive()
   @IsInt()
-  inventory?: number;
+  inventoryId?: number;
 
   @IsOptional()
   @ApiPropertyOptional({

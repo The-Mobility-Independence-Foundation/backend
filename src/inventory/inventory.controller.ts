@@ -20,7 +20,7 @@ import { ResourceAccessStrategyToken } from '../common/resource-access/interface
 
 @ApiTags('inventory')
 @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER)
-@Controller('organization/:organizationId')
+@Controller('organization/:orgId/inventory')
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
 
@@ -28,7 +28,7 @@ export class InventoryController {
    * Create a new inventory
    * @param dto : All the inforamtion to create a new inventory
    */
-  @Post('/inventory')
+  @Post('')
   @ApiOperation({ summary: 'Initiate creation of an inventory' })
   @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: false })
   create(@Body() dto: CreateInventoryDto): Promise<Inventory> {
@@ -40,13 +40,13 @@ export class InventoryController {
    * @param organizationId : The ID of the organization
    * @returns : A list of all of an organization's inventory
    */
-  @Get('/inventory')
+  @Get('')
   @ApiOperation({ summary: 'Retrieve an organizations inventories' })
   findAll(
-    @Param('organizationId', ParseIntPipe) organizationId: number,
+    @Param('orgId', ParseIntPipe) orgId: number,
     @Query() query: GetInventoriesDto,
   ): Promise<BaseApiCursorPaginationResponse<Inventory>> {
-    return this.inventoryService.findAll(organizationId, query);
+    return this.inventoryService.findAll(orgId, query);
   }
 
   /**
@@ -55,15 +55,15 @@ export class InventoryController {
    * @param organizationId : ID of the organization
    * @returns : The specific inventory
    */
-  @Get('/inventory/:id')
+  @Get(':id')
   @ApiOperation({
     summary: 'Retrieve a specific inventory from an organization',
   })
   findOne(
     @Param('id', ParseIntPipe) id: number,
-    @Param('organizationId', ParseIntPipe) organizationId: number,
+    @Param('orgId', ParseIntPipe) orgId: number,
   ): Promise<Inventory | null> {
-    return this.inventoryService.findWithOrganization(id, organizationId);
+    return this.inventoryService.findWithOrganization(id, orgId);
   }
 
   /**
@@ -71,14 +71,14 @@ export class InventoryController {
    * @param organizationId : ID of the organization
    * @param id : ID of the inventory wished to update
    */
-  @Patch('/inventory/:id')
+  @Patch(':id')
   @ApiOperation({ summary: 'Update information about an inventory' })
   @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: false })
   update(
-    @Param('organizationId', ParseIntPipe) organizationId: number,
+    @Param('orgId', ParseIntPipe) orgId: number,
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateInventoryDto,
   ) {
-    return this.inventoryService.update(organizationId, id, dto);
+    return this.inventoryService.update(orgId, id, dto);
   }
 }

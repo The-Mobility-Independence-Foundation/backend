@@ -21,7 +21,7 @@ import { ResourceAccessStrategyToken } from '../common/resource-access/interface
 
 @ApiTags('inventoryItem')
 @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_MEMBER)
-@Controller('organization/:orgId')
+@Controller('organization/:orgId/inventory/:inventoryId/items')
 export class InventoryItemController {
   constructor(private readonly inventoryItemService: InventoryItemService) {}
 
@@ -30,7 +30,7 @@ export class InventoryItemController {
    * @param dto : All necessary information to create a new item
    * @returns : A message of successful creation
    */
-  @Post('/inventory/:inventoryId/items')
+  @Post('')
   @ApiOperation({ summary: 'Initiate creation of an inventory item' })
   @ResponseMessage('Successfully created inventory item')
   @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_MEMBER, {
@@ -46,7 +46,7 @@ export class InventoryItemController {
    * @param inventoryId : The ID of the specific inventory
    * @returns : A list of items stored within that inventory
    */
-  @Get('/inventory/:inventoryId/items')
+  @Get('')
   @ApiOperation({ summary: 'Retrieve all items in a specific inventory' })
   @ResponseMessage('Successfully found all inventory item')
   findAll(
@@ -59,40 +59,40 @@ export class InventoryItemController {
 
   /**
    * Find a specifc iventory item
-   * @param organizationId : The ID of the organization
+   * @param orgId : The ID of the organization
    * @param inventoryId : The ID of the inventory
    * @param itemId : The ID of the inventory item
    * @returns : The data of the item
    */
-  @Get('/inventory/:inventoryId/items/:itemId')
+  @Get(':itemId')
   @ApiOperation({ summary: 'Retrieve a specific item in a specific inventory' })
   @ResponseMessage('Successfully found a specific inventory item')
   findOne(
-    @Param('organizationId', ParseIntPipe) organizationId: number,
+    @Param('orgId', ParseIntPipe) orgId: number,
     @Param('inventoryId', ParseIntPipe) inventoryId: number,
     @Param('itemId', ParseIntPipe) itemId: number,
   ): Promise<InventoryItem | null> {
     return this.inventoryItemService.findWithOrgInv(
-      organizationId,
+      orgId,
       inventoryId,
       itemId,
     );
   }
 
-  @Patch('/inventory/:inventoryId/items/:itemId')
+  @Patch(':itemId')
   @ApiOperation({ summary: 'Update information about an inventory item' })
   @ResponseMessage('Successfully updated inventory item')
   @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_MEMBER, {
     adminOnly: false,
   })
   update(
-    @Param('organizationId', ParseIntPipe) organizationId: number,
+    @Param('orgId', ParseIntPipe) orgId: number,
     @Param('inventoryId', ParseIntPipe) inventoryId: number,
     @Param('itemId', ParseIntPipe) id: number,
     @Body() dto: UpdateInventoryItemDto,
   ) {
     return this.inventoryItemService.update(
-      organizationId,
+      orgId,
       inventoryId,
       id,
       dto,

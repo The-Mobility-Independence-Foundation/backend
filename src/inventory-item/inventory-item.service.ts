@@ -30,16 +30,16 @@ export class InventoryItemService {
   async create(dto: CreateInventoryItemDto) {
     const inventoryItem = new InventoryItem();
 
-    inventoryItem.model = await this.modelService.findByIdOrThrow(dto.model, {
+    inventoryItem.model = await this.modelService.findByIdOrThrow(dto.modelId, {
       relations: ['manufacturer', 'types'],
     });
 
-    inventoryItem.part = await this.partService.findByIdOrThrow(dto.part, {
+    inventoryItem.part = await this.partService.findByIdOrThrow(dto.partId, {
       relations: ['model', 'types'],
     });
 
     inventoryItem.inventory = await this.inventoryService.findByIdOrThrow(
-      dto.inventory,
+      dto.inventoryId,
       {
         relations: ['organization', 'address', 'items'],
       },
@@ -71,11 +71,11 @@ export class InventoryItemService {
       },
     };
 
-    if (query.part) {
-      findWhere.part = query.part;
+    if (query.partId) {
+      findWhere.part = query.partId;
     }
-    if (query.model) {
-      findWhere.model = query.model;
+    if (query.modelId) {
+      findWhere.model = query.modelId;
     }
     if (query.tag) {
       findWhere.tags = { some: { id: query.tag } };
@@ -188,16 +188,16 @@ export class InventoryItemService {
       ...(dto.quantity && { quantity: dto.quantity }),
     });
 
-    item.model = await this.modelService.findByIdOrThrow(dto.model, {
+    item.model = await this.modelService.findByIdOrThrow(dto.modelId, {
       relations: ['manufacturer', 'types'],
     });
 
-    item.part = await this.partService.findByIdOrThrow(dto.part, {
+    item.part = await this.partService.findByIdOrThrow(dto.partId, {
       relations: ['model', 'types'],
     });
 
     item.inventory = await this.inventoryService.findByIdOrThrow(
-      dto.inventory,
+      dto.inventoryId,
       {
         relations: ['organization', 'address', 'items'],
       },

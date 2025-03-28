@@ -3,6 +3,7 @@ import {
   IsInt,
   IsNotEmpty,
   IsObject,
+  IsOptional,
   IsPositive,
   IsString,
   MaxLength,
@@ -13,19 +14,19 @@ export class CreateInventoryItemDto {
   @IsPositive()
   @IsInt()
   @IsNotEmpty({ message: 'Part cannot be blank' })
-  part: number;
+  partId: number;
 
   @ApiProperty()
   @IsPositive()
   @IsInt()
   @IsNotEmpty({ message: 'Model cannot be blank.' })
-  model: number;
+  modelId: number;
 
   @ApiProperty()
   @IsPositive()
   @IsInt()
   @IsNotEmpty({ message: 'Inventory cannot be blank.' })
-  inventory: number;
+  inventoryId: number;
 
   @ApiProperty()
   @IsPositive()
@@ -36,7 +37,7 @@ export class CreateInventoryItemDto {
   @ApiProperty()
   @IsPositive()
   @IsInt()
-  @IsNotEmpty({ message: 'Public count cannot be blank.' })
+  @IsOptional()
   publicCount: number;
 
   @ApiProperty()
