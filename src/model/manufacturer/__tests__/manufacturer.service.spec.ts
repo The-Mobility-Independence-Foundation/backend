@@ -52,7 +52,7 @@ describe('ManufacturerService', () => {
     });
   });
 
-  //Tests for update method
+  //Tests for findAll method
   describe('findAll', () => {
     let getDto = new GetManufacturersDto();
     const manufacturer = new Manufacturer();
@@ -105,7 +105,7 @@ describe('ManufacturerService', () => {
       );
     });
   });
-  //Tests for findAll method
+  //Tests for update method
   describe('update', () => {
     let updateDto = new UpdateManufacturerDto();
     const manufacturer = new Manufacturer();
