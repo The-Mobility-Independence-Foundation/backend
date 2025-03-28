@@ -169,4 +169,22 @@ export class InventoryService {
       throw new NotFoundException('Inventory not found');
     }
   }
+
+  async delete(orgId: number, invId: number) {
+    const inventory = await this.findByIdOrThrow(invId, {
+      relations: {
+        items: true,
+      },
+    });
+
+    if (inventory.items.length !== 0) {
+      throw new BadRequestException(
+        'You cannot delete an inventory with items in it.',
+      );
+    }
+
+    await this.inventoryRepository.softDelete(invId);
+
+    return;
+  }
 }

@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Query,
   Controller,
+  Delete,
 } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
@@ -55,17 +56,17 @@ export class InventoryController {
 
   /**
    * Get a specific inventory by ID
-   * @param id : ID of the specific inventory
+   * @param invId : ID of the specific inventory
    * @param organizationId : ID of the organization
    * @returns : The specific inventory
    */
-  @Get(':id')
+  @Get(':invId')
   @ApiOperation({
     summary: 'Retrieve a specific inventory from an organization',
   })
   @ResponseMessage('Successfully got inventory information')
   findOne(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('invId', ParseIntPipe) id: number,
     @Param('orgId', ParseIntPipe) orgId: number,
   ) {
     return this.inventoryService.findWithOrganization(id, orgId);
@@ -74,17 +75,33 @@ export class InventoryController {
   /**
    * Update an existing inventory owned by an organization
    * @param organizationId : ID of the organization
-   * @param id : ID of the inventory wished to update
+   * @param invId : ID of the inventory wished to update
    */
-  @Patch(':id')
+  @Patch(':invId')
   @ApiOperation({ summary: 'Update information about an inventory' })
   @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER)
   @ResponseMessage('Successfully updated inventory')
   update(
     @Param('orgId', ParseIntPipe) orgId: number,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('invId', ParseIntPipe) id: number,
     @Body() dto: UpdateInventoryDto,
   ) {
     return this.inventoryService.update(orgId, id, dto);
+  }
+
+  /**
+   * Soft deletes an existing inventory.
+   * @param orgId - ID of the organization
+   * @param invId: id of the inventory
+   */
+  @Delete(':invId')
+  @ApiOperation({ summary: 'Delete an inventory. This cannot be undone.' })
+  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER)
+  @ResponseMessage('Successfully deleted inventory')
+  delete(
+    @Param('orgId', ParseIntPipe) orgId: number,
+    @Param('invId', ParseIntPipe) id: number,
+  ) {
+    return this.inventoryService.delete(orgId, id);
   }
 }
