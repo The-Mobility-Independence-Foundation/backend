@@ -31,9 +31,6 @@ export class InventoryService {
 
     const organization = await this.organizationService.findByIdOrThrow(
       dto.organizationId,
-      {
-        relations: ['address', 'user', 'inventory'],
-      },
     );
     inventory.organization = organization;
 
@@ -56,6 +53,7 @@ export class InventoryService {
       organization: { id: organizationId },
       name: query.name,
     };
+
     const paginationDto = new CursorPaginationDto();
 
     Object.assign(paginationDto, {
