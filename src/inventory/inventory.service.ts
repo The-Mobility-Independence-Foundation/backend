@@ -31,18 +31,15 @@ export class InventoryService {
    * @param dto : Relevant information needed to create the inventory
    * @returns The save of the inventory
    */
-  async create(dto: CreateInventoryDto): Promise<Inventory> {
+  async create(orgId: number, dto: CreateInventoryDto): Promise<Inventory> {
     const inventory = new Inventory();
     const addressData = new CreateAddressDto();
 
-    const organization = await this.organizationService.findByIdOrThrow(
-      dto.organizationId,
-      {
-        relations: {
-          address: true,
-        },
+    const organization = await this.organizationService.findByIdOrThrow(orgId, {
+      relations: {
+        address: true,
       },
-    );
+    });
     inventory.organization = organization;
 
     Object.assign(addressData, {
@@ -95,6 +92,9 @@ export class InventoryService {
       {
         cursorColumn: 'id',
         where: findWhere,
+        relations: {
+          address: true,
+        },
       },
     );
   }

@@ -8,11 +8,6 @@ export class GetInventoriesDto extends CursorPaginationDto {
   name?: string;
 
   @IsOptional()
-  @ApiPropertyOptional({ description: 'The ID of the organization.' })
-  @IsPositive()
-  organizationId?: number;
-
-  @IsOptional()
   @ApiPropertyOptional({ description: 'The ID of the address.' })
   @IsPositive()
   address?: number;

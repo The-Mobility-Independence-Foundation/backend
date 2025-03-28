@@ -9,14 +9,13 @@ import {
   Controller,
 } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
-import { Inventory } from './inventory.entity';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
 import { GetInventoriesDto } from './dto/get-inventory.dto';
-import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
 import { UseStrategy } from '../common/resource-access/decorators/resource-access.decorator';
 import { ResourceAccessStrategyToken } from '../common/resource-access/interfaces/strategy-provider.interface';
+import { ResponseMessage } from '../common/decorators/response-message.decorator';
 
 @ApiTags('inventory')
 @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER)
@@ -28,13 +27,15 @@ export class InventoryController {
    * Create a new inventory
    * @param dto : All the inforamtion to create a new inventory
    */
-  @Post('')
+  @Post()
   @ApiOperation({ summary: 'Initiate creation of an inventory' })
-  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER, {
-    adminOnly: false,
-  })
-  create(@Body() dto: CreateInventoryDto): Promise<Inventory> {
-    return this.inventoryService.create(dto);
+  @ResponseMessage('Successfully created inventory')
+  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER)
+  create(
+    @Param('orgId', ParseIntPipe) orgId: number,
+    @Body() dto: CreateInventoryDto,
+  ) {
+    return this.inventoryService.create(orgId, dto);
   }
 
   /**
@@ -42,12 +43,13 @@ export class InventoryController {
    * @param organizationId : The ID of the organization
    * @returns : A list of all of an organization's inventory
    */
-  @Get('')
+  @Get()
   @ApiOperation({ summary: 'Retrieve an organizations inventories' })
+  @ResponseMessage('Successfully found all inventories')
   findAll(
     @Param('orgId', ParseIntPipe) orgId: number,
     @Query() query: GetInventoriesDto,
-  ): Promise<BaseApiCursorPaginationResponse<Inventory>> {
+  ) {
     return this.inventoryService.findAll(orgId, query);
   }
 
@@ -61,10 +63,11 @@ export class InventoryController {
   @ApiOperation({
     summary: 'Retrieve a specific inventory from an organization',
   })
+  @ResponseMessage('Successfully got inventory information')
   findOne(
     @Param('id', ParseIntPipe) id: number,
     @Param('orgId', ParseIntPipe) orgId: number,
-  ): Promise<Inventory | null> {
+  ) {
     return this.inventoryService.findWithOrganization(id, orgId);
   }
 
@@ -75,9 +78,8 @@ export class InventoryController {
    */
   @Patch(':id')
   @ApiOperation({ summary: 'Update information about an inventory' })
-  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER, {
-    adminOnly: false,
-  })
+  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER)
+  @ResponseMessage('Successfully updated inventory')
   update(
     @Param('orgId', ParseIntPipe) orgId: number,
     @Param('id', ParseIntPipe) id: number,

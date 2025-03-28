@@ -172,7 +172,6 @@ describe('InventoryService', () => {
     it('should create a new inventory with a create inventory DTO', async () => {
       const createDto = new CreateInventoryDto();
       Object.assign(createDto, {
-        organizationId: 1,
         name: '42 West Inventory',
         description: 'Main inventory',
       });
@@ -192,7 +191,7 @@ describe('InventoryService', () => {
       });
 
       when(organizationService.findByIdOrThrow)
-        .calledWith(createDto.organizationId, {
+        .calledWith(organization.id, {
           relations: {
             address: true,
           },
@@ -203,43 +202,38 @@ describe('InventoryService', () => {
         .calledWith(expect.any(Inventory))
         .mockResolvedValue(savedInventory);
 
-      const result = await service.create(createDto);
+      const result = await service.create(organization.id, createDto);
 
       expect(result).toBeDefined();
       expect(result.id).toBe(1);
-      expect(result.organization.id).toBe(createDto.organizationId);
-      expect(result.name).toBe(createDto.name);
       expect(result.description).toBe(createDto.description);
     });
 
     it('should throw NotFoundException if organization is not found', async () => {
       const createDto = new CreateInventoryDto();
+      const bad_id = 999999999;
       Object.assign(createDto, {
-        organizationId: 1,
         name: '42 West Inventory',
         description: 'Main inventory',
       });
 
       when(organizationService.findByIdOrThrow)
-        .calledWith(createDto.organizationId, {
+        .calledWith(bad_id, {
           relations: {
             address: true,
           },
         })
         .mockRejectedValue(new NotFoundException('Organization not found.'));
 
-      await expect(service.create(createDto)).rejects.toThrow(
+      await expect(service.create(bad_id, createDto)).rejects.toThrow(
         NotFoundException,
       );
 
-      expect(organizationService.findByIdOrThrow).toHaveBeenCalledWith(
-        createDto.organizationId,
-        {
-          relations: {
-            address: true,
-          },
+      expect(organizationService.findByIdOrThrow).toHaveBeenCalledWith(bad_id, {
+        relations: {
+          address: true,
         },
-      );
+      });
     });
   });
   describe('update', () => {

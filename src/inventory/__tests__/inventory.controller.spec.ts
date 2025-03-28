@@ -8,9 +8,6 @@ import {
 
 describe('InventoryController', () => {
   let controller: InventoryController;
-  //let paginationService: PaginationService;
-  //let organizationService: OrganizationService;
-  //let addressService: AddressService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -26,9 +23,6 @@ describe('InventoryController', () => {
       .compile();
 
     controller = module.get<InventoryController>(InventoryController);
-    //paginationService = module.get(PaginationService);
-    //organizationService = module.get(OrganizationService);
-    //addressService = module.get(AddressService);
   });
 
   it('should be defined', () => {
