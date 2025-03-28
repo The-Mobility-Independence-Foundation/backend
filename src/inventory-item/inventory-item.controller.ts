@@ -72,11 +72,7 @@ export class InventoryItemController {
     @Param('inventoryId', ParseIntPipe) inventoryId: number,
     @Param('itemId', ParseIntPipe) itemId: number,
   ): Promise<InventoryItem | null> {
-    return this.inventoryItemService.findWithOrgInv(
-      orgId,
-      inventoryId,
-      itemId,
-    );
+    return this.inventoryItemService.findWithOrgInv(orgId, inventoryId, itemId);
   }
 
   @Patch(':itemId')
@@ -91,11 +87,6 @@ export class InventoryItemController {
     @Param('itemId', ParseIntPipe) id: number,
     @Body() dto: UpdateInventoryItemDto,
   ) {
-    return this.inventoryItemService.update(
-      orgId,
-      inventoryId,
-      id,
-      dto,
-    );
+    return this.inventoryItemService.update(orgId, inventoryId, id, dto);
   }
 }

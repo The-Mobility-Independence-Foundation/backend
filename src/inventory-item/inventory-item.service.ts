@@ -77,8 +77,8 @@ export class InventoryItemService {
     if (query.modelId) {
       findWhere.model = query.modelId;
     }
-    if (query.tag) {
-      findWhere.tags = { some: { id: query.tag } };
+    if (query.tagId) {
+      findWhere.tags = { some: { id: query.tagId } };
     }
 
     const paginationDto = new CursorPaginationDto();
@@ -188,20 +188,27 @@ export class InventoryItemService {
       ...(dto.quantity && { quantity: dto.quantity }),
     });
 
-    item.model = await this.modelService.findByIdOrThrow(dto.modelId, {
-      relations: ['manufacturer', 'types'],
-    });
+    if (dto.modelId) {
+      item.model = await this.modelService.findByIdOrThrow(dto.modelId, {
+        relations: ['manufacturer', 'types'],
+      });
+    }
 
-    item.part = await this.partService.findByIdOrThrow(dto.partId, {
-      relations: ['model', 'types'],
-    });
+    if (dto.partId) {
+      item.part = await this.partService.findByIdOrThrow(dto.partId, {
+        relations: ['model', 'types'],
+      });
+    }
 
-    item.inventory = await this.inventoryService.findByIdOrThrow(
-      dto.inventoryId,
-      {
-        relations: ['organization', 'address', 'items'],
-      },
-    );
+    if (dto.inventoryId) {
+      item.inventory = await this.inventoryService.findByIdOrThrow(
+        dto.inventoryId,
+        {
+          relations: ['organization', 'address', 'items'],
+        },
+      );
+    }
+
     return await this.inventoryItemRepository.save(item);
   }
 

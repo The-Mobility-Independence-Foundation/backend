@@ -182,7 +182,7 @@ describe('InventoryItemService', () => {
 
     it('should use tag search when a tag is specified', async () => {
       Object.assign(getDto, {
-        tag: itemTag.id,
+        tagId: itemTag.id,
       });
 
       service.findAll(1, 1, getDto);
@@ -196,7 +196,7 @@ describe('InventoryItemService', () => {
               id: 1,
               organization: { id: 1 },
             },
-            tags: { some: { id: getDto.tag } },
+            tags: { some: { id: getDto.tagId } },
           },
           cursorColumn: 'id',
           relations: expect.any(Object),

@@ -1,4 +1,4 @@
-import { ApiPropertyOptional, IntersectionType } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsInt,
   IsObject,
@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 
-export class SearchInventoryItemDto {
+export class GetInventoryItemsDto extends CursorPaginationDto {
   @IsOptional()
   @ApiPropertyOptional({ description: 'The ID of the part.' })
   @IsPositive()
@@ -56,10 +56,5 @@ export class SearchInventoryItemDto {
   @IsOptional()
   @ApiPropertyOptional({ description: 'Tag related to the inventory item.' })
   @IsInt()
-  tag?: number;
+  tagId?: number;
 }
-
-export class GetInventoryItemsDto extends IntersectionType(
-  CursorPaginationDto,
-  SearchInventoryItemDto,
-) {}
