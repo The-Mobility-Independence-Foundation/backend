@@ -49,12 +49,13 @@ export class InventoryService {
    * @returns A collection of all relevant inventory information owned by this organization
    */
   async findAll(organizationId: number, query: GetInventoriesDto) {
-    const findWhere: any = {
-      organization: { id: organizationId },
-      name: query.name,
-    };
-
+    const findWhere = {};
     const paginationDto = new CursorPaginationDto();
+
+    Object.assign(findWhere, {
+        organization: { id: organizationId },
+        name: query.name,
+    });
 
     Object.assign(paginationDto, {
       cursor: query.cursor,
