@@ -71,7 +71,8 @@ const STRATEGY_PROVIDERS = [
         [ResourceAccessStrategyToken.CONVERSATION]: conversationStrategy,
         [ResourceAccessStrategyToken.ORGANIZATION_OWNER]:
           organizationOwnerStrategy,
-        [ResourceAccessStrategyToken.ORGANIZATION_MEMBER] : organizationMemberStrategy,
+        [ResourceAccessStrategyToken.ORGANIZATION_MEMBER]:
+          organizationMemberStrategy,
       }),
       inject: STRATEGY_PROVIDERS.map((provider) => provider.provide),
     },

@@ -30,7 +30,9 @@ export class InventoryController {
    */
   @Post('')
   @ApiOperation({ summary: 'Initiate creation of an inventory' })
-  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER, { adminOnly: false })
+  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER, {
+    adminOnly: false,
+  })
   create(@Body() dto: CreateInventoryDto): Promise<Inventory> {
     return this.inventoryService.create(dto);
   }
@@ -73,7 +75,9 @@ export class InventoryController {
    */
   @Patch(':id')
   @ApiOperation({ summary: 'Update information about an inventory' })
-  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER, { adminOnly: false })
+  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER, {
+    adminOnly: false,
+  })
   update(
     @Param('orgId', ParseIntPipe) orgId: number,
     @Param('id', ParseIntPipe) id: number,
