@@ -14,7 +14,7 @@ import { when } from 'jest-when';
 describe('ModelTypeService', () => {
   let service: ModelTypeService;
   let modelTypeRepository: Repository<ModelType>;
-  let paginationService: PaginationService
+  let paginationService: PaginationService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -170,5 +170,4 @@ describe('ModelTypeService', () => {
       );
     });
   });
-
 });
