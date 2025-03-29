@@ -29,7 +29,7 @@ describe('ManufacturerService', () => {
       .useMocker(createMock)
       .compile();
 
-    service = module.get<ManufacturerService>(ManufacturerService);
+    service = module.get(ManufacturerService);
     manufacturerRepository = module.get(getRepositoryToken(Manufacturer));
     paginationService = module.get(PaginationService);
   });
@@ -155,7 +155,7 @@ describe('ManufacturerService', () => {
 
     it('should find a manufacturer if valid id given', async () => {
       when(manufacturerRepository.findOne)
-        .calledWith({ where: { id: manufacturer.id }, relations: ['models'] })
+        .calledWith({ where: { id: manufacturer.id }, relations: { models: true } })
         .mockResolvedValue(manufacturer);
 
       const result = await service.findOne(1);
@@ -165,7 +165,7 @@ describe('ManufacturerService', () => {
 
     it('should throw NotFoundException if manufacturer is not found', async () => {
       when(manufacturerRepository.findOne)
-        .calledWith({ where: { id: 2 }, relations: ['models'] })
+        .calledWith({ where: { id: 2 }, relations: { models: true } })
         .mockResolvedValue(null);
 
       await expect(service.findByIdOrThrow(2)).rejects.toThrow(

@@ -65,7 +65,7 @@ export class ManufacturerService {
    */
   async update(id: number, dto: UpdateManufacturerDto): Promise<Manufacturer> {
     const manufacturer = await this.findByIdOrThrow(id, {
-      relations: ['models'],
+      relations: { models: true },
     });
 
     const updatedManufacturer = { ...manufacturer };
@@ -112,7 +112,7 @@ export class ManufacturerService {
       where: {
         id: id,
       },
-      relations: ['models'],
+      relations: { models: true },
     });
 
     if (!manufacturer) {

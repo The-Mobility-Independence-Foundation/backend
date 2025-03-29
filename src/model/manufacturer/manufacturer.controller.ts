@@ -17,9 +17,9 @@ import { ManufacturerService } from './manufacturer.service';
 import { UseStrategy } from '../../common/resource-access/decorators/resource-access.decorator';
 import { ResourceAccessStrategyToken } from '../../common/resource-access/interfaces/strategy-provider.interface';
 
-@ApiTags('manufacturer')
+@ApiTags('manufacturers')
 @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER)
-@Controller('manufacturer')
+@Controller('manufacturers')
 export class ManufacturerController {
   constructor(private readonly manufacturerService: ManufacturerService) {}
 
