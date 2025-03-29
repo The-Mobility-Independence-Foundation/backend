@@ -4,6 +4,6 @@ import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 
 export class GetModelTypesDto extends CursorPaginationDto {
   @IsOptional()
-  @ApiPropertyOptional({ description: 'The name of the manufacturer.' })
+  @ApiPropertyOptional({ description: 'The name of the model type.' })
   name?: string;
 }

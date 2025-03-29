@@ -121,7 +121,7 @@ export class ModelTypeService {
     });
 
     if (!modelType) {
-      throw new NotFoundException('Manufacturer not found');
+      throw new NotFoundException('Model type not found');
     }
 
     return modelType;
