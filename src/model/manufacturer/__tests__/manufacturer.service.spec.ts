@@ -155,7 +155,10 @@ describe('ManufacturerService', () => {
 
     it('should find a manufacturer if valid id given', async () => {
       when(manufacturerRepository.findOne)
-        .calledWith({ where: { id: manufacturer.id }, relations: { models: true } })
+        .calledWith({
+          where: { id: manufacturer.id },
+          relations: { models: true },
+        })
         .mockResolvedValue(manufacturer);
 
       const result = await service.findOne(1);
