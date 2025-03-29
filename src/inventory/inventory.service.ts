@@ -154,13 +154,47 @@ export class InventoryService {
    */
   async update(organizationId: number, id: number, dto: UpdateInventoryDto) {
     const inventory = await this.findByIdOrThrow(id, {
-      relations: ['organization', 'address', 'items'],
+      relations: { address: true },
     });
 
+    if (
+      dto.addressLine1 ||
+      dto.addressLine2 ||
+      dto.city ||
+      dto.state ||
+      dto.zipCode
+    ) {
+      const oldAddress = inventory.address;
+      const addressData = new CreateAddressDto();
+
+      Object.assign(addressData, {
+        addressLine1: oldAddress.addressLine1,
+        addressLine2: oldAddress.addressLine2,
+        city: oldAddress.city,
+        state: oldAddress.state,
+        zipCode: oldAddress.zipCode,
+      });
+
+      Object.assign(addressData, {
+        addressLine1: dto.addressLine1,
+        addressLine2: dto.addressLine2,
+        city: dto.city,
+        state: dto.state,
+        zipCode: dto.zipCode,
+      });
+
+      const address = await this.addressService.create(addressData);
+      inventory.address = address;
+    }
+
     Object.assign(inventory, {
-      ...(dto.name && { name: dto.name }), // Only update name if it's in the DTO
-      ...(dto.description && { description: dto.description }), // Only update description if it's in the DTO
+      name: dto.name,
+      description: dto.description,
     });
+
+    if (dto.restore) {
+      return await this.inventoryRepository.restore(id);
+    }
 
     return await this.inventoryRepository.save(inventory);
   }
@@ -180,6 +214,7 @@ export class InventoryService {
         id,
       },
       relations: relations as string[],
+      withDeleted: true,
     });
 
     if (inventory) {
