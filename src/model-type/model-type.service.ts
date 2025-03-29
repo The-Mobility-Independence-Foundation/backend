@@ -23,24 +23,24 @@ export class ModelTypeService {
    */
   async findAll(query: GetModelTypesDto) {
     const findWhere: any = {
-        name: query.name,
-      };
-  
-      const paginationDto = new CursorPaginationDto();
-      Object.assign(paginationDto, {
-        cursor: query.cursor,
-        limit: query.limit,
-        direction: query.direction,
-      });
-  
-      return this.paginationService.paginateWithCursor(
-        this.modelTypeRepository,
-        paginationDto,
-        {
-          cursorColumn: 'id',
-          where: findWhere,
-          relations: { models: true },
-        },
+      name: query.name,
+    };
+
+    const paginationDto = new CursorPaginationDto();
+    Object.assign(paginationDto, {
+      cursor: query.cursor,
+      limit: query.limit,
+      direction: query.direction,
+    });
+
+    return this.paginationService.paginateWithCursor(
+      this.modelTypeRepository,
+      paginationDto,
+      {
+        cursorColumn: 'id',
+        where: findWhere,
+        relations: { models: true },
+      },
     );
   }
 
@@ -57,12 +57,11 @@ export class ModelTypeService {
     return this.modelTypeRepository.save(manufacturer);
   }
 
-
   /**
    * Changing the name of a pre-existing model type
    * @param id : The id of the model type to be changed
    * @param dto : The `new` name of the model type
-   * @returns : A success message when updated 
+   * @returns : A success message when updated
    */
   async update(id: number, dto: UpdateModelTypeDto): Promise<ModelType> {
     const modelType = await this.findByIdOrThrow(id, {
@@ -72,15 +71,14 @@ export class ModelTypeService {
     const updatedModelType = { ...modelType };
 
     if (dto.name) {
-        updatedModelType.name = dto.name; 
+      updatedModelType.name = dto.name;
     }
 
     return await this.modelTypeRepository.save(updatedModelType);
   }
 
-
   /**
-   * Find a specific model type 
+   * Find a specific model type
    * @param id : The id of the model type being searched for
    * @param options : Any possible relations the model type might have
    * @returns : A NotFoundExpection is model type wasn't found or the model type
@@ -110,7 +108,7 @@ export class ModelTypeService {
   }
 
   /**
-   * Find a specific model type 
+   * Find a specific model type
    * @param id : The id of the model type being searched for
    * @returns : A NotFoundExpection is model type wasn't found or the model type
    */
@@ -125,7 +123,7 @@ export class ModelTypeService {
     if (!modelType) {
       throw new NotFoundException('Manufacturer not found');
     }
-    
+
     return modelType;
   }
 }
