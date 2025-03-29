@@ -15,6 +15,7 @@ import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { GetUsersDto } from './dto/get-users.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationService } from '../common/services/pagination.service';
+import { ListingService } from '../listing/listing.service';
 
 @Injectable()
 export class UserService {
@@ -23,6 +24,7 @@ export class UserService {
     private userRepository: Repository<User>,
     private userAuthService: UserAuthService,
     private paginationService: PaginationService,
+    private listingService: ListingService,
   ) {}
 
   /**
@@ -165,6 +167,50 @@ export class UserService {
       lastName: dto.lastName,
       displayName: dto.displayName,
       type: dto.accountType,
+    });
+
+    return this.userRepository.save(user);
+  }
+
+  /**
+   * Get all bookmarks from a user
+   * @param userId - the users id
+   * @returns the array of bookmarks
+   */
+  async getBookmarks(userId: number) {
+    const user = await this.findByIdOrThrow(userId, {
+      relations: { bookmarks: true },
+    });
+
+    return user.bookmarks;
+  }
+
+  async createBookmark(userId: number, listingId: number) {
+    const user = await this.findByIdOrThrow(userId, {
+      relations: { bookmarks: true },
+    });
+    const listing = await this.listingService.findByIdOrThrow(listingId);
+    const index = user.bookmarks.indexOf(listing);
+
+    if (index > -1) {
+      // bookmark already exists
+      user.bookmarks.splice(index, 1);
+    } else {
+      // create new bookmark
+      user.bookmarks.push(listing);
+    }
+
+    return this.userRepository.save(user);
+  }
+
+  async deleteBookmark(userId: number, listingId: number) {
+    const user = await this.findByIdOrThrow(userId, {
+      relations: { bookmarks: true },
+    });
+    const listing = await this.listingService.findByIdOrThrow(listingId);
+
+    user.bookmarks = user.bookmarks.filter((list) => {
+      return list.id !== listing.id;
     });
 
     return this.userRepository.save(user);

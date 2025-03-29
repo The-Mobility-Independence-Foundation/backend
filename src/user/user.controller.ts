@@ -7,6 +7,8 @@ import {
   ParseIntPipe,
   Req,
   Body,
+  Post,
+  Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
@@ -55,5 +57,35 @@ export class UserController {
     @Body() dto: UpdateUserDto,
   ) {
     return this.userService.update(userId, dto);
+  }
+
+  @Get(':userId/bookmarks')
+  @ResponseMessage('Successfully retrieved bookmarks')
+  @ApiOperation({ summary: 'Get all bookmarks for a given user' })
+  @UseStrategy(ResourceAccessStrategyToken.USER)
+  async getBookmarks(@Param('userId', ParseIntPipe) userId: number) {
+    return this.userService.getBookmarks(userId);
+  }
+
+  @Post(':userId/bookmarks/:listingId')
+  @ResponseMessage('Successfully created bookmark')
+  @ApiOperation({ summary: 'Create a bookmark for a given listing' })
+  @UseStrategy(ResourceAccessStrategyToken.USER)
+  async createBookmark(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Param('listingId', ParseIntPipe) listingId: number,
+  ) {
+    return this.userService.createBookmark(userId, listingId);
+  }
+
+  @Delete(':userId/bookmarks/:listingId')
+  @ResponseMessage('Successfully deleted bookmark')
+  @ApiOperation({ summary: 'Delete a bookmark' })
+  @UseStrategy(ResourceAccessStrategyToken.USER)
+  async deleteBookmark(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Param('listingId', ParseIntPipe) listingId: number,
+  ) {
+    return this.userService.deleteBookmark(userId, listingId);
   }
 }
