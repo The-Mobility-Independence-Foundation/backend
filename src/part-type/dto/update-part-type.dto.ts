@@ -1,3 +1,3 @@
-import { CreatePartTypeDto } from "./create-part-type.dto";
+import { CreatePartTypeDto } from './create-part-type.dto';
 
 export class UpdatePartTypeDto extends CreatePartTypeDto {}
