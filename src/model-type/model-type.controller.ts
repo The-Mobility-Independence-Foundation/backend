@@ -17,9 +17,9 @@ import { GetModelTypesDto } from './dto/get-model-type.dto';
 import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
 import { UpdateModelTypeDto } from './dto/update-model-type.dto';
 
-@ApiTags('model-type')
+@ApiTags('model-types')
 @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER)
-@Controller('model-type')
+@Controller('model-types')
 export class ModelTypeController {
   constructor(private readonly modelTypeService: ModelTypeService) {}
 

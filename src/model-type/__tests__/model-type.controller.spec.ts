@@ -22,7 +22,7 @@ describe('ModelTypeController', () => {
       .useMocker(createMock)
       .compile();
 
-    controller = module.get<ModelTypeController>(ModelTypeController);
+    controller = module.get(ModelTypeController);
   });
 
   it('should be defined', () => {

@@ -65,7 +65,7 @@ export class ModelTypeService {
    */
   async update(id: number, dto: UpdateModelTypeDto): Promise<ModelType> {
     const modelType = await this.findByIdOrThrow(id, {
-      relations: ['models'],
+      relations: { models: true },
     });
 
     const updatedModelType = { ...modelType };
@@ -117,7 +117,7 @@ export class ModelTypeService {
       where: {
         id: id,
       },
-      relations: ['models'],
+      relations: { models: true },
     });
 
     if (!modelType) {

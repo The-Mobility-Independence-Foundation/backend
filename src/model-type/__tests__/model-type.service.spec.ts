@@ -29,7 +29,7 @@ describe('ModelTypeService', () => {
       .useMocker(createMock)
       .compile();
 
-    service = module.get<ModelTypeService>(ModelTypeService);
+    service = module.get(ModelTypeService);
     modelTypeRepository = module.get(getRepositoryToken(ModelType));
     paginationService = module.get(PaginationService);
   });
@@ -152,7 +152,7 @@ describe('ModelTypeService', () => {
 
     it('should find a manufacturer if valid id given', async () => {
       when(modelTypeRepository.findOne)
-        .calledWith({ where: { id: modelType.id }, relations: ['models'] })
+        .calledWith({ where: { id: modelType.id }, relations: { models: true } })
         .mockResolvedValue(modelType);
 
       const result = await service.findOne(1);
@@ -162,7 +162,7 @@ describe('ModelTypeService', () => {
 
     it('should throw NotFoundException if model type is not found', async () => {
       when(modelTypeRepository.findOne)
-        .calledWith({ where: { id: 2 }, relations: ['models'] })
+        .calledWith({ where: { id: 2 }, relations: { models: true } })
         .mockResolvedValue(null);
 
       await expect(service.findByIdOrThrow(2)).rejects.toThrow(
