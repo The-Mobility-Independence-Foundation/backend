@@ -29,6 +29,8 @@ import { ConnectionsModule } from '../connections/connections.module';
 import { AddressModule } from '../address/address.module';
 import { ManufacturerModule } from '../manufacturer/manufacturer.module';
 import { ModelTypeModule } from '../model-type/model-type.module';
+import { PartTypeModule } from '../part-type/part-type.module';
+
 
 @Module({
   imports: [
@@ -69,6 +71,7 @@ import { ModelTypeModule } from '../model-type/model-type.module';
     AddressModule,
     ManufacturerModule,
     ModelTypeModule,
+    PartTypeModule,
   ],
 })
 export class DatabaseModule {}
