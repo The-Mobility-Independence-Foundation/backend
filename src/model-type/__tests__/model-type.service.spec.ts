@@ -150,7 +150,7 @@ describe('ModelTypeService', () => {
       Object.assign(modelType, { id: 1, name: 'Power Chair' });
     });
 
-    it('should find a manufacturer if valid id given', async () => {
+    it('should find a model type if valid id given', async () => {
       when(modelTypeRepository.findOne)
         .calledWith({
           where: { id: modelType.id },

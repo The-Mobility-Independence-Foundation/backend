@@ -50,11 +50,11 @@ export class ModelTypeService {
    * @returns : A success message when created correctly
    */
   async create(dto: CreateModelTypeDto): Promise<ModelType> {
-    const manufacturer = new ModelType();
+    const modelType = new ModelType();
 
-    manufacturer.name = dto.name;
+    modelType.name = dto.name;
 
-    return this.modelTypeRepository.save(manufacturer);
+    return this.modelTypeRepository.save(modelType);
   }
 
   /**
