@@ -152,7 +152,10 @@ describe('ModelTypeService', () => {
 
     it('should find a manufacturer if valid id given', async () => {
       when(modelTypeRepository.findOne)
-        .calledWith({ where: { id: modelType.id }, relations: { models: true } })
+        .calledWith({
+          where: { id: modelType.id },
+          relations: { models: true },
+        })
         .mockResolvedValue(modelType);
 
       const result = await service.findOne(1);
