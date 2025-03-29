@@ -30,7 +30,6 @@ import { AddressModule } from '../address/address.module';
 import { ManufacturerModule } from '../manufacturer/manufacturer.module';
 import { ModelTypeModule } from '../model-type/model-type.module';
 
-
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
