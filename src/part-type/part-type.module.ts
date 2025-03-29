@@ -4,6 +4,6 @@ import { PartTypeService } from './part-type.service';
 
 @Module({
   controllers: [PartTypeController],
-  providers: [PartTypeService]
+  providers: [PartTypeService],
 })
 export class PartTypeModule {}

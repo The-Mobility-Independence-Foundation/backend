@@ -31,7 +31,6 @@ import { ManufacturerModule } from '../manufacturer/manufacturer.module';
 import { ModelTypeModule } from '../model-type/model-type.module';
 import { PartTypeModule } from '../part-type/part-type.module';
 
-
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
