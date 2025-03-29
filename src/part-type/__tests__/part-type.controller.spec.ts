@@ -1,4 +1,9 @@
+import { createMock } from '@golevelup/ts-jest';
 import { Test, TestingModule } from '@nestjs/testing';
+import {
+  STRATEGY_PROVIDERS_TOKEN,
+  ResourceAccessStrategyRegistry,
+} from '../../common/resource-access/interfaces/strategy-provider.interface';
 import { PartTypeController } from '../part-type.controller';
 
 describe('PartTypeController', () => {
@@ -7,9 +12,17 @@ describe('PartTypeController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [PartTypeController],
-    }).compile();
+      providers: [
+        {
+          provide: STRATEGY_PROVIDERS_TOKEN,
+          useValue: createMock<ResourceAccessStrategyRegistry>(),
+        },
+      ],
+    })
+      .useMocker(createMock)
+      .compile();
 
-    controller = module.get<PartTypeController>(PartTypeController);
+    controller = module.get(PartTypeController);
   });
 
   it('should be defined', () => {
