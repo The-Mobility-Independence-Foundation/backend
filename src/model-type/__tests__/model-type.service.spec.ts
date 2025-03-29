@@ -12,13 +12,14 @@ describe('ModelTypeService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ModelTypeService,
-      {
-        provide: getRepositoryToken(ModelType),
-        useValue: createMock<Repository<ModelType>>(),
-      }],
+        {
+          provide: getRepositoryToken(ModelType),
+          useValue: createMock<Repository<ModelType>>(),
+        },
+      ],
     })
-    .useMocker(createMock)
-    .compile();
+      .useMocker(createMock)
+      .compile();
 
     service = module.get<ModelTypeService>(ModelTypeService);
   });

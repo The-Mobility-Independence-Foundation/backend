@@ -6,11 +6,9 @@ import { ModelType } from '../model/model.entity';
 
 @Injectable()
 export class ModelTypeService {
-    constructor(
-        @InjectRepository(ModelType)
-        private readonly modelTypeRepository: Repository<ModelType>,
-        //private readonly paginationService: PaginationService,
-     ) {}
-    
-
+  constructor(
+    @InjectRepository(ModelType)
+    private readonly modelTypeRepository: Repository<ModelType>,
+    //private readonly paginationService: PaginationService,
+  ) {}
 }
