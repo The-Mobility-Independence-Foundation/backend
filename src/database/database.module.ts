@@ -28,6 +28,8 @@ import { AttachmentsModule } from '../attachments/attachments.module';
 import { ConnectionsModule } from '../connections/connections.module';
 import { AddressModule } from '../address/address.module';
 import { ManufacturerModule } from '../manufacturer/manufacturer.module';
+import { ModelTypeModule } from '../model-type/model-type.module';
+
 
 @Module({
   imports: [
@@ -67,6 +69,7 @@ import { ManufacturerModule } from '../manufacturer/manufacturer.module';
     ConnectionsModule,
     AddressModule,
     ManufacturerModule,
+    ModelTypeModule,
   ],
 })
 export class DatabaseModule {}
