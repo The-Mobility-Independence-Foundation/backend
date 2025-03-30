@@ -61,6 +61,7 @@ export class PaginationService {
       relations = {},
       order = {},
       includeCount = false,
+      withDeleted = false,
     } = options;
     let whereClause = { ...where };
     const orderClause = {
@@ -85,6 +86,7 @@ export class PaginationService {
       relations,
       where: whereClause,
       order: orderClause,
+      withDeleted: withDeleted,
     });
 
     const hasNextPage = items.length > limit;

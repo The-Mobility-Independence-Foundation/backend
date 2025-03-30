@@ -1,12 +1,8 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsPositive, MaxLength } from 'class-validator';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { IsNotEmpty, MaxLength } from 'class-validator';
+import { CreateAddressDto } from '../../address/dto/create-address.dto';
 
-export class CreateInventoryDto {
-  @ApiProperty()
-  @IsPositive()
-  @IsNotEmpty({ message: 'Organization cannot be blank' })
-  organizationId: number;
-
+export class CreateInventoryDto extends PartialType(CreateAddressDto) {
   @ApiProperty()
   @IsNotEmpty({ message: 'Inventory name cannot be blank.' })
   @MaxLength(40, {
@@ -22,9 +18,4 @@ export class CreateInventoryDto {
       'Description is too long. Maximum length is $constraint1 characters.',
   })
   description: string;
-
-  @ApiProperty()
-  @IsPositive()
-  @IsNotEmpty({ message: 'Address cannot be blank.' })
-  address: number;
 }
