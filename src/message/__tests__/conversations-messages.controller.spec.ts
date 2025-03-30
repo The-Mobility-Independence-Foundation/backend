@@ -16,7 +16,8 @@ import { when } from 'jest-when';
 import { BaseApiCursorPaginationResponse } from '../../common/responses/base-api-cursor-pagination.response';
 import { SendMessageDto } from '../dto/send-message.dto';
 import { User } from '../../user/entities/user.entity';
-import { Request } from 'express';
+import { Conversation } from '../../conversations/entities/conversation.entity';
+import { UpdateMessageDto } from '../dto/update-message.dto';
 
 describe('ConversationsMessagesController', () => {
   let controller: ConversationsMessagesController;
@@ -35,10 +36,8 @@ describe('ConversationsMessagesController', () => {
       .useMocker(createMock)
       .compile();
 
-    controller = module.get<ConversationsMessagesController>(
-      ConversationsMessagesController,
-    );
-    service = module.get<MessageService>(MessageService);
+    controller = module.get(ConversationsMessagesController);
+    service = module.get(MessageService);
   });
 
   describe('resource access strategy', () => {
@@ -87,6 +86,7 @@ describe('ConversationsMessagesController', () => {
   describe('sendMessage', () => {
     it('should send a message to a conversation', async () => {
       const conversationId = 1;
+      const files: Express.Multer.File[] = [];
 
       const sendMessageDto = new SendMessageDto();
       Object.assign(sendMessageDto, {
@@ -96,13 +96,102 @@ describe('ConversationsMessagesController', () => {
       const user = new User();
       user.id = 1;
 
-      const req = createMock<Request>({ user });
+      const message = {
+        id: 1,
+        authorId: user.id,
+        author: user,
+        conversationId: 1,
+        conversation: createMock<Conversation>({ id: 1 }),
+        messageContent: 'Hello, world!',
+        readStatus: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        hasAttachments: false,
+      };
 
       when(service.sendMessage)
         .calledWith(user.id, conversationId, sendMessageDto)
-        .mockResolvedValue(new Message());
+        .mockResolvedValue(message);
 
-      await controller.sendMessage(req, conversationId, sendMessageDto);
+      const result = await controller.sendMessage(
+        user,
+        conversationId,
+        sendMessageDto,
+        files,
+      );
+
+      expect(result).toEqual(message);
+      expect(service.sendMessage).toHaveBeenCalledWith(
+        user.id,
+        conversationId,
+        sendMessageDto,
+      );
+    });
+  });
+
+  describe('updateMessage', () => {
+    it('should update a message', async () => {
+      const messageId = 1;
+      const files: Express.Multer.File[] = [];
+
+      const updateMessageDto = new UpdateMessageDto();
+      Object.assign(updateMessageDto, {
+        content: 'Updated message content',
+      });
+
+      const user = new User();
+      user.id = 1;
+
+      const message = {
+        id: messageId,
+        authorId: user.id,
+        author: user,
+        conversationId: 1,
+        conversation: createMock<Conversation>({ id: 1 }),
+        messageContent: 'Updated message content',
+        readStatus: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        hasAttachments: false,
+      };
+
+      when(service.updateMessage)
+        .calledWith(user.id, messageId, updateMessageDto)
+        .mockResolvedValue(message);
+
+      const result = await controller.updateMessage(
+        user,
+        messageId,
+        updateMessageDto,
+        files,
+      );
+
+      expect(result).toEqual(message);
+      expect(service.updateMessage).toHaveBeenCalledWith(
+        user.id,
+        messageId,
+        updateMessageDto,
+      );
+    });
+  });
+
+  describe('deleteMessage', () => {
+    it('should delete a message', async () => {
+      const messageId = 1;
+
+      const user = new User();
+      user.id = 1;
+
+      const deleteResult = { affected: 1, raw: {} };
+
+      when(service.deleteMessage)
+        .calledWith(user.id, messageId)
+        .mockResolvedValue(deleteResult);
+
+      const result = await controller.deleteMessage(user, messageId);
+
+      expect(result).toEqual(deleteResult);
+      expect(service.deleteMessage).toHaveBeenCalledWith(user.id, messageId);
     });
   });
 });

@@ -1,5 +1,10 @@
-import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
-import { ParseFilePipe, FileTypeValidator } from '@nestjs/common';
+import {
+  PipeTransform,
+  Injectable,
+  BadRequestException,
+  ParseFilePipeBuilder,
+} from '@nestjs/common';
+import { ParseFilePipe } from '@nestjs/common';
 
 /**
  * Convert a size in megabytes to bytes
@@ -22,6 +27,7 @@ export interface FilesValidationOptions {
   totalMaxSizeInMb?: number;
   totalMaxFileCount?: number;
   fileType?: RegExp;
+  fileIsRequired?: boolean;
 }
 
 /**
@@ -42,13 +48,13 @@ export class FilesValidationPipe implements PipeTransform {
       fileType = FilesValidationPipe.DEFAULT_FILE_TYPE,
       totalMaxSizeInMb = FilesValidationPipe.DEFAULT_TOTAL_MAX_SIZE_IN_MB,
       totalMaxFileCount = FilesValidationPipe.DEFAULT_TOTAL_MAX_FILE_COUNT,
+      fileIsRequired = true,
     } = options;
-
     this.totalMaxSizeInMb = totalMaxSizeInMb;
     this.totalMaxFileCount = totalMaxFileCount;
-    this.parseFilePipe = new ParseFilePipe({
-      validators: [new FileTypeValidator({ fileType })],
-    });
+    this.parseFilePipe = new ParseFilePipeBuilder()
+      .addFileTypeValidator({ fileType })
+      .build({ fileIsRequired });
   }
 
   /**

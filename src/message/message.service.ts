@@ -14,6 +14,7 @@ import { ConversationType } from '../conversations/entities/conversation.entity'
 import { UserService } from '../user/user.service';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { AttachmentsService } from '../attachments/attachments.service';
+import { AttachmentEntityType } from '../attachments/attachment.entity';
 @Injectable()
 export class MessageService {
   constructor(
@@ -77,7 +78,7 @@ export class MessageService {
   ) {
     const { content, attachments } = sendMessageDto;
 
-    if (!content && !attachments) {
+    if (!content && (!attachments || attachments.length === 0)) {
       throw new BadRequestException(
         'Message content or attachments are required',
       );
@@ -106,7 +107,20 @@ export class MessageService {
 
     const savedMessage = await this.messageRepository.save(message);
 
-    return savedMessage;
+    // Upload attachments if provided
+    if (attachments && attachments.length > 0) {
+      await this.attachmentsService.uploadFiles(
+        savedMessage.id,
+        AttachmentEntityType.MESSAGE,
+        attachments,
+        authorId,
+      );
+    }
+
+    return {
+      ...savedMessage,
+      hasAttachments: attachments && attachments.length > 0,
+    };
   }
 
   /**
@@ -123,7 +137,7 @@ export class MessageService {
   ) {
     const { content, attachments } = updateMessageDto;
 
-    if (!content && !attachments) {
+    if (!content && (!attachments || attachments.length === 0)) {
       throw new BadRequestException(
         'Message content or attachments are required',
       );
@@ -172,11 +186,22 @@ export class MessageService {
       message.messageContent = content;
     }
 
-    if (attachments) {
-      // message.attachments = attachments;
+    const updatedMessage = await this.messageRepository.save(message);
+
+    // Upload attachments if provided
+    if (attachments && attachments.length > 0) {
+      await this.attachmentsService.uploadFiles(
+        updatedMessage.id,
+        AttachmentEntityType.MESSAGE,
+        attachments,
+        authorId,
+      );
     }
 
-    return this.messageRepository.save(message);
+    return {
+      ...updatedMessage,
+      hasAttachments: attachments && attachments.length > 0,
+    };
   }
 
   /**

@@ -88,6 +88,23 @@ describe('FilesValidationPipe', () => {
       );
     });
 
+    it('should throw BadRequestException when file type is invalid', async () => {
+      const files = [
+        {
+          size: mbToBytes(1),
+          mimetype: 'application/pdf',
+          originalname: 'test.pdf',
+        } as Express.Multer.File,
+      ];
+
+      const options: FilesValidationOptions = {
+        fileType: /(jpg|jpeg|png)$/i,
+      };
+      const pipe = new FilesValidationPipe(options);
+
+      await expect(pipe.transform(files)).rejects.toThrow(BadRequestException);
+    });
+
     it('should use default options when none are provided', async () => {
       const files = [];
       const maxFileCount = FilesValidationPipe.DEFAULT_TOTAL_MAX_FILE_COUNT;
