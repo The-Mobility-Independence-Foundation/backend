@@ -5,7 +5,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Message } from './message.entity';
 import { User } from '../user/entities/user.entity';
 import { Conversation } from '../conversation/conversation.entity';
-
+import { createMock } from '@golevelup/ts-jest';
 export const mockRepository = jest.fn(() => ({
   metadata: {
     columns: [],
@@ -34,7 +34,9 @@ describe('MessageController', () => {
           useClass: mockRepository,
         },
       ],
-    }).compile();
+    })
+      .useMocker(createMock)
+      .compile();
 
     controller = module.get<MessageController>(MessageController);
   });

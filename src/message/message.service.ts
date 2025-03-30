@@ -18,21 +18,24 @@ export class MessageService {
     private conversationRepository: Repository<Conversation>,
   ) {}
 
-  async create() {
+  async create(conversationId: number, authorId: number, content: string) {
     const message = new Message();
-    const sender = await this.userRepository.findOneBy({ id: 1 });
-    const conversation = await this.conversationRepository.findOneBy({ id: 1 });
+    const sender = await this.userRepository.findOneBy({ id: authorId });
+    const conversation = await this.conversationRepository.findOneBy({
+      id: conversationId,
+    });
 
-    if (sender) {
-      message.author = sender;
+    if (!sender || !conversation) {
+      throw new Error('Sender or conversation not found');
     }
-    if (conversation) {
-      message.conversation = conversation;
-    }
 
-    message.messageContent = 'This message is content!';
+    message.author = sender;
+    message.conversation = conversation;
+    message.messageContent = content;
 
-    return this.messageRepository.save(message);
+    const savedMessage = await this.messageRepository.save(message);
+
+    return savedMessage;
   }
 
   async findAll() {
