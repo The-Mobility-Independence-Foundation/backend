@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
-import { Manufacturer } from '../model.entity';
+import { Manufacturer } from '../model/model.entity';
 import { UpdateManufacturerDto } from './dto/update-manufacturer.dto';
-import { PaginationService } from '../../common/services/pagination.service';
+import { PaginationService } from '../common/services/pagination.service';
 import { CreateManufacturerDto } from './dto/create-manufacturer.dto';
 import { GetManufacturersDto } from './dto/get-manufacturer.dto';
-import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
+import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 
 @Injectable()
 export class ManufacturerService {

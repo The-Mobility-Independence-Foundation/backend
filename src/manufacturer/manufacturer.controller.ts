@@ -8,15 +8,15 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { BaseApiCursorPaginationResponse } from '../../common/responses/base-api-cursor-pagination.response';
-import { Manufacturer } from '../model.entity';
+import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
+import { Manufacturer } from '../model/model.entity';
 import { CreateManufacturerDto } from './dto/create-manufacturer.dto';
 import { GetManufacturersDto } from './dto/get-manufacturer.dto';
 import { UpdateManufacturerDto } from './dto/update-manufacturer.dto';
 import { ManufacturerService } from './manufacturer.service';
-import { UseStrategy } from '../../common/resource-access/decorators/resource-access.decorator';
-import { ResourceAccessStrategyToken } from '../../common/resource-access/interfaces/strategy-provider.interface';
-import { ResponseMessage } from '../../common/decorators/response-message.decorator';
+import { UseStrategy } from '../common/resource-access/decorators/resource-access.decorator';
+import { ResourceAccessStrategyToken } from '../common/resource-access/interfaces/strategy-provider.interface';
+import { ResponseMessage } from '../common/decorators/response-message.decorator';
 
 @ApiTags('manufacturers')
 @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER)

@@ -1,14 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ManufacturerService } from '../manufacturer.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Manufacturer } from '../../model.entity';
+import { Manufacturer } from '../../model/model.entity';
 import { createMock } from '@golevelup/ts-jest';
 import { Repository } from 'typeorm';
-import { PaginationService } from '../../../common/services/pagination.service';
+import { PaginationService } from '../../common/services/pagination.service';
 import { CreateManufacturerDto } from '../dto/create-manufacturer.dto';
 import { when } from 'jest-when';
 import { GetManufacturersDto } from '../dto/get-manufacturer.dto';
-import { CursorPaginationDto } from '../../../common/dto/cursor-pagination.dto';
+import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 import { UpdateManufacturerDto } from '../dto/update-manufacturer.dto';
 
 describe('ManufacturerService', () => {

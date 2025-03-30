@@ -4,7 +4,7 @@ import { createMock } from '@golevelup/ts-jest';
 import {
   ResourceAccessStrategyRegistry,
   STRATEGY_PROVIDERS_TOKEN,
-} from '../../../common/resource-access/interfaces/strategy-provider.interface';
+} from '../../common/resource-access/interfaces/strategy-provider.interface';
 
 describe('ModelController', () => {
   let controller: ManufacturerController;
