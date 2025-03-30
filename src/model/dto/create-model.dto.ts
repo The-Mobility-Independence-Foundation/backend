@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsPositive } from 'class-validator';
+import { IsInt, IsNotEmpty, IsOptional, IsPositive } from 'class-validator';
 
 export class CreateModelDto {
   @ApiProperty()
@@ -17,4 +17,10 @@ export class CreateModelDto {
   @IsInt()
   @IsPositive()
   year: number;
+
+  @ApiProperty({ type: [Number], required: false })
+  @IsInt({ each: true }) 
+  @IsPositive({ each: true }) 
+  @IsOptional()
+  modelTypeIds: number[];
 }
