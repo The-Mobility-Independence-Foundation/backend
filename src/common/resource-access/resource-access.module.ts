@@ -13,7 +13,7 @@ import { AnyUserResourceAccessStrategy } from './strategies/any-user-resource-ac
 import { OrganizationOwnerResourceAccessStrategy } from './strategies/organization-owner-resource-access.strategy';
 import { OrganizationModule } from '../../organization/organization.module';
 import { OrganizationMemberResourceAccessStrategy } from './strategies/organization-member-resource-access.strategy';
-import { ConversationsModule } from 'src/conversations/conversations.module';
+import { ConversationsModule } from '../../conversations/conversations.module';
 import { OrderResourceAccessStrategy } from './strategies/order-resource-access.strategy';
 
 const STRATEGY_PROVIDERS = [

@@ -3,9 +3,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Conversation } from './entities/conversation.entity';
 import { UsersConversationsController } from './users-conversations.controller';
 import { ConversationsService } from './conversations.service';
-import { ListingModule } from 'src/listing/listing.module';
-import { UserModule } from 'src/user/user.module';
-import { CommonModule } from 'src/common/common.module';
+import { ListingModule } from '../listing/listing.module';
+import { UserModule } from '../user/user.module';
+import { CommonModule } from '../common/common.module';
 import { ConversationHistory } from './entities/conversation-history.entity';
 import { ConversationsController } from './conversations.controller';
 @Module({
