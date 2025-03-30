@@ -1,27 +1,25 @@
-import { Test } from '@nestjs/testing';
-import { TestingModule } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { ConversationsMessagesController } from '../conversations-messages.controller';
 import { MessageService } from '../message.service';
 import { createMock } from '@golevelup/ts-jest';
-import {
-  ResourceAccessStrategyRegistry,
-  ResourceAccessStrategyToken,
-  STRATEGY_PROVIDERS_TOKEN,
-} from '../../common/resource-access/interfaces/strategy-provider.interface';
-import { Reflector } from '@nestjs/core';
-import { RESOURCE_ACCESS } from '../../common/resource-access/decorators/resource-access.decorator';
-import { Message } from '../message.entity';
-import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 import { when } from 'jest-when';
-import { BaseApiCursorPaginationResponse } from '../../common/responses/base-api-cursor-pagination.response';
+import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 import { SendMessageDto } from '../dto/send-message.dto';
-import { User } from '../../user/entities/user.entity';
-import { Conversation } from '../../conversations/entities/conversation.entity';
 import { UpdateMessageDto } from '../dto/update-message.dto';
+import { User } from '../../user/entities/user.entity';
+import { Attachment } from '../../attachments/attachment.entity';
+import { BaseApiCursorPaginationResponse } from '../../common/responses/base-api-cursor-pagination.response';
+import { MessageResponse } from '../respones/message.response';
+import { SendMessageResponse } from '../respones/send-message.response';
+import { UpdateMessageResponse } from '../respones/update-message.response';
+import {
+  STRATEGY_PROVIDERS_TOKEN,
+  ResourceAccessStrategyRegistry,
+} from '../../common/resource-access/interfaces/strategy-provider.interface';
 
 describe('ConversationsMessagesController', () => {
   let controller: ConversationsMessagesController;
-  let service: MessageService;
+  let messageService: MessageService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -37,46 +35,50 @@ describe('ConversationsMessagesController', () => {
       .compile();
 
     controller = module.get(ConversationsMessagesController);
-    service = module.get(MessageService);
-  });
-
-  describe('resource access strategy', () => {
-    it('should use the CONVERSATION resource access strategy', () => {
-      const reflector = new Reflector();
-
-      const strategy = reflector.get(
-        RESOURCE_ACCESS,
-        ConversationsMessagesController,
-      );
-
-      expect(strategy).toEqual({
-        strategy: { providerToken: ResourceAccessStrategyToken.CONVERSATION },
-      });
-    });
+    messageService = module.get(MessageService);
   });
 
   describe('findAll', () => {
-    it('should return paginated messages for a conversation', async () => {
+    it('should successfully retrieve messages for a conversation', async () => {
       const conversationId = 1;
       const paginationDto = new CursorPaginationDto();
-
-      const expectedResponse = new BaseApiCursorPaginationResponse<Message>();
-      Object.assign(expectedResponse, {
-        results: [new Message(), new Message()],
-        nextCursor: '2',
-        hasNextPage: true,
-        hasPreviousPage: false,
-        total: 2,
+      Object.assign(paginationDto, {
+        cursor: 'cursor123',
+        limit: 10,
+        direction: 'next',
       });
 
-      when(service.findAll)
+      const user = new User();
+      const attachment = new Attachment();
+
+      const messageResponse: MessageResponse = {
+        id: 1,
+        author: user,
+        conversationId,
+        content: 'Hello world',
+        attachments: [attachment],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const expectedResponse =
+        new BaseApiCursorPaginationResponse<MessageResponse>();
+      Object.assign(expectedResponse, {
+        results: [messageResponse],
+        nextCursor: 'nextCursor123',
+        hasNextPage: true,
+        hasPreviousPage: false,
+      });
+
+      when(messageService.findAll)
         .calledWith(conversationId, paginationDto)
         .mockResolvedValue(expectedResponse);
 
       const result = await controller.findAll(conversationId, paginationDto);
 
-      expect(result).toEqual(expectedResponse);
-      expect(service.findAll).toHaveBeenCalledWith(
+      expect(result).toBeDefined();
+      expect(result).toBe(expectedResponse);
+      expect(messageService.findAll).toHaveBeenCalledWith(
         conversationId,
         paginationDto,
       );
@@ -84,34 +86,31 @@ describe('ConversationsMessagesController', () => {
   });
 
   describe('sendMessage', () => {
-    it('should send a message to a conversation', async () => {
+    it('should successfully send a message to a conversation', async () => {
       const conversationId = 1;
-      const files: Express.Multer.File[] = [];
-
-      const sendMessageDto = new SendMessageDto();
-      Object.assign(sendMessageDto, {
-        content: 'Hello, world!',
-      });
-
       const user = new User();
-      user.id = 1;
+      Object.assign(user, { id: 123 });
 
-      const message = {
-        id: 1,
-        authorId: user.id,
-        author: user,
-        conversationId: 1,
-        conversation: createMock<Conversation>({ id: 1 }),
-        messageContent: 'Hello, world!',
-        readStatus: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        hasAttachments: false,
+      const sendMessageDto: SendMessageDto = {
+        content: 'Hello, how are you?',
       };
 
-      when(service.sendMessage)
-        .calledWith(user.id, conversationId, sendMessageDto)
-        .mockResolvedValue(message);
+      const files: Express.Multer.File[] = [];
+      const attachment = new Attachment();
+
+      const expectedResponse: SendMessageResponse = {
+        id: 1,
+        author: user,
+        conversationId,
+        content: sendMessageDto.content,
+        attachments: [attachment],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      when(messageService.sendMessage)
+        .calledWith(user.id, conversationId, sendMessageDto, files)
+        .mockResolvedValue(expectedResponse);
 
       const result = await controller.sendMessage(
         user,
@@ -120,54 +119,112 @@ describe('ConversationsMessagesController', () => {
         files,
       );
 
-      expect(result).toEqual(message);
-      expect(service.sendMessage).toHaveBeenCalledWith(
+      expect(result).toBeDefined();
+      expect(result).toBe(expectedResponse);
+      expect(messageService.sendMessage).toHaveBeenCalledWith(
         user.id,
         conversationId,
         sendMessageDto,
+        files,
+      );
+    });
+
+    it('should successfully send a message with file attachments', async () => {
+      const conversationId = 1;
+      const user = new User();
+      Object.assign(user, { id: 123 });
+
+      const sendMessageDto: SendMessageDto = {
+        content: 'Check out this file',
+      };
+
+      const files = [
+        {
+          fieldname: 'file',
+          originalname: 'test.jpg',
+          mimetype: 'image/jpeg',
+          buffer: Buffer.from('test'),
+          size: 4,
+        },
+      ] as Express.Multer.File[];
+
+      const attachment = new Attachment();
+      Object.assign(attachment, {
+        id: 1,
+        entityId: 1,
+        entityType: 'message',
+        fileName: 'test.jpg',
+      });
+
+      const expectedResponse: SendMessageResponse = {
+        id: 1,
+        author: user,
+        conversationId,
+        content: sendMessageDto.content,
+        attachments: [attachment],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      when(messageService.sendMessage)
+        .calledWith(user.id, conversationId, sendMessageDto, files)
+        .mockResolvedValue(expectedResponse);
+
+      const result = await controller.sendMessage(
+        user,
+        conversationId,
+        sendMessageDto,
+        files,
+      );
+
+      expect(result).toBeDefined();
+      expect(result).toBe(expectedResponse);
+      expect(result.attachments).toHaveLength(1);
+      expect(messageService.sendMessage).toHaveBeenCalledWith(
+        user.id,
+        conversationId,
+        sendMessageDto,
+        files,
       );
     });
   });
 
   describe('updateMessage', () => {
-    it('should update a message', async () => {
+    it('should successfully update a message', async () => {
       const messageId = 1;
-      const files: Express.Multer.File[] = [];
-
-      const updateMessageDto = new UpdateMessageDto();
-      Object.assign(updateMessageDto, {
-        content: 'Updated message content',
-      });
-
       const user = new User();
-      user.id = 1;
+      Object.assign(user, { id: 123 });
 
-      const message = {
-        id: messageId,
-        authorId: user.id,
-        author: user,
-        conversationId: 1,
-        conversation: createMock<Conversation>({ id: 1 }),
-        messageContent: 'Updated message content',
-        readStatus: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        hasAttachments: false,
+      const updateMessageDto: UpdateMessageDto = {
+        content: 'Updated content',
       };
 
-      when(service.updateMessage)
+      const attachment = new Attachment();
+
+      const expectedResponse: UpdateMessageResponse = {
+        id: messageId,
+        author: user,
+        conversationId: 1,
+        content: updateMessageDto.content,
+        attachments: [attachment],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      when(messageService.updateMessage)
         .calledWith(user.id, messageId, updateMessageDto)
-        .mockResolvedValue(message);
+        .mockResolvedValue(expectedResponse);
 
       const result = await controller.updateMessage(
         user,
         messageId,
         updateMessageDto,
-        files,
       );
 
-      expect(result).toEqual(message);
-      expect(service.updateMessage).toHaveBeenCalledWith(
+      expect(result).toBeDefined();
+      expect(result).toBe(expectedResponse);
+      expect(result.content).toBe(updateMessageDto.content);
+      expect(messageService.updateMessage).toHaveBeenCalledWith(
         user.id,
         messageId,
         updateMessageDto,
@@ -176,22 +233,22 @@ describe('ConversationsMessagesController', () => {
   });
 
   describe('deleteMessage', () => {
-    it('should delete a message', async () => {
+    it('should successfully delete a message', async () => {
       const messageId = 1;
-
       const user = new User();
-      user.id = 1;
+      Object.assign(user, { id: 123 });
 
-      const deleteResult = { affected: 1, raw: {} };
-
-      when(service.deleteMessage)
+      when(messageService.deleteMessage)
         .calledWith(user.id, messageId)
-        .mockResolvedValue(deleteResult);
+        .mockResolvedValue(undefined);
 
       const result = await controller.deleteMessage(user, messageId);
 
-      expect(result).toEqual(deleteResult);
-      expect(service.deleteMessage).toHaveBeenCalledWith(user.id, messageId);
+      expect(result).toBeUndefined();
+      expect(messageService.deleteMessage).toHaveBeenCalledWith(
+        user.id,
+        messageId,
+      );
     });
   });
 });

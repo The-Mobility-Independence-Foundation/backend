@@ -51,6 +51,28 @@ export class ConversationsService {
   }
 
   /**
+   * Find a conversation by id or throw an error
+   * @param id - The id of the conversation
+   * @param options - Optional query options
+   * @returns The conversation record
+   */
+  async findByIdOrThrow(
+    id: number,
+    options: Partial<{
+      where: FindOptionsWhere<Omit<Conversation, 'id'>>;
+      relations: FindOptionsRelations<Conversation>;
+    }> = {},
+  ) {
+    const conversation = await this.findById(id, options);
+
+    if (!conversation) {
+      throw new NotFoundException('Conversation not found');
+    }
+
+    return conversation;
+  }
+
+  /**
    * Find all conversations for a user through pagination
    * @param userId - The id of the user
    * @param paginationDto - The pagination dto

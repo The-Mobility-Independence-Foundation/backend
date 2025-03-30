@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsArray } from 'class-validator';
+import { IsString, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 /**
@@ -9,9 +9,4 @@ export class SendMessageDto {
   @IsOptional()
   @IsString()
   content?: string;
-
-  @ApiProperty()
-  @IsOptional()
-  @IsArray()
-  attachments?: Express.Multer.File[];
 }

@@ -8,6 +8,7 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 
 @Entity()
@@ -32,12 +33,15 @@ export class Message {
   @Column({ type: 'varchar', length: 2000, nullable: true })
   content?: string;
 
-  @Column({ type: 'timestamp', nullable: true, default: null })
-  readStatus: Date | null;
+  @Column({ type: 'timestamp', nullable: true })
+  readAt: Date | null;
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date | null;
 }

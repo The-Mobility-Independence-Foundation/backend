@@ -4,17 +4,24 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { Message } from './message.entity';
-import { Repository } from 'typeorm';
+import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { PaginationService } from '../common/services/pagination.service';
 import { SendMessageDto } from './dto/send-message.dto';
 import { ConversationsService } from '../conversations/conversations.service';
-import { ConversationType } from '../conversations/entities/conversation.entity';
 import { UserService } from '../user/user.service';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { AttachmentsService } from '../attachments/attachments.service';
-import { AttachmentEntityType } from '../attachments/attachment.entity';
+import {
+  Attachment,
+  AttachmentEntityType,
+} from '../attachments/attachment.entity';
+import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
+import { MessageResponse } from './respones/message.response';
+import { SendMessageResponse } from './respones/send-message.response';
+import { UpdateMessageResponse } from './respones/update-message.response';
+
 @Injectable()
 export class MessageService {
   constructor(
@@ -27,17 +34,67 @@ export class MessageService {
   ) {}
 
   /**
+   * Find a message by id
+   * @param id - The id of the message
+   * @param options - Optional query options
+   * @returns The message record
+   */
+  async findById(
+    id: number,
+    options: Partial<{
+      where: FindOptionsWhere<Omit<Message, 'id'>>;
+      relations: FindOptionsRelations<Message>;
+    }> = {},
+  ) {
+    const { where = {}, relations } = options;
+
+    return this.messageRepository.findOne({
+      where: {
+        ...where,
+        id: id,
+      },
+      relations,
+    });
+  }
+
+  /**
+   * Find a message by id or throw an error
+   * @param id - The id of the message
+   * @param options - Optional query options
+   * @returns The message record
+   */
+  async findByIdOrThrow(
+    id: number,
+    options: Partial<{
+      where: FindOptionsWhere<Omit<Message, 'id'>>;
+      relations: FindOptionsRelations<Message>;
+    }> = {},
+  ) {
+    const message = await this.findById(id, options);
+
+    if (!message) {
+      throw new NotFoundException('Message not found');
+    }
+
+    return message;
+  }
+
+  /**
    * Find all messages for a conversation with their attachments
    * @param conversationId - The id of the conversation
    * @param paginationDto - The pagination dto
    * @returns The paginated messages
    */
-  async findAll(conversationId: number, paginationDto: CursorPaginationDto) {
+  async findAll(
+    conversationId: number,
+    paginationDto: CursorPaginationDto,
+  ): Promise<BaseApiCursorPaginationResponse<MessageResponse>> {
     const paginated = await this.paginationService.paginateWithCursor(
       this.messageRepository,
       paginationDto,
       {
         cursorColumn: 'id',
+        relations: { author: true },
         where: { conversationId },
         order: {
           createdAt: 'DESC',
@@ -45,23 +102,27 @@ export class MessageService {
       },
     );
 
-    return paginated;
-    // const formattedMessages = await Promise.all(
-    //   paginated.results.map(async (message) => {
-    //     return {
-    //       ...message,
-    //       attachments: await this.attachmentsService.findByTypeAndId(
-    //         AttachmentEntityType.MESSAGE,
-    //         message.id,
-    //       ),
-    //     };
-    //   }),
-    // );
+    const formattedMessages = await Promise.all(
+      paginated.results.map(async (message) => {
+        return {
+          id: message.id,
+          author: message.author,
+          conversationId: message.conversationId,
+          content: message.content,
+          attachments: await this.attachmentsService.findByEntity(
+            message.id,
+            AttachmentEntityType.MESSAGE,
+          ),
+          createdAt: message.createdAt,
+          updatedAt: message.updatedAt,
+        };
+      }),
+    );
 
-    // return {
-    //   ...paginated,
-    //   results: formattedMessages,
-    // };
+    return {
+      ...paginated,
+      results: formattedMessages,
+    };
   }
 
   /**
@@ -69,14 +130,16 @@ export class MessageService {
    * @param authorId - The id of the author
    * @param conversationId - The id of the conversation
    * @param sendMessageDto - The send message dto
+   * @param attachments - The attachments of the message
    * @returns The message
    */
   async sendMessage(
     authorId: number,
     conversationId: number,
     sendMessageDto: SendMessageDto,
-  ) {
-    const { content, attachments } = sendMessageDto;
+    attachments?: Express.Multer.File[],
+  ): Promise<SendMessageResponse> {
+    const { content } = sendMessageDto;
 
     if (!content && (!attachments || attachments.length === 0)) {
       throw new BadRequestException(
@@ -85,10 +148,7 @@ export class MessageService {
     }
 
     const conversation =
-      await this.conversationService.findById(conversationId);
-    if (!conversation) {
-      throw new NotFoundException('Conversation not found');
-    }
+      await this.conversationService.findByIdOrThrow(conversationId);
 
     if (
       conversation.initiator.id !== authorId &&
@@ -99,108 +159,85 @@ export class MessageService {
       );
     }
 
-    const message = this.messageRepository.create({
-      authorId,
-      conversationId,
-      messageContent: content,
-    });
-
-    const savedMessage = await this.messageRepository.save(message);
-
-    // Upload attachments if provided
-    if (attachments && attachments.length > 0) {
-      await this.attachmentsService.uploadFiles(
-        savedMessage.id,
-        AttachmentEntityType.MESSAGE,
-        attachments,
+    try {
+      const message = await this.messageRepository.save({
         authorId,
-      );
-    }
+        conversationId,
+        content,
+      });
 
-    return {
-      ...savedMessage,
-      hasAttachments: attachments && attachments.length > 0,
-    };
+      let attachmentEntities: Attachment[] = [];
+      if (attachments && attachments.length > 0) {
+        attachmentEntities = await this.attachmentsService.uploadFiles(
+          message.id,
+          AttachmentEntityType.MESSAGE,
+          attachments,
+          authorId,
+        );
+      }
+
+      return {
+        ...message,
+        attachments: attachmentEntities,
+      };
+    } catch (error) {
+      throw new BadRequestException('Failed to send message', {
+        cause: error,
+      });
+    }
   }
 
   /**
    * Update a message
-   * @param authorId - The id of the author
+   * @param userId - The id of the user
    * @param messageId - The id of the message
    * @param updateMessageDto - The update message dto
    * @returns The message
    */
   async updateMessage(
-    authorId: number,
+    userId: number,
     messageId: number,
     updateMessageDto: UpdateMessageDto,
-  ) {
-    const { content, attachments } = updateMessageDto;
+  ): Promise<UpdateMessageResponse> {
+    const { content } = updateMessageDto;
 
-    if (!content && (!attachments || attachments.length === 0)) {
-      throw new BadRequestException(
-        'Message content or attachments are required',
-      );
+    if (!content) {
+      throw new BadRequestException('Message content is required');
     }
 
-    const author = await this.userService.findById(authorId);
-    if (!author) {
-      throw new NotFoundException('Author not found');
-    }
-
-    const message = await this.messageRepository.findOne({
-      where: { id: messageId },
-      relations: ['conversation'],
+    const message = await this.findByIdOrThrow(messageId, {
+      relations: {
+        conversation: true,
+      },
     });
-    if (!message) {
-      throw new NotFoundException('Message not found');
-    }
 
-    if (message.author.id !== authorId) {
+    if (message.author.id !== userId) {
       throw new BadRequestException('You are not the author of this message');
     }
 
-    if (message.conversation.type === ConversationType.DIRECT) {
-      if (
-        message.conversation.initiator.id !== authorId &&
-        message.conversation.participant?.id !== authorId
-      ) {
-        throw new BadRequestException(
-          'You are not a participant of this conversation',
-        );
-      }
-    }
-
-    if (message.conversation.type === ConversationType.INQUIRY) {
-      if (
-        message.conversation.initiator.id !== authorId &&
-        message.conversation.participant?.id !== authorId
-      ) {
-        throw new BadRequestException(
-          'You are not a participant of this conversation',
-        );
-      }
+    if (
+      message.conversation.initiator.id !== userId &&
+      message.conversation.participant?.id !== userId
+    ) {
+      throw new BadRequestException(
+        'You are not a participant of this conversation',
+      );
     }
 
     if (content) {
-      message.messageContent = content;
+      message.content = content;
     }
 
     const updatedMessage = await this.messageRepository.save(message);
 
-    // Upload attachments if provided
-    if (attachments && attachments.length > 0) {
-      await this.attachmentsService.uploadFiles(
-        updatedMessage.id,
-        AttachmentEntityType.MESSAGE,
-        attachments,
-        authorId,
-      );
-    }
+    const attachments = await this.attachmentsService.findByEntity(
+      updatedMessage.id,
+      AttachmentEntityType.MESSAGE,
+    );
 
     return {
       ...updatedMessage,
-      hasAttachments: attachments && attachments.length > 0,
+      attachments,
     };
   }
 
@@ -208,49 +245,32 @@ export class MessageService {
    * Delete a message
    * @param userId - The id of the user
    * @param messageId - The id of the message
-   * @returns The message
    */
-  async deleteMessage(userId: number, messageId: number) {
-    const author = await this.userService.findById(userId);
-    if (!author) {
-      throw new NotFoundException('Author not found');
-    }
-
-    const message = await this.messageRepository.findOne({
-      where: { id: messageId },
-      relations: ['conversation'],
+  async deleteMessage(userId: number, messageId: number): Promise<void> {
+    const message = await this.findByIdOrThrow(messageId, {
+      relations: {
+        conversation: true,
+      },
     });
-    if (!message) {
-      throw new NotFoundException('Message not found');
-    }
 
     if (message.author.id !== userId) {
       throw new BadRequestException('You are not the author of this message');
     }
 
-    if (message.conversation.type === ConversationType.DIRECT) {
-      if (
-        message.conversation.initiator.id !== userId &&
-        message.conversation.participant?.id !== userId
-      ) {
-        throw new BadRequestException(
-          'You are not a participant of this conversation',
-        );
-      }
+    if (
+      message.conversation.initiator.id !== userId &&
+      message.conversation.participant?.id !== userId
+    ) {
+      throw new BadRequestException(
+        'You are not a participant of this conversation',
+      );
     }
 
-    if (message.conversation.type === ConversationType.INQUIRY) {
-      if (
-        message.conversation.initiator.id !== userId &&
-        message.conversation.participant?.id !== userId
-      ) {
-        throw new BadRequestException(
-          'You are not a participant of this conversation',
-        );
-      }
-    }
+    await this.attachmentsService.softDeleteByEntity(
+      messageId,
+      AttachmentEntityType.MESSAGE,
+    );
 
-    // TODO: Soft delete the message
-    return this.messageRepository.delete(messageId);
+    await this.messageRepository.softDelete(messageId);
   }
 }

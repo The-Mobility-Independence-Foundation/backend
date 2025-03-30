@@ -10,7 +10,7 @@ import {
   Delete,
   UploadedFiles,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
 import { SendMessageDto } from './dto/send-message.dto';
@@ -22,6 +22,10 @@ import { ResourceAccessStrategyToken } from '../common/resource-access/interface
 import { FileUpload } from '../common/decorators/file-upload.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { FilesValidationPipe } from '../common/pipes/files-validation.pipe';
+import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
+import { MessageResponse } from './respones/message.response';
+import { SendMessageResponse } from './respones/send-message.response';
+import { UpdateMessageResponse } from './respones/update-message.response';
 
 @ApiTags('conversations')
 @Controller('conversations/:conversationId/messages')
@@ -30,12 +34,17 @@ export class ConversationsMessagesController {
   constructor(private readonly messageService: MessageService) {}
 
   @Get()
-  @ResponseMessage('Successfully retrieved messages')
   @ApiOperation({ summary: 'Get messages for a conversation' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully retrieved messages',
+    type: BaseApiCursorPaginationResponse,
+  })
+  @ResponseMessage('Successfully retrieved messages')
   async findAll(
     @Param('conversationId', ParseIntPipe) conversationId: number,
     @Query() paginationDto: CursorPaginationDto,
-  ) {
+  ): Promise<BaseApiCursorPaginationResponse<MessageResponse>> {
     return this.messageService.findAll(conversationId, paginationDto);
   }
 
@@ -50,6 +59,11 @@ export class ConversationsMessagesController {
     },
   })
   @ApiOperation({ summary: 'Send a message to a conversation' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully sent a message',
+    type: MessageResponse,
+  })
   @ResponseMessage('Successfully sent a message')
   async sendMessage(
     @CurrentUser() user: User,
@@ -57,35 +71,28 @@ export class ConversationsMessagesController {
     @Body() sendMessageDto: SendMessageDto,
     @UploadedFiles(new FilesValidationPipe({ fileIsRequired: false }))
     files: Express.Multer.File[],
-  ) {
-    sendMessageDto.attachments = files;
+  ): Promise<SendMessageResponse> {
     return this.messageService.sendMessage(
       user.id,
       conversationId,
       sendMessageDto,
+      files,
     );
   }
 
   @Patch(':messageId')
-  @FileUpload({
-    properties: {
-      content: {
-        type: 'string',
-        description: 'The updated content of the message',
-        example: 'Updated message content',
-      },
-    },
-  })
   @ApiOperation({ summary: 'Update a message' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully updated a message',
+    type: MessageResponse,
+  })
   @ResponseMessage('Successfully updated a message')
   async updateMessage(
     @CurrentUser() user: User,
     @Param('messageId', ParseIntPipe) messageId: number,
     @Body() updateMessageDto: UpdateMessageDto,
-    @UploadedFiles(new FilesValidationPipe({ fileIsRequired: false }))
-    files: Express.Multer.File[],
-  ) {
-    updateMessageDto.attachments = files;
+  ): Promise<UpdateMessageResponse> {
     return this.messageService.updateMessage(
       user.id,
       messageId,
@@ -94,12 +101,16 @@ export class ConversationsMessagesController {
   }
 
   @Delete(':messageId')
-  @ResponseMessage('Successfully deleted a message')
   @ApiOperation({ summary: 'Delete a message' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully deleted a message',
+  })
+  @ResponseMessage('Successfully deleted a message')
   async deleteMessage(
     @CurrentUser() user: User,
     @Param('messageId', ParseIntPipe) messageId: number,
-  ) {
+  ): Promise<void> {
     return this.messageService.deleteMessage(user.id, messageId);
   }
 }

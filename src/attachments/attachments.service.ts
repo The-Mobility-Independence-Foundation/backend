@@ -201,6 +201,18 @@ export class AttachmentsService {
   }
 
   /**
+   * Soft delete attachments by entity id and type
+   * @param entityId - The id of the entity the attachment belongs to
+   * @param entityType - The type of the entity the attachment belongs to
+   */
+  async softDeleteByEntity(
+    entityId: number,
+    entityType: AttachmentEntityType,
+  ): Promise<void> {
+    await this.attachmentRepository.softDelete({ entityId, entityType });
+  }
+
+  /**
    * Soft delete an attachment
    * @param attachmentId - The id of the attachment to soft delete
    */
