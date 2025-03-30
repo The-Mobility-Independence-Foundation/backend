@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ModelService } from './model.service';
+import { ModelService } from '../model.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Manufacturer, Model } from './model.entity';
+import { Manufacturer, Model } from '../model.entity';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -28,7 +28,7 @@ describe('ModelService', () => {
       ],
     }).compile();
 
-    service = module.get<ModelService>(ModelService);
+    service = module.get(ModelService);
   });
 
   it('should be defined', () => {

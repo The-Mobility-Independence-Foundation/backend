@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ModelController } from './model.controller';
-import { ModelService } from './model.service';
+import { ModelController } from '../model.controller';
+import { ModelService } from '../model.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Manufacturer, Model } from './model.entity';
+import { Manufacturer, Model } from '../model.entity';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -30,7 +30,7 @@ describe('ModelController', () => {
       ],
     }).compile();
 
-    controller = module.get<ModelController>(ModelController);
+    controller = module.get(ModelController);
   });
 
   it('should be defined', () => {

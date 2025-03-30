@@ -55,21 +55,6 @@ export class Order {
   @Column({ type: 'timestamp', nullable: true, default: null })
   dateCompleted: Date;
 
-  @Column({ type: 'varchar', length: 100 })
-  addressLine1: string;
-
-  @Column({ type: 'varchar', length: 100, default: '' })
-  addressLine2: string;
-
-  @Column({ type: 'varchar', length: 30 })
-  city: string;
-
-  @Column({ type: 'varchar', length: 15 })
-  state: string;
-
-  @Column({ type: 'varchar', length: 10 })
-  zipcode: string;
-
   @OneToMany(() => Review, (review) => review.order)
   receivedReviews: Review[];
 }
