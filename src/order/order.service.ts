@@ -50,7 +50,7 @@ export class OrderService {
     if (providerOrganization) {
       order.providerOrganization = providerOrganization;
     }
-    
+
     order.quantity = 1;
 
     return this.orderRepository.save(order);

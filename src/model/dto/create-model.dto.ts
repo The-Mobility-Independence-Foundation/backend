@@ -3,7 +3,7 @@ import { IsInt, IsNotEmpty, IsPositive } from 'class-validator';
 
 export class CreateModelDto {
   @ApiProperty()
-  @IsNotEmpty({message: 'Manufacturer can not be empty'})
+  @IsNotEmpty({ message: 'Manufacturer can not be empty' })
   @IsInt()
   @IsPositive()
   manufacturerId: number;
@@ -13,7 +13,7 @@ export class CreateModelDto {
   name: string;
 
   @ApiProperty()
-  @IsNotEmpty({message: 'Year can not be empty'})
+  @IsNotEmpty({ message: 'Year can not be empty' })
   @IsInt()
   @IsPositive()
   year: number;
