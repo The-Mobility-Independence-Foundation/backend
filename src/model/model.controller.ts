@@ -1,4 +1,12 @@
-import { Controller, Post, Get, Param, Body, Query, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Param,
+  Body,
+  Query,
+  Patch,
+} from '@nestjs/common';
 import { ModelService } from './model.service';
 import { Model } from './model.entity';
 import { CreateModelDto } from './dto/create-model.dto';
@@ -26,7 +34,9 @@ export class ModelController {
   @Get()
   @ApiOperation({ summary: 'Retrieve a list of all models' })
   @ResponseMessage('Successfully retrieved all models')
-  findAll(@Query() query: GetModelsDto): Promise<BaseApiCursorPaginationResponse<Model>> {
+  findAll(
+    @Query() query: GetModelsDto,
+  ): Promise<BaseApiCursorPaginationResponse<Model>> {
     return this.modelService.findAll(query);
   }
 

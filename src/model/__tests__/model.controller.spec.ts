@@ -1,7 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ModelController } from '../model.controller';
 import { createMock } from '@golevelup/ts-jest';
-import { STRATEGY_PROVIDERS_TOKEN, ResourceAccessStrategyRegistry } from '../../common/resource-access/interfaces/strategy-provider.interface';
+import {
+  STRATEGY_PROVIDERS_TOKEN,
+  ResourceAccessStrategyRegistry,
+} from '../../common/resource-access/interfaces/strategy-provider.interface';
 
 describe('ModelController', () => {
   let controller: ModelController;
@@ -16,8 +19,8 @@ describe('ModelController', () => {
         },
       ],
     })
-    .useMocker(createMock)
-    .compile();
+      .useMocker(createMock)
+      .compile();
 
     controller = module.get(ModelController);
   });

@@ -6,7 +6,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from '../common/common.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Model, ModelType, Manufacturer]), CommonModule],
+  imports: [
+    TypeOrmModule.forFeature([Model, ModelType, Manufacturer]),
+    CommonModule,
+  ],
   providers: [ModelService],
   exports: [ModelService],
   controllers: [ModelController],

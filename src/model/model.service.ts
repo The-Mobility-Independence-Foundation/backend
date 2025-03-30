@@ -17,7 +17,7 @@ export class ModelService {
   ) {}
 
   /**
-   * Method used to create a new model 
+   * Method used to create a new model
    * @param dto : All the needed informatioin to create a mofel
    * @returns : A success message if it was created properly
    */
@@ -61,15 +61,15 @@ export class ModelService {
     });
 
     return this.paginationService.paginateWithCursor(
-      this.modelRepository, 
+      this.modelRepository,
       paginationDto,
       {
         cursorColumn: 'id',
         where: findWhere,
         relations: {
-          manufacturer: true, 
-          types: true,        
-          parts: true,        
+          manufacturer: true,
+          types: true,
+          parts: true,
         },
       },
     );
@@ -123,9 +123,9 @@ export class ModelService {
   async update(id: number, dto: UpdateModelDto): Promise<Model> {
     const model = await this.findByIdOrThrow(id, {
       relations: {
-        manufacturer: true, 
-        types: true,        
-        parts: true,        
+        manufacturer: true,
+        types: true,
+        parts: true,
       },
     });
 
