@@ -1,47 +1,84 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Manufacturer, Model } from './model.entity';
+import { Model } from './model.entity';
 import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PaginationService } from '../common/services/pagination.service';
+import { CreateModelDto } from './dto/create-model.dto';
+import { GetModelsDto } from './dto/get-model.dto';
+import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
+import { UpdateModelDto } from './dto/update-model.dto';
 
 @Injectable()
 export class ModelService {
   constructor(
     @InjectRepository(Model)
     private readonly modelRepository: Repository<Model>,
-
-    @InjectRepository(Manufacturer)
-    private readonly manufacturerRepository: Repository<Manufacturer>,
+    private readonly paginationService: PaginationService,
   ) {}
 
   /**
-   *
-   * @returns
+   * Method used to create a new model 
+   * @param dto : All the needed informatioin to create a mofel
+   * @returns : A success message if it was created properly
    */
-  async create() {
+  async create(dto: CreateModelDto) {
     const model = new Model();
-    const manufacturer = await this.manufacturerRepository.findOneBy({ id: 1 });
 
-    if (manufacturer) {
-      model.manufacturer = manufacturer;
+    /** 
+     * uncomment when manufacturer pr is in 
+    model.manufacturer = await this.manufacturerService.findByIdOrThrow(dto.manufacturerId);
+    */
+
+    model.year = dto.year;
+    model.name = dto.name;
+
+    /**
+     * uncomment when model type pr is in
+    if (dto.modelTypeIds && dto.modelTypeIds.length > 0) {
+      model.types = await this.modelTypeService.findBy({
+          id: In(dto.modelTypeIds),
+      });
     }
-    model.name = 'Model Name';
-    model.year = 2025;
-
+    */
     return this.modelRepository.save(model);
   }
 
   /**
-   *
-   * @returns
+   * Find all models with possible filters
+   * @param query : Possible filters when searching
+   * @returns : A paginated list of all models
    */
-  async findAll() {
-    return this.modelRepository.find();
+  async findAll(query: GetModelsDto) {
+    const findWhere: any = {
+      name: query.name,
+    };
+
+    const paginationDto = new CursorPaginationDto();
+    Object.assign(paginationDto, {
+      cursor: query.cursor,
+      limit: query.limit,
+      direction: query.direction,
+    });
+
+    return this.paginationService.paginateWithCursor(
+      this.modelRepository, 
+      paginationDto,
+      {
+        cursorColumn: 'id',
+        where: findWhere,
+        relations: {
+          manufacturer: true, 
+          types: true,        
+          parts: true,        
+        },
+      },
+    );
   }
 
   /**
-   *
-   * @param id
-   * @returns
+   * Find a specific model give an ID
+   * @param id : The ID of the model
+   * @returns : The model being looked for
    */
   async findOne(id: number) {
     return this.modelRepository.findOneBy({ id: id });
@@ -75,5 +112,39 @@ export class ModelService {
     } else {
       throw new NotFoundException('Model not found');
     }
+  }
+
+  /**
+   * Change the information on a certain model
+   * @param id : The ID of the model wished to be changed
+   * @param dto : The information to be changed
+   * @returns : A success message if updated properly
+   */
+  async update(id: number, dto: UpdateModelDto): Promise<Model> {
+    const model = await this.findByIdOrThrow(id, {
+      relations: {
+        manufacturer: true, 
+        types: true,        
+        parts: true,        
+      },
+    });
+
+    model.name = dto.name;
+    model.year = dto.year;
+
+    /**
+     * uncomment when both prs are merged
+    if (dto.manufacturerId) {
+        model.manufacturer = await this.manufacturerService.findByIdOrThrow(dto.manufacturerId);
+    }
+
+    if (dto.modelTypeIds) {
+      model.types = await Promise.all(
+          dto.modelTypeIds.map((typeId) => this.modelTypeService.findByIdOrThrow(typeId))
+      );
+    }
+    */
+
+    return this.modelRepository.save(model);
   }
 }
