@@ -10,6 +10,7 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
+import { Address } from '../address/address.entity';
 
 export enum OrderStatus {
   INITIATED = 'initiated',
@@ -29,7 +30,7 @@ export class Order {
 
   @JoinColumn()
   @ManyToOne(() => User, (user) => user.ordersManaged)
-  provider: User;
+  provider: User | null;
 
   @JoinColumn()
   @ManyToOne(() => Organization, (org) => org.orders)
@@ -55,20 +56,9 @@ export class Order {
   @Column({ type: 'timestamp', nullable: true, default: null })
   dateCompleted: Date;
 
-  @Column({ type: 'varchar', length: 100 })
-  addressLine1: string;
-
-  @Column({ type: 'varchar', length: 100, default: '' })
-  addressLine2: string;
-
-  @Column({ type: 'varchar', length: 30 })
-  city: string;
-
-  @Column({ type: 'varchar', length: 15 })
-  state: string;
-
-  @Column({ type: 'varchar', length: 10 })
-  zipcode: string;
+  @JoinColumn()
+  @ManyToOne(() => Address, (address) => address.orders)
+  address: Address;
 
   @OneToMany(() => Review, (review) => review.order)
   receivedReviews: Review[];

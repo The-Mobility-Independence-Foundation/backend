@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { Order } from './order.entity';
+import { Order, OrderStatus } from './order.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../user/entities/user.entity';
-import { Listing } from '../listing/listing.entity';
-import { Organization } from '../organization/organization.entity';
+import { UserService } from '../user/user.service';
+import { OrganizationService } from '../organization/organization.service';
+import { ListingService } from '../listing/listing.service';
+import { CreateOrderDto } from './dto/create-order-dto';
+import { CreateAddressDto } from '../address/dto/create-address.dto';
+import { AddressService } from '../address/address.service';
 
 @Injectable()
 export class OrderService {
@@ -12,51 +15,41 @@ export class OrderService {
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
 
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-
-    @InjectRepository(Listing)
-    private readonly listingRepository: Repository<Listing>,
-
-    @InjectRepository(Organization)
-    private readonly organizationRepository: Repository<Organization>,
+    private readonly userService: UserService,
+    private readonly listingService: ListingService,
+    private readonly organizationService: OrganizationService,
+    private readonly addressService: AddressService,
   ) {}
 
-  async create() {
+  async create(dto: CreateOrderDto) {
     const order = new Order();
-
-    const recipient = await this.userRepository.findOneBy({ id: 1 });
-    const recipientOrganization = await this.organizationRepository.findOneBy({
-      id: 2,
+    const listing = await this.listingService.findByIdOrThrow(dto.listingId, {
+      relations: { owner: true },
     });
-    const provider = await this.userRepository.findOneBy({ id: 2 });
-    const providerOrganization = await this.organizationRepository.findOneBy({
-      id: 1,
+    const recipient = await this.userService.findByIdOrThrow(dto.recipientId, {
+      relations: { organization: true },
     });
-    const listing = await this.listingRepository.findOneBy({ id: 1 });
 
-    if (listing) {
-      order.listing = listing;
-    }
-    if (provider) {
-      order.provider = provider;
-    }
-    if (recipient) {
-      order.recipient = recipient;
-    }
-    if (recipientOrganization) {
-      order.recipientOrganization = recipientOrganization;
-    }
-    if (providerOrganization) {
-      order.providerOrganization = providerOrganization;
-    }
+    const addressData = new CreateAddressDto();
+    Object.assign(addressData, {
+      addressLine1: dto.addressLine1,
+      addressLine2: dto.addressLine2,
+      city: dto.city,
+      state: dto.state,
+      zipCode: dto.zipCode,
+    });
+    const address = await this.addressService.create(addressData);
 
-    order.addressLine1 = '1789 State Highway 8';
-    order.city = 'Mount Upton';
-    order.state = 'New York';
-    order.zipcode = '13809';
-
-    order.quantity = 1;
+    Object.assign(order, {
+      listing: listing,
+      providerOrganization: listing.owner,
+      recipient: recipient,
+      recipientOrganization: recipient.organization,
+      quantity: dto.quantity,
+      status: OrderStatus.PENDING,
+      dateCreated: new Date(),
+      address: address,
+    });
 
     return this.orderRepository.save(order);
   }
