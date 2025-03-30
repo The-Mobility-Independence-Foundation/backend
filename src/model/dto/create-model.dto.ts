@@ -19,8 +19,8 @@ export class CreateModelDto {
   year: number;
 
   @ApiProperty({ type: [Number], required: false })
-  @IsInt({ each: true }) 
-  @IsPositive({ each: true }) 
+  @IsInt({ each: true })
+  @IsPositive({ each: true })
   @IsOptional()
   modelTypeIds: number[];
 }

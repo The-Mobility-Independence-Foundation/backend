@@ -20,11 +20,11 @@ export class GetModelsDto extends CursorPaginationDto {
   year?: number;
 
   @IsOptional()
-  @IsInt({ each: true }) 
-  @IsPositive({ each: true }) 
-  @ApiPropertyOptional({ 
-    type: [Number], 
-    description: 'Filter by multiple Model Type IDs' 
+  @IsInt({ each: true })
+  @IsPositive({ each: true })
+  @ApiPropertyOptional({
+    type: [Number],
+    description: 'Filter by multiple Model Type IDs',
   })
   modelTypeIds?: number[];
 }
