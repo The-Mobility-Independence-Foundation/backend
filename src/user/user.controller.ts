@@ -43,7 +43,9 @@ export class UserController {
   @ResponseMessage('Successfully found user')
   @ApiOperation({ summary: 'Find a specific user given their id' })
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.userService.findByIdOrThrow(id);
+    return this.userService.findByIdOrThrow(id, {
+      relations: { organization: true },
+    });
   }
 
   @Patch(':userId')

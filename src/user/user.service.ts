@@ -117,6 +117,7 @@ export class UserService {
       {
         cursorColumn: 'id',
         where: findWhere,
+        relations: { organization: true },
       },
     );
   }
