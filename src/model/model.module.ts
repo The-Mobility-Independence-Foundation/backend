@@ -9,7 +9,7 @@ import { ManufacturerModule } from '../manufacturer/manufacturer.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Model, ModelType, Manufacturer]),
+    TypeOrmModule.forFeature([Model]),
     CommonModule,
     ModelTypeModule,
     ManufacturerModule,
