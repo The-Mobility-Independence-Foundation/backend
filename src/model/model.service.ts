@@ -53,9 +53,23 @@ export class ModelService {
    * @returns : A paginated list of all models
    */
   async findAll(query: GetModelsDto) {
-    const findWhere: any = {
-      name: query.name,
-    };
+    const findWhere: any = {};
+
+    if (query.name) {
+      findWhere.name = query.name;
+    }
+
+    if (query.modelTypeIds) {
+      findWhere.modelTypeIds = query.modelTypeIds;
+    }
+
+    if(query.manufacturerId){
+      findWhere.manufacturerId = query.manufacturerId;
+    }
+
+    if(query.year){
+      findWhere.year = query.year;
+    }
 
     const paginationDto = new CursorPaginationDto();
     Object.assign(paginationDto, {
@@ -143,11 +157,7 @@ export class ModelService {
     }
 
     if (dto.modelTypeIds) {
-      model.types = await Promise.all(
-        dto.modelTypeIds.map((typeId) =>
-          this.modelTypeService.findByIdOrThrow(typeId),
-        ),
-      );
+      model.types = await this.modelTypeService.findByIdsOrThrow(dto.modelTypeIds);
     }
 
     return this.modelRepository.save(model);
