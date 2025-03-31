@@ -9,6 +9,7 @@ import {
   ManyToOne,
   ManyToMany,
   JoinTable,
+  Check,
 } from 'typeorm';
 import { Tag } from '../tag/tag.entity';
 import { Model } from '../model/model.entity';
@@ -36,6 +37,7 @@ export class InventoryItem {
   quantity: number;
 
   @Column({ default: 0 })
+  @Check(`"publicCount" <= "quantity"`)
   publicCount: number;
 
   @IsOptional()
