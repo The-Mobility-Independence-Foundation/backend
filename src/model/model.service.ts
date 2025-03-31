@@ -29,17 +29,19 @@ export class ModelService {
     const model = new Model();
 
     model.manufacturer = await this.manufacturerService.findByIdOrThrow(
-      dto.manufacturerId, {
-        relations: {models: true},
-      }
+      dto.manufacturerId,
+      {
+        relations: { models: true },
+      },
     );
 
     model.year = dto.year;
     model.name = dto.name;
     model.types = await this.modelTypeService.findByIdsOrThrow(
-      dto.modelTypeIds, {
-        relations: {models: true},
-      }
+      dto.modelTypeIds,
+      {
+        relations: { models: true },
+      },
     );
 
     return this.modelRepository.save(model);
