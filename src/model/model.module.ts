@@ -12,7 +12,7 @@ import { ManufacturerModule } from '../manufacturer/manufacturer.module';
     TypeOrmModule.forFeature([Model, ModelType, Manufacturer]),
     CommonModule,
     ModelTypeModule,
-    ManufacturerModule
+    ManufacturerModule,
   ],
   providers: [ModelService],
   exports: [ModelService],

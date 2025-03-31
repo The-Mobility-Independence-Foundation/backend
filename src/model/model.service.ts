@@ -17,7 +17,7 @@ export class ModelService {
     private readonly modelRepository: Repository<Model>,
     private readonly paginationService: PaginationService,
     private readonly modelTypeService: ModelTypeService,
-    private readonly manufacturerService: ManufacturerService
+    private readonly manufacturerService: ManufacturerService,
   ) {}
 
   /**
@@ -28,12 +28,16 @@ export class ModelService {
   async create(dto: CreateModelDto) {
     const model = new Model();
 
-    model.manufacturer = await this.manufacturerService.findByIdOrThrow(dto.manufacturerId);
+    model.manufacturer = await this.manufacturerService.findByIdOrThrow(
+      dto.manufacturerId,
+    );
 
     model.year = dto.year;
     model.name = dto.name;
-    model.types = await this.modelTypeService.findByIdsOrThrow(dto.modelTypeIds);
-    
+    model.types = await this.modelTypeService.findByIdsOrThrow(
+      dto.modelTypeIds,
+    );
+
     return this.modelRepository.save(model);
   }
 
@@ -127,12 +131,16 @@ export class ModelService {
     model.year = dto.year;
 
     if (dto.manufacturerId) {
-        model.manufacturer = await this.manufacturerService.findByIdOrThrow(dto.manufacturerId);
+      model.manufacturer = await this.manufacturerService.findByIdOrThrow(
+        dto.manufacturerId,
+      );
     }
 
     if (dto.modelTypeIds) {
       model.types = await Promise.all(
-          dto.modelTypeIds.map((typeId) => this.modelTypeService.findByIdOrThrow(typeId))
+        dto.modelTypeIds.map((typeId) =>
+          this.modelTypeService.findByIdOrThrow(typeId),
+        ),
       );
     }
 

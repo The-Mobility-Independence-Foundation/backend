@@ -1,7 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationService } from '../common/services/pagination.service';
-import { FindOptionsRelations, FindOptionsWhere, In, Repository } from 'typeorm';
+import {
+  FindOptionsRelations,
+  FindOptionsWhere,
+  In,
+  Repository,
+} from 'typeorm';
 import { ModelType } from '../model/model.entity';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { GetModelTypesDto } from './dto/get-model-type.dto';
@@ -135,7 +140,7 @@ export class ModelTypeService {
     }> = {},
   ) {
     const { where = {}, relations } = options;
-  
+
     const modelTypes = await this.modelTypeRepository.find({
       where: {
         ...where,
@@ -143,7 +148,7 @@ export class ModelTypeService {
       },
       relations: relations as string[],
     });
-  
+
     if (modelTypes.length === ids.length) {
       return modelTypes;
     } else {
