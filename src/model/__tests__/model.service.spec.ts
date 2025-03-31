@@ -141,7 +141,7 @@ describe('ModelService', () => {
 
     it('should use model type search when a model type is specified', async () => {
       Object.assign(getDto, {
-        modelTypeIds: [modelType.id]
+        modelTypeIds: [modelType.id],
       });
 
       service.findAll(getDto);
@@ -161,7 +161,7 @@ describe('ModelService', () => {
 
     it('should use manufacturer search when a manufacturer ID is specified', async () => {
       Object.assign(getDto, {
-        manufacturerId: manufacturer.id
+        manufacturerId: manufacturer.id,
       });
 
       service.findAll(getDto);
@@ -181,7 +181,7 @@ describe('ModelService', () => {
 
     it('should use name search when a name is specified', async () => {
       Object.assign(getDto, {
-        name: model.name
+        name: model.name,
       });
 
       service.findAll(getDto);
@@ -201,7 +201,7 @@ describe('ModelService', () => {
 
     it('should use year search when a year is specified', async () => {
       Object.assign(getDto, {
-        year: model.year
+        year: model.year,
       });
 
       service.findAll(getDto);
@@ -247,39 +247,40 @@ describe('ModelService', () => {
     const manufacturer = new Manufacturer();
 
     beforeAll(() => {
-      Object.assign(modelType, { id: 1, name: 'Example Type'});
+      Object.assign(modelType, { id: 1, name: 'Example Type' });
       Object.assign(manufacturer, { id: 1 });
       Object.assign(model, {
         id: 1,
         name: 'wheel',
         year: 2001,
         types: [],
-        },
-      );
+      });
     });
 
     beforeEach(() => {
       updateDto = new UpdateModelDto();
     });
-  
+
     it('Should update the manufacturer of a model if specified', async () => {
       Object.assign(updateDto, {
         manufacturerId: manufacturer.id,
       });
-    
+
       when(modelRepository.findOne)
         .calledWith(expect.objectContaining({ where: { id: model.id } }))
         .mockResolvedValue(Promise.resolve(model));
-    
+
       when(manufacturerService.findByIdOrThrow)
         .calledWith(manufacturer.id)
         .mockResolvedValue(manufacturer);
-    
+
       await expect(service.update(model.id, updateDto)).resolves.not.toThrow();
-    
-      expect(modelRepository.save).toHaveBeenCalledWith(expect.objectContaining({
-        manufacturer: manufacturer
-      }));
+
+      expect(modelRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          manufacturer: manufacturer,
+        }),
+      );
     });
 
     it('Should update the name of a model if specified', async () => {
@@ -291,12 +292,10 @@ describe('ModelService', () => {
         .calledWith(expect.objectContaining({ where: { id: model.id } }))
         .mockResolvedValue(Promise.resolve(model));
 
-      await expect(
-        service.update(model.id, updateDto),
-      ).resolves.not.toThrow();
+      await expect(service.update(model.id, updateDto)).resolves.not.toThrow();
       expect(modelRepository.save).toHaveBeenCalled();
     });
-    
+
     it('Should update the year of a model if specified', async () => {
       Object.assign(updateDto, {
         year: 2020,
@@ -306,9 +305,7 @@ describe('ModelService', () => {
         .calledWith(expect.objectContaining({ where: { id: model.id } }))
         .mockResolvedValue(Promise.resolve(model));
 
-      await expect(
-        service.update(model.id, updateDto),
-      ).resolves.not.toThrow();
+      await expect(service.update(model.id, updateDto)).resolves.not.toThrow();
       expect(modelRepository.save).toHaveBeenCalled();
     });
 
@@ -316,22 +313,26 @@ describe('ModelService', () => {
       Object.assign(updateDto, {
         modelTypeIds: [modelType.id],
       });
-  
+
       when(modelRepository.findOne)
         .calledWith(expect.objectContaining({ where: { id: model.id } }))
         .mockResolvedValue(Promise.resolve(model));
-  
+
       when(modelTypeService.findByIdsOrThrow)
         .calledWith([modelType.id])
-        .mockResolvedValue([{ id: modelType.id, name: 'Example Type' } as ModelType]);
-  
+        .mockResolvedValue([
+          { id: modelType.id, name: 'Example Type' } as ModelType,
+        ]);
+
       await expect(service.update(model.id, updateDto)).resolves.not.toThrow();
-  
-      expect(modelRepository.save).toHaveBeenCalledWith(expect.objectContaining({
-        types: expect.arrayContaining([
-          expect.objectContaining({ id: modelType.id })
-        ])
-      }));
+
+      expect(modelRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          types: expect.arrayContaining([
+            expect.objectContaining({ id: modelType.id }),
+          ]),
+        }),
+      );
     });
   });
 
@@ -339,28 +340,28 @@ describe('ModelService', () => {
     const model = new Model();
 
     beforeEach(() => {
-      Object.assign(model, { id: 1  });
+      Object.assign(model, { id: 1 });
     });
 
     it('should find a model if valid id given', async () => {
       when(modelRepository.findOneBy)
-      .calledWith(
-        expect.objectContaining({
-          where: { id: model.id },
-          relations: expect.objectContaining({
-            manufacturer: true,
-            types: true,
-            parts: true,
+        .calledWith(
+          expect.objectContaining({
+            where: { id: model.id },
+            relations: expect.objectContaining({
+              manufacturer: true,
+              types: true,
+              parts: true,
+            }),
           }),
-        })
-      )
-      .mockResolvedValue(model);
+        )
+        .mockResolvedValue(model);
 
-    const result = await service.findByIdOrThrow(1, {
-      relations: ['manufacturer', 'types', 'parts'],
-    });
+      const result = await service.findByIdOrThrow(1, {
+        relations: ['manufacturer', 'types', 'parts'],
+      });
 
-    expect(result).toBeDefined();
+      expect(result).toBeDefined();
     });
 
     it('should throw NotFoundException if model is not found', async () => {
@@ -373,14 +374,15 @@ describe('ModelService', () => {
               types: true,
               parts: true,
             }),
-          })
+          }),
         )
-        .mockResolvedValue(null); 
+        .mockResolvedValue(null);
 
-      
-      await expect(service.findByIdOrThrow(9999, {
-        relations: ['manufacturer', 'types', 'parts'],
-      })).rejects.toThrow(NotFoundException);
+      await expect(
+        service.findByIdOrThrow(9999, {
+          relations: ['manufacturer', 'types', 'parts'],
+        }),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });

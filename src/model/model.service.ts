@@ -63,11 +63,11 @@ export class ModelService {
       findWhere.modelTypeIds = query.modelTypeIds;
     }
 
-    if(query.manufacturerId){
+    if (query.manufacturerId) {
       findWhere.manufacturerId = query.manufacturerId;
     }
 
-    if(query.year){
+    if (query.year) {
       findWhere.year = query.year;
     }
 
@@ -157,7 +157,9 @@ export class ModelService {
     }
 
     if (dto.modelTypeIds) {
-      model.types = await this.modelTypeService.findByIdsOrThrow(dto.modelTypeIds);
+      model.types = await this.modelTypeService.findByIdsOrThrow(
+        dto.modelTypeIds,
+      );
     }
 
     return this.modelRepository.save(model);
