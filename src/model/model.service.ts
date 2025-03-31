@@ -7,6 +7,8 @@ import { CreateModelDto } from './dto/create-model.dto';
 import { GetModelsDto } from './dto/get-model.dto';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { UpdateModelDto } from './dto/update-model.dto';
+import { ModelTypeService } from '../model-type/model-type.service';
+import { ManufacturerService } from '../manufacturer/manufacturer.service';
 
 @Injectable()
 export class ModelService {
@@ -14,6 +16,8 @@ export class ModelService {
     @InjectRepository(Model)
     private readonly modelRepository: Repository<Model>,
     private readonly paginationService: PaginationService,
+    private readonly modelTypeService: ModelTypeService,
+    private readonly manufacturerService: ManufacturerService
   ) {}
 
   /**
@@ -24,22 +28,12 @@ export class ModelService {
   async create(dto: CreateModelDto) {
     const model = new Model();
 
-    /** 
-     * uncomment when manufacturer pr is in 
     model.manufacturer = await this.manufacturerService.findByIdOrThrow(dto.manufacturerId);
-    */
 
     model.year = dto.year;
     model.name = dto.name;
-
-    /**
-     * uncomment when model type pr is in
-    if (dto.modelTypeIds && dto.modelTypeIds.length > 0) {
-      model.types = await this.modelTypeService.findBy({
-          id: In(dto.modelTypeIds),
-      });
-    }
-    */
+    model.types = await this.modelTypeService.findByIdsOrThrow(dto.modelTypeIds);
+    
     return this.modelRepository.save(model);
   }
 
@@ -132,8 +126,6 @@ export class ModelService {
     model.name = dto.name;
     model.year = dto.year;
 
-    /**
-     * uncomment when both prs are merged
     if (dto.manufacturerId) {
         model.manufacturer = await this.manufacturerService.findByIdOrThrow(dto.manufacturerId);
     }
@@ -143,7 +135,6 @@ export class ModelService {
           dto.modelTypeIds.map((typeId) => this.modelTypeService.findByIdOrThrow(typeId))
       );
     }
-    */
 
     return this.modelRepository.save(model);
   }
