@@ -15,8 +15,8 @@ export class BaseApiCursorPaginationResponse<T extends ObjectLiteral> {
   @ApiProperty({ type: Boolean })
   hasPreviousPage: boolean;
 
-  @ApiProperty({ type: String })
-  nextCursor: string | null;
+  @ApiProperty({ type: String, required: false })
+  nextCursor?: string | null;
 
   @ApiProperty({ type: String, required: false })
   previousCursor?: string | null;

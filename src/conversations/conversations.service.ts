@@ -149,6 +149,10 @@ export class ConversationsService {
       throw new NotFoundException('Participant not found');
     }
 
+    if (participant.type === UserRole.GUEST) {
+      throw new BadRequestException('Cannot initiate conversation with guest');
+    }
+
     const conversation = this.conversationRepository.create({
       initiatorId,
       participantId,

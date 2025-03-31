@@ -192,6 +192,8 @@ describe('ConversationsMessagesController', () => {
   describe('updateMessage', () => {
     it('should successfully update a message', async () => {
       const messageId = 1;
+      const conversationId = 1;
+
       const user = new User();
       Object.assign(user, { id: 123 });
 
@@ -204,7 +206,7 @@ describe('ConversationsMessagesController', () => {
       const expectedResponse: UpdateMessageResponse = {
         id: messageId,
         author: user,
-        conversationId: 1,
+        conversationId,
         content: updateMessageDto.content,
         attachments: [attachment],
         createdAt: new Date(),
@@ -217,6 +219,7 @@ describe('ConversationsMessagesController', () => {
 
       const result = await controller.updateMessage(
         user,
+        conversationId,
         messageId,
         updateMessageDto,
       );
@@ -235,6 +238,8 @@ describe('ConversationsMessagesController', () => {
   describe('deleteMessage', () => {
     it('should successfully delete a message', async () => {
       const messageId = 1;
+      const conversationId = 1;
+
       const user = new User();
       Object.assign(user, { id: 123 });
 
@@ -242,7 +247,11 @@ describe('ConversationsMessagesController', () => {
         .calledWith(user.id, messageId)
         .mockResolvedValue(undefined);
 
-      const result = await controller.deleteMessage(user, messageId);
+      const result = await controller.deleteMessage(
+        user,
+        conversationId,
+        messageId,
+      );
 
       expect(result).toBeUndefined();
       expect(messageService.deleteMessage).toHaveBeenCalledWith(

@@ -90,6 +90,7 @@ export class ConversationsMessagesController {
   @ResponseMessage('Successfully updated a message')
   async updateMessage(
     @CurrentUser() user: User,
+    @Param('conversationId', ParseIntPipe) _: number,
     @Param('messageId', ParseIntPipe) messageId: number,
     @Body() updateMessageDto: UpdateMessageDto,
   ): Promise<UpdateMessageResponse> {
@@ -109,6 +110,7 @@ export class ConversationsMessagesController {
   @ResponseMessage('Successfully deleted a message')
   async deleteMessage(
     @CurrentUser() user: User,
+    @Param('conversationId', ParseIntPipe) _: number,
     @Param('messageId', ParseIntPipe) messageId: number,
   ): Promise<void> {
     return this.messageService.deleteMessage(user.id, messageId);

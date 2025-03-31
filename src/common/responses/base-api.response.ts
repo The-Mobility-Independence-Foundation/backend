@@ -13,4 +13,7 @@ export class BaseApiResponse<T = any> {
 
   @ApiProperty({ nullable: true })
   data: T | null;
+
+  @ApiProperty({ nullable: true })
+  error?: string | null;
 }

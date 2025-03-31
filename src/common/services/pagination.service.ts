@@ -63,8 +63,8 @@ export class PaginationService {
       includeCount = false,
       withDeleted = false,
     } = options;
-    // TODO: support whereClause as an array
-    let whereClause = { ...where };
+    const whereConditions = Array.isArray(where) ? where : [where];
+
     const orderClause = {
       ...order,
       [cursorColumn]: direction === 'next' ? 'ASC' : 'DESC',
@@ -72,22 +72,27 @@ export class PaginationService {
 
     const decodedCursor = cursor ? this.decodeCursor(cursor) : undefined;
     if (decodedCursor) {
-      whereClause = {
-        ...whereClause,
-        [cursorColumn]:
-          direction === 'next'
-            ? MoreThan(decodedCursor)
-            : LessThan(decodedCursor),
-      };
+      const cursorOperator =
+        direction === 'next'
+          ? MoreThan(decodedCursor)
+          : LessThan(decodedCursor);
+
+      // Apply the cursor condition to each where clause
+      for (let i = 0; i < whereConditions.length; i++) {
+        whereConditions[i] = {
+          ...whereConditions[i],
+          [cursorColumn]: cursorOperator,
+        };
+      }
     }
 
     const items = await repository.find({
       // Fetch one more item than requested to determine if there are more pages
       take: limit + 1,
-      relations,
-      where: whereClause,
+      where: whereConditions,
       order: orderClause,
       withDeleted: withDeleted,
+      relations,
     });
 
     const hasNextPage = items.length > limit;
@@ -96,20 +101,24 @@ export class PaginationService {
     if (direction === 'next') {
       // In "next" direction, previous page exists if we have a cursor
       hasPreviousPage = !!cursor;
-    } else {
+    } else if (items.length > 0) {
       // In "previous" direction, we need to check if there are more items in the opposite direction
-      if (items.length > 0) {
-        // Check if there are any items before the first item in our current set
-        const firstItemId = items[0][cursorColumn];
-        const previousCheck = await repository.count({
-          where: {
-            ...where,
-            [cursorColumn]: LessThan(firstItemId),
-          },
-        });
+      const firstItemId = items[0][cursorColumn];
 
-        hasPreviousPage = previousCheck > 0;
+      // Check if there are any items before the first item in our current set
+      const previousWhereConditions = Array.isArray(where) ? where : [where];
+      for (let i = 0; i < previousWhereConditions.length; i++) {
+        previousWhereConditions[i] = {
+          ...previousWhereConditions[i],
+          [cursorColumn]: LessThan(firstItemId),
+        };
       }
+
+      const previousCheck = await repository.count({
+        where: previousWhereConditions,
+      });
+
+      hasPreviousPage = previousCheck > 0;
     }
 
     // Remove the extra item that we fetched to determine if there are more pages
@@ -122,12 +131,11 @@ export class PaginationService {
       count = await repository.count({ where });
     }
 
-    // TODO: Small bug: Cursor appears on first page when direction is next
     const nextCursor =
-      hasNextPage && items.length > 0
+      items.length > 0 && hasNextPage
         ? this.encodeCursor(items[items.length - 1][cursorColumn])
         : null;
-    // TODO: Small bug here
+
     const previousCursor =
       items.length > 0 && hasPreviousPage
         ? this.encodeCursor(items[0][cursorColumn])

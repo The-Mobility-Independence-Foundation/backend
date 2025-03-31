@@ -160,7 +160,6 @@ describe('MessageService', () => {
       when(messageRepository.findOne)
         .calledWith({
           where: { id: messageId },
-          relations: undefined,
         })
         .mockResolvedValue(null);
 
@@ -237,15 +236,15 @@ describe('MessageService', () => {
   describe('sendMessage', () => {
     it('should send a message to a conversation', async () => {
       const authorId = 1;
-      const conversationId = 2;
       const author = new User();
       Object.assign(author, { id: authorId });
 
+      const conversationId = 2;
       const conversation = new Conversation();
       Object.assign(conversation, {
         id: conversationId,
-        initiator: { id: authorId },
-        participant: { id: 3 },
+        initiatorId: authorId,
+        participantId: 3,
       });
 
       const sendMessageDto: SendMessageDto = {
@@ -286,15 +285,15 @@ describe('MessageService', () => {
 
     it('should send a message with attachments', async () => {
       const authorId = 1;
-      const conversationId = 2;
       const author = new User();
       Object.assign(author, { id: authorId });
 
+      const conversationId = 2;
       const conversation = new Conversation();
       Object.assign(conversation, {
         id: conversationId,
-        initiator: { id: authorId },
-        participant: { id: 3 },
+        initiatorId: authorId,
+        participantId: 3,
       });
 
       const sendMessageDto: SendMessageDto = {
@@ -381,19 +380,32 @@ describe('MessageService', () => {
       );
     });
 
-    it('should throw BadRequestException if message fails to save', async () => {
+    it('should throw BadRequestException if attachments fail to upload', async () => {
       const authorId = 1;
+      const author = new User();
+      Object.assign(author, { id: authorId });
+
       const conversationId = 2;
+      const conversation = new Conversation();
+      Object.assign(conversation, {
+        id: conversationId,
+        initiatorId: authorId,
+        participantId: 3,
+      });
+
       const sendMessageDto: SendMessageDto = {
         content: 'Hello, world!',
       };
 
-      const conversation = new Conversation();
-      Object.assign(conversation, {
-        id: conversationId,
-        initiator: { id: authorId },
-        participant: { id: 3 },
+      const message = new Message();
+      Object.assign(message, {
+        id: 1,
+        author,
+        conversationId,
+        content: sendMessageDto.content,
       });
+
+      const files = [{ filename: 'test.jpg' }] as Express.Multer.File[];
 
       when(conversationsService.findByIdOrThrow)
         .calledWith(conversationId)
@@ -405,36 +417,42 @@ describe('MessageService', () => {
           conversationId,
           content: sendMessageDto.content,
         })
-        .mockRejectedValue(new Error('Database error'));
+        .mockResolvedValue(message);
+
+      when(attachmentsService.uploadFiles)
+        .calledWith(message.id, AttachmentEntityType.MESSAGE, files, authorId)
+        .mockRejectedValue(new Error('Failed to upload attachments'));
 
       await expect(
-        service.sendMessage(authorId, conversationId, sendMessageDto),
+        service.sendMessage(authorId, conversationId, sendMessageDto, files),
       ).rejects.toThrow(
         new BadRequestException('Failed to send message', {
-          cause: new Error('Database error'),
+          cause: new Error('Failed to upload attachments'),
         }),
       );
+      expect(messageRepository.delete).toHaveBeenCalledWith(message.id);
     });
   });
 
   describe('updateMessage', () => {
     it('should update a message', async () => {
       const userId = 1;
-      const messageId = 2;
-      const updateMessageDto: UpdateMessageDto = {
-        content: 'Updated content',
-      };
 
+      const messageId = 2;
       const message = new Message();
       Object.assign(message, {
         id: messageId,
-        author: { id: userId },
+        authorId: userId,
         conversation: {
-          initiator: { id: userId },
-          participant: { id: 3 },
+          initiatorId: userId,
+          participantId: 3,
         },
         content: 'Original content',
       });
+
+      const updateMessageDto: UpdateMessageDto = {
+        content: 'Updated content',
+      };
 
       const updatedMessage = new Message();
       Object.assign(updatedMessage, {
@@ -452,7 +470,7 @@ describe('MessageService', () => {
         .mockResolvedValue(message);
 
       when(messageRepository.save)
-        .calledWith(message)
+        .calledWith(updatedMessage)
         .mockResolvedValue(updatedMessage);
 
       when(attachmentsService.findByEntity)
@@ -482,18 +500,19 @@ describe('MessageService', () => {
 
     it('should throw BadRequestException if user is not the author', async () => {
       const userId = 1;
-      const messageId = 2;
+
       const updateMessageDto: UpdateMessageDto = {
         content: 'Updated content',
       };
 
+      const messageId = 2;
       const message = new Message();
       Object.assign(message, {
         id: messageId,
-        author: { id: 3 }, // Different user
+        authorId: 3,
         conversation: {
-          initiator: { id: userId },
-          participant: { id: 4 },
+          initiatorId: userId,
+          participantId: 4,
         },
       });
 
@@ -513,18 +532,19 @@ describe('MessageService', () => {
 
     it('should throw BadRequestException if user is not a participant', async () => {
       const userId = 1;
-      const messageId = 2;
+
       const updateMessageDto: UpdateMessageDto = {
         content: 'Updated content',
       };
 
+      const messageId = 2;
       const message = new Message();
       Object.assign(message, {
         id: messageId,
-        author: { id: userId },
+        authorId: userId,
         conversation: {
-          initiator: { id: 3 },
-          participant: { id: 4 },
+          initiatorId: 3,
+          participantId: 4,
         },
       });
 
@@ -553,10 +573,10 @@ describe('MessageService', () => {
       const message = new Message();
       Object.assign(message, {
         id: messageId,
-        author: { id: userId },
+        authorId: userId,
         conversation: {
-          initiator: { id: userId },
-          participant: { id: 3 },
+          initiatorId: userId,
+          participantId: 3,
         },
       });
 
@@ -591,10 +611,10 @@ describe('MessageService', () => {
       const message = new Message();
       Object.assign(message, {
         id: messageId,
-        author: { id: 3 }, // Different user
+        authorId: 3,
         conversation: {
-          initiator: { id: userId },
-          participant: { id: 4 },
+          initiatorId: userId,
+          participantId: 4,
         },
       });
 
@@ -617,10 +637,10 @@ describe('MessageService', () => {
       const message = new Message();
       Object.assign(message, {
         id: messageId,
-        author: { id: userId },
+        authorId: userId,
         conversation: {
-          initiator: { id: 3 },
-          participant: { id: 4 },
+          initiatorId: 3,
+          participantId: 4,
         },
       });
 

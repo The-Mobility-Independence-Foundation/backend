@@ -151,16 +151,17 @@ export class MessageService {
       await this.conversationService.findByIdOrThrow(conversationId);
 
     if (
-      conversation.initiator.id !== authorId &&
-      conversation.participant?.id !== authorId
+      conversation.initiatorId !== authorId &&
+      conversation.participantId !== authorId
     ) {
       throw new BadRequestException(
         'You are not a participant of this conversation',
       );
     }
 
+    let message: Message | undefined;
     try {
-      const message = await this.messageRepository.save({
+      message = await this.messageRepository.save({
         authorId,
         conversationId,
         content,
@@ -181,6 +182,10 @@ export class MessageService {
         attachments: attachmentEntities,
       };
     } catch (error) {
+      if (message) {
+        await this.messageRepository.delete(message.id);
+      }
+
       throw new BadRequestException('Failed to send message', {
         cause: error,
       });
@@ -211,24 +216,23 @@ export class MessageService {
       },
     });
 
-    if (message.author.id !== userId) {
+    if (message.authorId !== userId) {
       throw new BadRequestException('You are not the author of this message');
     }
 
     if (
-      message.conversation.initiator.id !== userId &&
-      message.conversation.participant?.id !== userId
+      message.conversation.initiatorId !== userId &&
+      message.conversation.participantId !== userId
     ) {
       throw new BadRequestException(
         'You are not a participant of this conversation',
       );
     }
 
-    if (content) {
-      message.content = content;
-    }
-
-    const updatedMessage = await this.messageRepository.save(message);
+    const updatedMessage = await this.messageRepository.save({
+      ...message,
+      content,
+    });
 
     const attachments = await this.attachmentsService.findByEntity(
       updatedMessage.id,
@@ -253,13 +257,13 @@ export class MessageService {
       },
     });
 
-    if (message.author.id !== userId) {
+    if (message.authorId !== userId) {
       throw new BadRequestException('You are not the author of this message');
     }
 
     if (
-      message.conversation.initiator.id !== userId &&
-      message.conversation.participant?.id !== userId
+      message.conversation.initiatorId !== userId &&
+      message.conversation.participantId !== userId
     ) {
       throw new BadRequestException(
         'You are not a participant of this conversation',
