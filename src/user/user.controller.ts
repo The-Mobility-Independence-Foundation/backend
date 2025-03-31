@@ -32,23 +32,23 @@ export class UserController {
     return req.user as User;
   }
 
-  @Get()
+  @Get('/')
   @ResponseMessage('Successfully retrieved all users matching your criteria')
   @ApiOperation({ summary: 'Get all users matching search criteria' })
   async findAll(@Query() query: GetUsersDto) {
     return this.userService.findAll(query);
   }
 
-  @Get(':userId')
+  @Get('/:userId')
   @ResponseMessage('Successfully found user')
   @ApiOperation({ summary: 'Find a specific user given their id' })
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.userService.findByIdOrThrow(id, {
+  async findOne(@Param('userId', ParseIntPipe) userId: number) {
+    return this.userService.findByIdOrThrow(userId, {
       relations: { organization: true },
     });
   }
 
-  @Patch(':userId')
+  @Patch('/:userId')
   @ResponseMessage('Successfully updated user')
   @ApiOperation({ summary: 'Update a specific user given their id' })
   @UseStrategy(ResourceAccessStrategyToken.USER)
