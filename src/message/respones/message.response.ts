@@ -34,7 +34,7 @@ export class MessageResponse {
     description: 'The attachments of the message',
     example: [],
   })
-  attachments: Attachment[];
+  attachments: (Attachment & { url: string })[];
 
   @ApiProperty({
     description: 'The created at date of the message',

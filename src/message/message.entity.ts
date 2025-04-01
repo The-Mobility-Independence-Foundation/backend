@@ -33,6 +33,7 @@ export class Message {
   @Column({ type: 'varchar', length: 2000, nullable: true })
   content?: string;
 
+  // TODO: Address this
   @Column({ type: 'timestamp', nullable: true })
   readAt: Date | null;
 

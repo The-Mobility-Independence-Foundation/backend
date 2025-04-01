@@ -50,13 +50,14 @@ describe('ConversationsMessagesController', () => {
 
       const user = new User();
       const attachment = new Attachment();
+      Object.assign(attachment, { url: 'https://example.com/test.jpg' });
 
       const messageResponse: MessageResponse = {
         id: 1,
         author: user,
         conversationId,
         content: 'Hello world',
-        attachments: [attachment],
+        attachments: [attachment as Attachment & { url: string }],
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -97,13 +98,14 @@ describe('ConversationsMessagesController', () => {
 
       const files: Express.Multer.File[] = [];
       const attachment = new Attachment();
+      Object.assign(attachment, { url: 'https://example.com/test.jpg' });
 
       const expectedResponse: SendMessageResponse = {
         id: 1,
         author: user,
         conversationId,
         content: sendMessageDto.content,
-        attachments: [attachment],
+        attachments: [attachment as Attachment & { url: string }],
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -154,6 +156,7 @@ describe('ConversationsMessagesController', () => {
         entityId: 1,
         entityType: 'message',
         fileName: 'test.jpg',
+        url: 'https://example.com/test.jpg',
       });
 
       const expectedResponse: SendMessageResponse = {
@@ -161,7 +164,7 @@ describe('ConversationsMessagesController', () => {
         author: user,
         conversationId,
         content: sendMessageDto.content,
-        attachments: [attachment],
+        attachments: [attachment as Attachment & { url: string }],
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -202,13 +205,14 @@ describe('ConversationsMessagesController', () => {
       };
 
       const attachment = new Attachment();
+      Object.assign(attachment, { url: 'https://example.com/test.jpg' });
 
       const expectedResponse: UpdateMessageResponse = {
         id: messageId,
         author: user,
         conversationId,
         content: updateMessageDto.content,
-        attachments: [attachment],
+        attachments: [attachment as Attachment & { url: string }],
         createdAt: new Date(),
         updatedAt: new Date(),
       };

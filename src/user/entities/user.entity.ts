@@ -58,6 +58,11 @@ export enum UserRole {
  * A user
  */
 @Entity()
+@Index(['email'], { unique: true })
+@Index(['displayName'])
+@Index(['type'])
+@Index(['organizationId'])
+@Index(['inactive'])
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -78,7 +83,6 @@ export class User {
   lastName: string;
 
   @IsEmail()
-  @Index({ unique: true })
   @Column({ type: 'varchar', length: UserValidation.email.max })
   email: string;
 

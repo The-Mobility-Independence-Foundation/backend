@@ -18,8 +18,4 @@ export class UserResourceAccessStrategy extends ResourceAccessStrategy {
     const resourceUserId = parseInt(params[this.userIdParam]);
     return !isNaN(resourceUserId) && user.id === resourceUserId;
   }
-
-  getForbiddenMessage(): string {
-    return "You do not have permission to access this user's data";
-  }
 }

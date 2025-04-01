@@ -11,6 +11,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Column,
+  Index,
 } from 'typeorm';
 
 export enum ConversationType {
@@ -19,6 +20,11 @@ export enum ConversationType {
 }
 
 @Entity()
+@Index(['initiatorId'])
+@Index(['participantId'])
+@Index(['initiatorId', 'participantId'])
+@Index(['initiatorId', 'listingId'])
+@Index(['type'])
 export class Conversation {
   @PrimaryGeneratedColumn()
   id: number;

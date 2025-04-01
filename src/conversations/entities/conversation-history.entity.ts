@@ -10,8 +10,10 @@ import {
 } from 'typeorm';
 import { Index } from 'typeorm/decorator/Index';
 
+// TODO: How to we show the history of the conversation?
 @Entity()
 @Index(['conversationId', 'participantId'])
+@Index(['assignedAt'])
 export class ConversationHistory {
   @PrimaryGeneratedColumn()
   id: number;

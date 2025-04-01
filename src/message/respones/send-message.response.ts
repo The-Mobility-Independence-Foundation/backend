@@ -8,5 +8,5 @@ export class SendMessageResponse extends MessageResponse {
     example: [],
     type: [Attachment],
   })
-  attachments: Attachment[];
+  attachments: (Attachment & { url: string })[];
 }

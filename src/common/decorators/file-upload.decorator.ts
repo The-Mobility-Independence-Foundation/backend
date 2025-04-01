@@ -8,8 +8,7 @@ import {
 
 /**
  * Decorator to handle file uploads with Swagger documentation
- * @param dtoClass - Optional DTO class to use for the API body
- * @param extraProperties - Optional additional properties to include in the schema
+ * @param options - Optional additional properties to include in the schema
  * @returns A decorator function
  */
 export function FileUpload(

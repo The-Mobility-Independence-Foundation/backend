@@ -60,10 +60,12 @@ export class ConversationResourceAccessStrategy extends ResourceAccessStrategy {
         return false;
       }
 
+      // If the user is part of the organization that owns the listing, they can access the conversation
       if (user.organizationId === conversation.listing.ownerId) {
         return true;
       }
 
+      // If the user is the initiator or the participant, they can access the conversation
       return (
         conversation.initiatorId === user.id ||
         conversation.participantId === user.id

@@ -104,15 +104,26 @@ export class MessageService {
 
     const formattedMessages = await Promise.all(
       paginated.results.map(async (message) => {
+        const attachments = await this.attachmentsService.findByEntity(
+          message.id,
+          AttachmentEntityType.MESSAGE,
+        );
+
+        const formattedAttachments = await Promise.all(
+          attachments.map(async (attachment) => ({
+            ...attachment,
+            url: await this.attachmentsService.generateGetPresignedUrl(
+              attachment.key,
+            ),
+          })),
+        );
+
         return {
           id: message.id,
           author: message.author,
           conversationId: message.conversationId,
           content: message.content,
-          attachments: await this.attachmentsService.findByEntity(
-            message.id,
-            AttachmentEntityType.MESSAGE,
-          ),
+          attachments: formattedAttachments,
           createdAt: message.createdAt,
           updatedAt: message.updatedAt,
         };
@@ -179,7 +190,14 @@ export class MessageService {
 
       return {
         ...message,
-        attachments: attachmentEntities,
+        attachments: await Promise.all(
+          attachmentEntities.map(async (attachment) => ({
+            ...attachment,
+            url: await this.attachmentsService.generateGetPresignedUrl(
+              attachment.key,
+            ),
+          })),
+        ),
       };
     } catch (error) {
       if (message) {
@@ -241,7 +259,14 @@ export class MessageService {
 
     return {
       ...updatedMessage,
-      attachments,
+      attachments: await Promise.all(
+        attachments.map(async (attachment) => ({
+          ...attachment,
+          url: await this.attachmentsService.generateGetPresignedUrl(
+            attachment.key,
+          ),
+        })),
+      ),
     };
   }
 

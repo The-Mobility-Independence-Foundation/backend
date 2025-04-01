@@ -194,12 +194,15 @@ describe('MessageService', () => {
       });
 
       const attachments = [new Attachment(), new Attachment()];
+      Object.assign(attachments[0], { key: 'attachment1.jpg' });
+      Object.assign(attachments[1], { key: 'attachment2.jpg' });
 
       const paginatedResponse = {
         results: [message1, message2],
         nextCursor: '2',
         hasNextPage: true,
         hasPreviousPage: false,
+        previousCursor: null,
       };
 
       when(paginationService.paginateWithCursor)
@@ -221,15 +224,36 @@ describe('MessageService', () => {
         .calledWith(message2.id, AttachmentEntityType.MESSAGE)
         .mockResolvedValue(attachments);
 
+      when(attachmentsService.generateGetPresignedUrl)
+        .calledWith('attachment1.jpg')
+        .mockResolvedValue('https://example.com/attachment1.jpg');
+
+      when(attachmentsService.generateGetPresignedUrl)
+        .calledWith('attachment2.jpg')
+        .mockResolvedValue('https://example.com/attachment2.jpg');
+
       const result = await service.findAll(conversationId, paginationDto);
 
       expect(result).toBeDefined();
       expect(result.results).toHaveLength(2);
-      expect(result.results[0].attachments).toBe(attachments);
-      expect(result.results[1].attachments).toBe(attachments);
+      expect(result.results[0].attachments).toHaveLength(2);
+      expect(result.results[0].attachments[0].url).toBe(
+        'https://example.com/attachment1.jpg',
+      );
+      expect(result.results[0].attachments[1].url).toBe(
+        'https://example.com/attachment2.jpg',
+      );
+      expect(result.results[1].attachments).toHaveLength(2);
+      expect(result.results[1].attachments[0].url).toBe(
+        'https://example.com/attachment1.jpg',
+      );
+      expect(result.results[1].attachments[1].url).toBe(
+        'https://example.com/attachment2.jpg',
+      );
       expect(result.nextCursor).toBe('2');
       expect(result.hasNextPage).toBe(true);
       expect(result.hasPreviousPage).toBe(false);
+      expect(result.previousCursor).toBeNull();
     });
   });
 
@@ -310,6 +334,8 @@ describe('MessageService', () => {
 
       const files = [{ filename: 'test.jpg' }] as Express.Multer.File[];
       const attachments = [new Attachment(), new Attachment()];
+      Object.assign(attachments[0], { key: 'attachment1.jpg' });
+      Object.assign(attachments[1], { key: 'attachment2.jpg' });
 
       when(conversationsService.findByIdOrThrow)
         .calledWith(conversationId)
@@ -327,6 +353,14 @@ describe('MessageService', () => {
         .calledWith(message.id, AttachmentEntityType.MESSAGE, files, authorId)
         .mockResolvedValue(attachments);
 
+      when(attachmentsService.generateGetPresignedUrl)
+        .calledWith('attachment1.jpg')
+        .mockResolvedValue('https://example.com/attachment1.jpg');
+
+      when(attachmentsService.generateGetPresignedUrl)
+        .calledWith('attachment2.jpg')
+        .mockResolvedValue('https://example.com/attachment2.jpg');
+
       const result = await service.sendMessage(
         authorId,
         conversationId,
@@ -338,7 +372,13 @@ describe('MessageService', () => {
       expect(result.author.id).toBe(authorId);
       expect(result.conversationId).toBe(conversationId);
       expect(result.content).toBe(sendMessageDto.content);
-      expect(result.attachments).toBe(attachments);
+      expect(result.attachments).toHaveLength(2);
+      expect(result.attachments[0].url).toBe(
+        'https://example.com/attachment1.jpg',
+      );
+      expect(result.attachments[1].url).toBe(
+        'https://example.com/attachment2.jpg',
+      );
     });
 
     it('should throw BadRequestException if content and attachments are empty', async () => {
@@ -461,6 +501,8 @@ describe('MessageService', () => {
       });
 
       const attachments = [new Attachment(), new Attachment()];
+      Object.assign(attachments[0], { key: 'attachment1.jpg' });
+      Object.assign(attachments[1], { key: 'attachment2.jpg' });
 
       when(messageRepository.findOne)
         .calledWith({
@@ -477,6 +519,14 @@ describe('MessageService', () => {
         .calledWith(updatedMessage.id, AttachmentEntityType.MESSAGE)
         .mockResolvedValue(attachments);
 
+      when(attachmentsService.generateGetPresignedUrl)
+        .calledWith('attachment1.jpg')
+        .mockResolvedValue('https://example.com/attachment1.jpg');
+
+      when(attachmentsService.generateGetPresignedUrl)
+        .calledWith('attachment2.jpg')
+        .mockResolvedValue('https://example.com/attachment2.jpg');
+
       const result = await service.updateMessage(
         userId,
         messageId,
@@ -485,7 +535,13 @@ describe('MessageService', () => {
 
       expect(result).toBeDefined();
       expect(result.content).toBe(updateMessageDto.content);
-      expect(result.attachments).toBe(attachments);
+      expect(result.attachments).toHaveLength(2);
+      expect(result.attachments[0].url).toBe(
+        'https://example.com/attachment1.jpg',
+      );
+      expect(result.attachments[1].url).toBe(
+        'https://example.com/attachment2.jpg',
+      );
     });
 
     it('should throw BadRequestException if content is empty', async () => {
