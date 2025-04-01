@@ -29,7 +29,10 @@ export class UserController {
   @ApiOperation({ summary: 'Get the current user' })
   @UseStrategy(ResourceAccessStrategyToken.ANY_USER)
   async getUser(@Req() req: Request): Promise<User> {
-    return req.user as User;
+    const user = req.user as User;
+    return this.userService.findByIdOrThrow(user.id, {
+      relations: { organization: true },
+    });
   }
 
   @Get('/')
