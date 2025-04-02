@@ -10,7 +10,6 @@ import { UserService } from '../../../user/user.service';
 @Injectable()
 export class OrganizationMemberResourceAccessStrategy extends ResourceAccessStrategy {
   private organizationIdParam: string = 'orgId';
-  private userIdParam: string = 'userId';
 
   constructor(private readonly userService: UserService) {
     super();
@@ -18,13 +17,12 @@ export class OrganizationMemberResourceAccessStrategy extends ResourceAccessStra
 
   async canAccess(user: User, params: Record<string, any>): Promise<boolean> {
     const orgId = parseInt(params[this.organizationIdParam]);
-    const userId = parseInt(params[this.userIdParam]);
 
-    if (isNaN(orgId) || isNaN(userId)) {
+    if (isNaN(orgId) || isNaN(user.id)) {
       return false;
     }
 
-    const member = await this.userService.findByIdOrThrow(userId, {
+    const member = await this.userService.findByIdOrThrow(user.id, {
       relations: {
         organization: true,
       },
