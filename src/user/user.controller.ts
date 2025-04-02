@@ -17,12 +17,17 @@ import { ResourceAccessStrategyToken } from '../common/resource-access/interface
 import { Request } from 'express';
 import { GetUsersDto } from './dto/get-users.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { GetOrdersDto } from '../order/dto/get-orders-dto';
+import { OrderService } from '../order/order.service';
 
 @ApiTags('users')
 @Controller('users')
 @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER)
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly orderService: OrderService,
+  ) {}
 
   @Get('/@me')
   @ResponseMessage('Successfully retrieved user')
@@ -32,21 +37,21 @@ export class UserController {
     return req.user as User;
   }
 
-  @Get()
+  @Get('/')
   @ResponseMessage('Successfully retrieved all users matching your criteria')
   @ApiOperation({ summary: 'Get all users matching search criteria' })
   async findAll(@Query() query: GetUsersDto) {
     return this.userService.findAll(query);
   }
 
-  @Get(':userId')
+  @Get('/:userId')
   @ResponseMessage('Successfully found user')
   @ApiOperation({ summary: 'Find a specific user given their id' })
   async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.userService.findByIdOrThrow(id);
   }
 
-  @Patch(':userId')
+  @Patch('/:userId')
   @ResponseMessage('Successfully updated user')
   @ApiOperation({ summary: 'Update a specific user given their id' })
   @UseStrategy(ResourceAccessStrategyToken.USER)
@@ -55,5 +60,16 @@ export class UserController {
     @Body() dto: UpdateUserDto,
   ) {
     return this.userService.update(userId, dto);
+  }
+
+  @Get('/:userId/orders')
+  @ResponseMessage('Successfully found orders')
+  @ApiOperation({ summary: 'Get orders, with pagination' })
+  findOrders(
+    @Query() dto: GetOrdersDto,
+    @Param('userId', ParseIntPipe) userId: number,
+  ) {
+    console.log('user', userId);
+    return this.orderService.findAll(dto, { user: userId });
   }
 }

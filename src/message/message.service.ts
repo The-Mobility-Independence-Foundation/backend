@@ -30,7 +30,7 @@ export class MessageService {
       message.conversation = conversation;
     }
 
-    message.messageContent = 'This message is content!';
+    message.content = 'This message is content!';
 
     return this.messageRepository.save(message);
   }

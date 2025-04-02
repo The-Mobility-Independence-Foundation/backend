@@ -4,7 +4,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Order, OrderStatus } from './order.entity';
-import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
+import {
+  And,
+  FindOptionsRelations,
+  FindOptionsWhere,
+  LessThan,
+  MoreThan,
+  Repository,
+} from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserService } from '../user/user.service';
 import { OrganizationService } from '../organization/organization.service';
@@ -14,6 +21,9 @@ import { CreateAddressDto } from '../address/dto/create-address.dto';
 import { AddressService } from '../address/address.service';
 import { UpdateOrderDto } from './dto/update-order-dto';
 import { UpdateAddressDto } from '../address/dto/update-address.dto';
+import { GetOrdersDto } from './dto/get-orders-dto';
+import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
+import { PaginationService } from '../common/services/pagination.service';
 
 @Injectable()
 export class OrderService {
@@ -25,6 +35,7 @@ export class OrderService {
     private readonly listingService: ListingService,
     private readonly organizationService: OrganizationService,
     private readonly addressService: AddressService,
+    private readonly paginationService: PaginationService,
   ) {}
 
   async create(dto: CreateOrderDto) {
@@ -58,10 +69,6 @@ export class OrderService {
     });
 
     return this.orderRepository.save(order);
-  }
-
-  async findAll() {
-    return this.orderRepository.find();
   }
 
   async findByIdOrThrow(
@@ -135,5 +142,70 @@ export class OrderService {
     }
 
     return this.orderRepository.save(order);
+  }
+
+  async findAll(
+    query: GetOrdersDto,
+    id?: { listing?: number; org?: number; user?: number },
+  ) {
+    const findWhere: any = {};
+    const paginationDto = new CursorPaginationDto();
+
+    console.log('Listing:', id?.listing);
+    console.log('Organization:', id?.org);
+    console.log('User:', id?.user);
+
+    if (query.before && query.after) {
+      findWhere.dateCreated = And(
+        LessThan(query.before),
+        MoreThan(query.after),
+      );
+    } else if (query.before) {
+      findWhere.dateCreated = LessThan(query.before);
+    } else if (query.after) {
+      findWhere.dateCreated = MoreThan(query.after);
+    }
+
+    if (id && id.listing) {
+      findWhere.listing = { id: id.listing };
+    }
+
+    if (id && id.org) {
+      if (query.sentOnly === true) {
+        findWhere.providerOrganization = { id: id.org };
+      } else {
+        findWhere.recipientOrganization = { id: id.org };
+      }
+    }
+
+    if (id && id.user) {
+      if (query.sentOnly === true) {
+        findWhere.provider = { id: id.user };
+      } else {
+        findWhere.recipient = { id: id.user };
+      }
+    }
+
+    Object.assign(paginationDto, {
+      cursor: query.cursor,
+      limit: query.limit,
+      direction: query.direction,
+    });
+
+    console.log(findWhere);
+
+    return this.paginationService.paginateWithCursor(
+      this.orderRepository,
+      paginationDto,
+      {
+        cursorColumn: 'id',
+        where: findWhere,
+        relations: {
+          listing: true,
+          providerOrganization: true,
+          recipientOrganization: true,
+        },
+      },
+    );
   }
 }
