@@ -147,8 +147,8 @@ export class ModelService {
       },
     });
 
-    model.name = dto.name;
-    model.year = dto.year;
+    model.name = dto.name ?? model.name;
+    model.year = dto.year ?? model.year;
 
     if (dto.manufacturerId) {
       model.manufacturer = await this.manufacturerService.findByIdOrThrow(

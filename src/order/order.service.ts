@@ -51,6 +51,11 @@ export class OrderService {
       order.providerOrganization = providerOrganization;
     }
 
+    order.addressLine1 = '1789 State Highway 8';
+    order.city = 'Mount Upton';
+    order.state = 'New York';
+    order.zipcode = '13809';
+
     order.quantity = 1;
 
     return this.orderRepository.save(order);
