@@ -70,6 +70,7 @@ export class OrganizationController {
   @Get('/:orgId/orders')
   @ResponseMessage('Successfully found orders')
   @ApiOperation({ summary: 'Get orders, with pagination' })
+  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_MEMBER)
   findOrganizationOrders(
     @Query() dto: GetOrdersDto,
     @Param('orgId', ParseIntPipe) orgId: number,

@@ -24,6 +24,7 @@ import { UpdateAddressDto } from '../address/dto/update-address.dto';
 import { GetOrdersDto } from './dto/get-orders-dto';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { PaginationService } from '../common/services/pagination.service';
+import { DEFAULT_ORDER_RELATIONS } from './order.constants';
 
 @Injectable()
 export class OrderService {
@@ -150,10 +151,7 @@ export class OrderService {
   ) {
     const findWhere: any = {};
     const paginationDto = new CursorPaginationDto();
-
-    console.log('Listing:', id?.listing);
-    console.log('Organization:', id?.org);
-    console.log('User:', id?.user);
+    const { relations: relations } = DEFAULT_ORDER_RELATIONS;
 
     if (query.before && query.after) {
       findWhere.dateCreated = And(
@@ -192,19 +190,13 @@ export class OrderService {
       direction: query.direction,
     });
 
-    console.log(findWhere);
-
     return this.paginationService.paginateWithCursor(
       this.orderRepository,
       paginationDto,
       {
         cursorColumn: 'id',
         where: findWhere,
-        relations: {
-          listing: true,
-          providerOrganization: true,
-          recipientOrganization: true,
-        },
+        relations: relations,
       },
     );
   }

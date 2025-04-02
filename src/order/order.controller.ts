@@ -15,6 +15,7 @@ import { ResourceAccessStrategyToken } from '../common/resource-access/interface
 import { CreateOrderDto } from './dto/create-order-dto';
 import { UpdateOrderDto } from './dto/update-order-dto';
 import { GetOrdersDto } from './dto/get-orders-dto';
+import { DEFAULT_ORDER_RELATIONS } from './order.constants';
 
 @ApiTags('orders')
 @Controller('orders')
@@ -40,7 +41,7 @@ export class OrderController {
   @ResponseMessage('Successfully found order')
   @ApiOperation({ summary: 'Get information about an order' })
   findOne(@Param('id') id: number) {
-    return this.orderService.findByIdOrThrow(id);
+    return this.orderService.findByIdOrThrow(id, DEFAULT_ORDER_RELATIONS);
   }
 
   @Patch(`:orderId`)

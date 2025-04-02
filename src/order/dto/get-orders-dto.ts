@@ -7,7 +7,7 @@ export class GetOrdersDto extends CursorPaginationDto {
   @IsOptional()
   @ApiPropertyOptional()
   @IsEnum(OrderStatus)
-  status: OrderStatus;
+  status?: OrderStatus;
 
   @IsOptional()
   @ApiPropertyOptional({
