@@ -8,6 +8,7 @@ import { PaginationService } from '../common/services/pagination.service';
 import { CreatePartDto } from './dto/create-part.dto';
 import { GetPartsDto } from './dto/get-part.dto';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
+import { UpdatePartDto } from './dto/update-part.dto';
 
 @Injectable()
 export class PartService {
@@ -116,5 +117,32 @@ export class PartService {
     } else {
       throw new NotFoundException('Part not found');
     }
+  }
+
+  async update(id: number, dto: UpdatePartDto): Promise<Part> {
+    const part = await this.findByIdOrThrow(id, {
+      relations: {
+        model: true,
+        types: true,
+      },
+    });
+
+    part.name = dto.name ?? part.name;
+    part.partNumber = dto.partNumber ?? part.partNumber;
+    part.description = dto.description ?? part.description;
+
+    if (dto.modelId) {
+      part.model = await this.modelService.findByIdOrThrow(
+        dto.modelId,
+      );
+    }
+
+    if (dto.partTypeIds) {
+      part.types = await this.partTypeService.findByIdsOrThrow(
+        dto.partTypeIds,
+      );
+    }
+
+    return this.partRepository.save(part);
   }
 }

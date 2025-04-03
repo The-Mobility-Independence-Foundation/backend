@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Param, Body, Query } from '@nestjs/common';
+import { Controller, Post, Get, Param, Body, Query, Patch } from '@nestjs/common';
 import { PartService } from './part.service';
 import { Part } from './part.entity';
 import { CreatePartDto } from './dto/create-part.dto';
@@ -8,6 +8,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UseStrategy } from '../common/resource-access/decorators/resource-access.decorator';
 import { ResourceAccessStrategyToken } from '../common/resource-access/interfaces/strategy-provider.interface';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
+import { UpdatePartDto } from './dto/update-part.dto';
 
 @ApiTags('parts')
 @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER)
@@ -34,5 +35,13 @@ export class PartController {
   @Get(':id')
   findOne(@Param('id') id: number): Promise<Part | null> {
     return this.partService.findOne(id);
+  }
+
+  @Patch(':id')
+  @ResponseMessage('Successfully updated a part')
+  @ApiOperation({ summary: 'Update information about a part' })
+  @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: true })
+  update(@Param('id') id: number, @Body() dto: UpdatePartDto) {
+    return this.partService.update(id, dto);
   }
 }
