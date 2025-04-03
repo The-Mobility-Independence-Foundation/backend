@@ -357,4 +357,52 @@ describe('PartService', () => {
       );
     });
   });
+
+  describe('findOne', () => {
+    const part = new Part();
+
+    beforeEach(() => {
+      Object.assign(part, { id: 1 });
+    });
+
+    it('should find a part if valid id given', async () => {
+      when(partRepository.findOneBy)
+        .calledWith(
+          expect.objectContaining({
+            where: { id: part.id },
+            relations: expect.objectContaining({
+              model: true,
+              types: true,
+            }),
+          }),
+        )
+        .mockResolvedValue(part);
+
+      const result = await service.findByIdOrThrow(1, {
+        relations: ['model', 'types'],
+      });
+
+      expect(result).toBeDefined();
+    });
+
+    it('should throw NotFoundException if part is not found', async () => {
+      when(partRepository.findOne)
+        .calledWith(
+          expect.objectContaining({
+            where: { id: 9999 },
+            relations: expect.objectContaining({
+              model: true,
+              types: true,
+            }),
+          }),
+        )
+        .mockResolvedValue(null);
+
+      await expect(
+        service.findByIdOrThrow(9999, {
+          relations: ['model', 'types'],
+        }),
+      ).rejects.toThrow(NotFoundException);
+    });
+  });
 });
