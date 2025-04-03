@@ -132,15 +132,11 @@ export class PartService {
     part.description = dto.description ?? part.description;
 
     if (dto.modelId) {
-      part.model = await this.modelService.findByIdOrThrow(
-        dto.modelId,
-      );
+      part.model = await this.modelService.findByIdOrThrow(dto.modelId);
     }
 
     if (dto.partTypeIds) {
-      part.types = await this.partTypeService.findByIdsOrThrow(
-        dto.partTypeIds,
-      );
+      part.types = await this.partTypeService.findByIdsOrThrow(dto.partTypeIds);
     }
 
     return this.partRepository.save(part);

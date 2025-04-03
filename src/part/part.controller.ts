@@ -1,4 +1,12 @@
-import { Controller, Post, Get, Param, Body, Query, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Param,
+  Body,
+  Query,
+  Patch,
+} from '@nestjs/common';
 import { PartService } from './part.service';
 import { Part } from './part.entity';
 import { CreatePartDto } from './dto/create-part.dto';
