@@ -170,4 +170,14 @@ export class UserService {
 
     return this.userRepository.save(user);
   }
+
+  async getUserInfo(id: number) {
+    const user = await this.findByIdOrThrow(id, {
+      relations: { organization: true },
+    });
+
+    user.lastActivity = new Date();
+
+    return this.userRepository.save(user);
+  }
 }
