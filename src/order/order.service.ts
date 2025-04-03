@@ -184,8 +184,6 @@ export class OrderService {
       }
     }
 
-    console.log(findWhere);
-
     Object.assign(paginationDto, {
       cursor: query.cursor,
       limit: query.limit,

@@ -5,7 +5,7 @@ import { UserService } from '../../../user/user.service';
 
 /**
  * Strategy for organization resource access
- * Checks if the user is the owner of the organization
+ * Checks if the user is a member of the organization
  */
 @Injectable()
 export class OrganizationMemberResourceAccessStrategy extends ResourceAccessStrategy {
