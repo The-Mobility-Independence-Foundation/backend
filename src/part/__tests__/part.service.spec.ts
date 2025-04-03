@@ -13,6 +13,7 @@ import { when } from 'jest-when';
 import { NotFoundException } from '@nestjs/common';
 import { GetPartsDto } from '../dto/get-part.dto';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
+import { UpdatePartDto } from '../dto/update-part.dto';
 
 describe('PartService', () => {
   let service: PartService;
@@ -246,6 +247,117 @@ describe('PartService', () => {
           direction: getDto.direction,
         }),
         expect.objectContaining({}),
+      );
+    });
+  });
+
+  describe('update', () => {
+    let updateDto = new UpdatePartDto();
+    const partType = new PartType();
+    const model = new Model();
+    const part = new Part();
+
+    beforeAll(() => {
+      Object.assign(partType, { id: 1, name: 'Wheel' });
+      Object.assign(model, { id: 1 });
+      Object.assign(part, {
+        id: 1,
+        name: 'Enkei Wheel',
+        partNumber: 'AB43',
+        types: [],
+      });
+    });
+
+    beforeEach(() => {
+      updateDto = new UpdatePartDto();
+    });
+
+    it('Should update the model of a part if specified', async () => {
+      Object.assign(updateDto, {
+        modelId: model.id,
+      });
+
+      when(partRepository.findOne)
+        .calledWith(expect.objectContaining({ where: { id: part.id } }))
+        .mockResolvedValue(Promise.resolve(part));
+
+      when(modelService.findByIdOrThrow)
+        .calledWith(model.id)
+        .mockResolvedValue(model);
+
+      await expect(service.update(part.id, updateDto)).resolves.not.toThrow();
+
+      expect(partRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          model: model,
+        }),
+      );
+    });
+
+    
+    it('Should update the name of a part if specified', async () => {
+      Object.assign(updateDto, {
+        name: 'Rays TE37',
+      });
+
+      when(partRepository.findOne)
+        .calledWith(expect.objectContaining({ where: { id: part.id } }))
+        .mockResolvedValue(Promise.resolve(part));
+
+      await expect(service.update(part.id, updateDto)).resolves.not.toThrow();
+      expect(partRepository.save).toHaveBeenCalled();
+    });
+
+    
+    it('Should update the description of a part if specified', async () => {
+      Object.assign(updateDto, {
+        description: 'Bronze',
+      });
+
+      when(partRepository.findOne)
+        .calledWith(expect.objectContaining({ where: { id: part.id } }))
+        .mockResolvedValue(Promise.resolve(part));
+
+      await expect(service.update(part.id, updateDto)).resolves.not.toThrow();
+      expect(partRepository.save).toHaveBeenCalled();
+    });
+
+    it('Should update the part number of a part if specified', async () => {
+      Object.assign(updateDto, {
+        partNumber: 'MN29',
+      });
+
+      when(partRepository.findOne)
+        .calledWith(expect.objectContaining({ where: { id: part.id } }))
+        .mockResolvedValue(Promise.resolve(part));
+
+      await expect(service.update(part.id, updateDto)).resolves.not.toThrow();
+      expect(partRepository.save).toHaveBeenCalled();
+    });
+
+    it('Should update the part type of a part if specified', async () => {
+      Object.assign(updateDto, {
+        partTypeIds: [partType.id],
+      });
+
+      when(partRepository.findOne)
+        .calledWith(expect.objectContaining({ where: { id: part.id } }))
+        .mockResolvedValue(Promise.resolve(part));
+
+      when(partTypeService.findByIdsOrThrow)
+        .calledWith([partType.id])
+        .mockResolvedValue([
+          { id: partType.id, name: 'Wheel' } as PartType,
+        ]);
+
+      await expect(service.update(part.id, updateDto)).resolves.not.toThrow();
+
+      expect(partRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          types: expect.arrayContaining([
+            expect.objectContaining({ id: partType.id }),
+          ]),
+        }),
       );
     });
   });
