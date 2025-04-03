@@ -39,7 +39,6 @@ describe('PartService', () => {
     modelService = module.get(ModelService);
   });
 
-  
   describe('create', () => {
     let createDto = new CreatePartDto();
     const partType = new PartType();
@@ -55,7 +54,7 @@ describe('PartService', () => {
     beforeEach(() => {
       createDto = new CreatePartDto();
     });
-  
+
     it('should create a new part with a DTO', async () => {
       Object.assign(createDto, {
         name: 'Wheel',
