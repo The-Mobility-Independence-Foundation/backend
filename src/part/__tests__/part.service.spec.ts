@@ -7,8 +7,7 @@ import { createMock } from '@golevelup/ts-jest';
 
 describe('PartService', () => {
   let service: PartService;
-  let partRepository: Repository<Part>;
-
+  //let partRepository: Repository<Part>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -20,11 +19,11 @@ describe('PartService', () => {
         },
       ],
     })
-    .useMocker(createMock)
-    .compile();
+      .useMocker(createMock)
+      .compile();
 
     service = module.get(PartService);
-    partRepository = module.get(getRepositoryToken(Part));
+    //partRepository = module.get(getRepositoryToken(Part));
   });
 
   it('should be defined', () => {

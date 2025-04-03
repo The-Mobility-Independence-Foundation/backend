@@ -8,10 +8,11 @@ import { PartTypeModule } from '../part-type/part-type.module';
 import { ModelModule } from '../model/model.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Part]),
-  CommonModule,
-  PartTypeModule,
-  ModelModule,
+  imports: [
+    TypeOrmModule.forFeature([Part]),
+    CommonModule,
+    PartTypeModule,
+    ModelModule,
   ],
   providers: [PartService],
   exports: [PartService],

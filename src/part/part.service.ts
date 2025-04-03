@@ -22,21 +22,16 @@ export class PartService {
   async create(dto: CreatePartDto) {
     const part = new Part();
 
-    part.model = await this.modelService.findByIdOrThrow(dto.modelId,
-      {
-        relations: { 
-          manufacturer: true,
-          parts: true,
-         },
+    part.model = await this.modelService.findByIdOrThrow(dto.modelId, {
+      relations: {
+        manufacturer: true,
+        parts: true,
       },
-    );
+    });
 
-    part.types = await this.partTypeService.findByIdsOrThrow(
-      dto.partTypeIds,
-      {
-        relations: { parts: true },
-      },
-    );
+    part.types = await this.partTypeService.findByIdsOrThrow(dto.partTypeIds, {
+      relations: { parts: true },
+    });
 
     part.name = dto.name;
     part.description = dto.description;

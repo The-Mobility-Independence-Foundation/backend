@@ -25,7 +25,9 @@ export class PartController {
   @Get()
   @ApiOperation({ summary: 'Retrieve a list of all parts' })
   @ResponseMessage('Successfully retrieved all parts')
-  findAll(@Query() query: GetPartsDto): Promise<BaseApiCursorPaginationResponse<Part>> {
+  findAll(
+    @Query() query: GetPartsDto,
+  ): Promise<BaseApiCursorPaginationResponse<Part>> {
     return this.partService.findAll(query);
   }
 

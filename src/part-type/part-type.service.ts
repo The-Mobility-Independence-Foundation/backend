@@ -2,7 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationService } from '../common/services/pagination.service';
 import { PartType } from '../part/part.entity';
-import { FindOptionsRelations, FindOptionsWhere, In, Repository } from 'typeorm';
+import {
+  FindOptionsRelations,
+  FindOptionsWhere,
+  In,
+  Repository,
+} from 'typeorm';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { GetPartTypesDto } from './dto/get-part-type.dto';
 import { CreatePartTypeDto } from './dto/create-part-type.dto';
