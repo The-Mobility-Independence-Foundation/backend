@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { OrderStatus } from '../order.entity';
-import { IsBoolean, IsEnum, IsOptional } from 'class-validator';
+import { IsEnum, IsOptional } from 'class-validator';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 
 export class GetOrdersDto extends CursorPaginationDto {
@@ -28,8 +28,6 @@ export class GetOrdersDto extends CursorPaginationDto {
   @IsOptional()
   @ApiPropertyOptional({
     description: 'True => only sent orders; False => only received',
-    default: true,
   })
-  @IsBoolean()
-  sentOnly?: boolean;
+  sentOnly?: string;
 }

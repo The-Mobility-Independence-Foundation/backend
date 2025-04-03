@@ -169,7 +169,7 @@ export class OrderService {
     }
 
     if (id && id.org) {
-      if (query.sentOnly === true) {
+      if (query.sentOnly === 'true') {
         findWhere.providerOrganization = { id: id.org };
       } else {
         findWhere.recipientOrganization = { id: id.org };
@@ -177,12 +177,14 @@ export class OrderService {
     }
 
     if (id && id.user) {
-      if (query.sentOnly === true) {
+      if (query.sentOnly === 'true') {
         findWhere.provider = { id: id.user };
       } else {
         findWhere.recipient = { id: id.user };
       }
     }
+
+    console.log(findWhere);
 
     Object.assign(paginationDto, {
       cursor: query.cursor,
