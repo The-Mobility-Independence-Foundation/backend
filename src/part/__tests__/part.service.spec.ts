@@ -136,14 +136,19 @@ describe('PartService', () => {
     beforeAll(() => {
       Object.assign(partType, { id: 1 });
       Object.assign(model, { id: 1 });
-      Object.assign(part, { id: 1, name: 'Wheel', partNumber: 'AB43', modelId: 1 ,partTypeIds: [1] });
+      Object.assign(part, {
+        id: 1,
+        name: 'Wheel',
+        partNumber: 'AB43',
+        modelId: 1,
+        partTypeIds: [1],
+      });
     });
 
     beforeEach(() => {
       getDto = new GetPartsDto();
     });
 
-    
     it('should use part type search when a part type is specified', async () => {
       Object.assign(getDto, {
         partTypeIds: [partType.id],
@@ -184,7 +189,6 @@ describe('PartService', () => {
       );
     });
 
-    
     it('should use name search when a name is specified', async () => {
       Object.assign(getDto, {
         name: part.name,
