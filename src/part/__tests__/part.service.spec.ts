@@ -1,19 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PartService } from '../part.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Part, PartType } from '../part.entity';
-import { Tag } from '../../tag/tag.entity';
-import { Model } from '../../model/model.entity';
-
-export const mockRepository = jest.fn(() => ({
-  metadata: {
-    columns: [],
-    relations: [],
-  },
-}));
+import { Part } from '../part.entity';
+import { Repository } from 'typeorm';
+import { createMock } from '@golevelup/ts-jest';
 
 describe('PartService', () => {
   let service: PartService;
+  let partRepository: Repository<Part>;
+
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -21,24 +16,15 @@ describe('PartService', () => {
         PartService,
         {
           provide: getRepositoryToken(Part),
-          useClass: mockRepository,
-        },
-        {
-          provide: getRepositoryToken(PartType),
-          useClass: mockRepository,
-        },
-        {
-          provide: getRepositoryToken(Tag),
-          useClass: mockRepository,
-        },
-        {
-          provide: getRepositoryToken(Model),
-          useClass: mockRepository,
+          useValue: createMock<Repository<Part>>(),
         },
       ],
-    }).compile();
+    })
+    .useMocker(createMock)
+    .compile();
 
-    service = module.get<PartService>(PartService);
+    service = module.get(PartService);
+    partRepository = module.get(getRepositoryToken(Part));
   });
 
   it('should be defined', () => {

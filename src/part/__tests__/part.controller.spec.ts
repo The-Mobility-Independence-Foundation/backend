@@ -1,10 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PartController } from '../part.controller';
-import { PartService } from '../part.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Part, PartType } from '../part.entity';
-import { Tag } from '../../tag/tag.entity';
-import { Model } from '../../model/model.entity';
+import { createMock } from '@golevelup/ts-jest';
+import { STRATEGY_PROVIDERS_TOKEN, ResourceAccessStrategyRegistry } from '../../common/resource-access/interfaces/strategy-provider.interface';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -20,25 +17,14 @@ describe('PartController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [PartController],
       providers: [
-        PartService,
         {
-          provide: getRepositoryToken(Part),
-          useClass: mockRepository,
-        },
-        {
-          provide: getRepositoryToken(PartType),
-          useClass: mockRepository,
-        },
-        {
-          provide: getRepositoryToken(Tag),
-          useClass: mockRepository,
-        },
-        {
-          provide: getRepositoryToken(Model),
-          useClass: mockRepository,
+          provide: STRATEGY_PROVIDERS_TOKEN,
+          useValue: createMock<ResourceAccessStrategyRegistry>(),
         },
       ],
-    }).compile();
+    })
+    .useMocker(createMock)
+    .compile();
 
     controller = module.get<PartController>(PartController);
   });

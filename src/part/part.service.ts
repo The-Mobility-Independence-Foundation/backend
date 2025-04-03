@@ -2,35 +2,91 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Part } from './part.entity';
 import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
-import { Model } from '../model/model.entity';
+import { ModelService } from '../model/model.service';
+import { PartTypeService } from '../part-type/part-type.service';
+import { PaginationService } from '../common/services/pagination.service';
+import { CreatePartDto } from './dto/create-part.dto';
+import { GetPartsDto } from './dto/get-part.dto';
+import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 
 @Injectable()
 export class PartService {
   constructor(
     @InjectRepository(Part)
     private readonly partRepository: Repository<Part>,
-
-    @InjectRepository(Model)
-    private readonly modelRepository: Repository<Model>,
+    private readonly modelService: ModelService,
+    private readonly partTypeService: PartTypeService,
+    private readonly paginationService: PaginationService,
   ) {}
 
-  async create() {
+  async create(dto: CreatePartDto) {
     const part = new Part();
-    const model = await this.modelRepository.findOneBy({ id: 1 });
 
-    if (model) {
-      part.model = model;
-    }
+    part.model = await this.modelService.findByIdOrThrow(dto.modelId,
+      {
+        relations: { 
+          manufacturer: true,
+          parts: true,
+         },
+      },
+    );
 
-    part.name = 'Partname!';
-    part.description = '';
-    part.partNumber = 'P12-345';
+    part.types = await this.partTypeService.findByIdsOrThrow(
+      dto.partTypeIds,
+      {
+        relations: { parts: true },
+      },
+    );
+
+    part.name = dto.name;
+    part.description = dto.description;
+    part.partNumber = dto.partNumber;
 
     return this.partRepository.save(part);
   }
 
-  async findAll() {
-    return this.partRepository.find();
+  async findAll(query: GetPartsDto) {
+    const findWhere: any = {};
+
+    if (query.name) {
+      findWhere.name = query.name;
+    }
+
+    if (query.partTypeIds) {
+      findWhere.partTypeIds = query.partTypeIds;
+    }
+
+    if (query.modelId) {
+      findWhere.modelId = query.modelId;
+    }
+
+    if (query.partNumber) {
+      findWhere.partNumber = query.partNumber;
+    }
+
+    if (query.description) {
+      findWhere.description = query.description;
+    }
+
+    const paginationDto = new CursorPaginationDto();
+    Object.assign(paginationDto, {
+      cursor: query.cursor,
+      limit: query.limit,
+      direction: query.direction,
+    });
+
+    return this.paginationService.paginateWithCursor(
+      this.partRepository,
+      paginationDto,
+      {
+        cursorColumn: 'id',
+        where: findWhere,
+        relations: {
+          model: true,
+          types: true,
+        },
+      },
+    );
   }
 
   async findOne(id: number) {
