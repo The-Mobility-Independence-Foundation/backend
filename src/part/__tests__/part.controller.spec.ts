@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PartService } from './part.service';
+import { PartController } from '../part.controller';
+import { PartService } from '../part.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Part, PartType } from './part.entity';
-import { Tag } from '../tag/tag.entity';
-import { Model } from '../model/model.entity';
+import { Part, PartType } from '../part.entity';
+import { Tag } from '../../tag/tag.entity';
+import { Model } from '../../model/model.entity';
 
 export const mockRepository = jest.fn(() => ({
   metadata: {
@@ -12,11 +13,12 @@ export const mockRepository = jest.fn(() => ({
   },
 }));
 
-describe('PartService', () => {
-  let service: PartService;
+describe('PartController', () => {
+  let controller: PartController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      controllers: [PartController],
       providers: [
         PartService,
         {
@@ -38,10 +40,10 @@ describe('PartService', () => {
       ],
     }).compile();
 
-    service = module.get<PartService>(PartService);
+    controller = module.get<PartController>(PartController);
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(controller).toBeDefined();
   });
 });
