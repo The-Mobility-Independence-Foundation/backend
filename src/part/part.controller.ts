@@ -41,8 +41,10 @@ export class PartController {
   }
 
   @Get(':id')
+  @ResponseMessage('Successfully retrieve part')
+  @ApiOperation({ summary: 'Retrieve a specific part' })
   findOne(@Param('id') id: number): Promise<Part | null> {
-    return this.partService.findOne(id);
+    return this.partService.findByIdOrThrow(id);
   }
 
   @Patch(':id')

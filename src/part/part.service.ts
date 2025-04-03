@@ -20,6 +20,11 @@ export class PartService {
     private readonly paginationService: PaginationService,
   ) {}
 
+  /**
+   * Method used to create a new part
+   * @param dto : All needed information to create a part
+   * @returns : A success message if it was created properly
+   */
   async create(dto: CreatePartDto) {
     const part = new Part();
 
@@ -41,6 +46,11 @@ export class PartService {
     return this.partRepository.save(part);
   }
 
+  /**
+   * Find all parts with possible filters
+   * @param query : Possible filters when searching
+   * @returns : A paginated list of all parts
+   */
   async findAll(query: GetPartsDto) {
     const findWhere: any = {};
 
@@ -85,6 +95,11 @@ export class PartService {
     );
   }
 
+  /**
+   * Find a specific part give an ID
+   * @param id : The ID of the part
+   * @returns : The part being looked for
+   */
   async findOne(id: number) {
     return this.partRepository.findOneBy({ id: id });
   }
@@ -119,6 +134,12 @@ export class PartService {
     }
   }
 
+  /**
+   * Change the information on a certain part
+   * @param id : The Id of the part being changed
+   * @param dto : The information to be changed
+   * @returns : A success message if updated properly
+   */
   async update(id: number, dto: UpdatePartDto): Promise<Part> {
     const part = await this.findByIdOrThrow(id, {
       relations: {
