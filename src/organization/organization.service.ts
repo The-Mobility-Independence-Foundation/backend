@@ -17,6 +17,8 @@ import { PaginationService } from '../common/services/pagination.service';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { UpdateAddressDto } from '../address/dto/update-address.dto';
 import { User } from '../user/entities/user.entity';
+import { Order } from '../order/order.entity';
+import { DEFAULT_ORDER_RELATIONS } from '../order/order.constants';
 
 @Injectable()
 export class OrganizationService {
@@ -26,6 +28,9 @@ export class OrganizationService {
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+
+    @InjectRepository(Order)
+    private readonly orderRepository: Repository<Order>,
 
     private readonly userService: UserService,
     private readonly addressService: AddressService,
@@ -183,5 +188,23 @@ export class OrganizationService {
     });
 
     return users;
+  }
+
+  async getOrderPool(id: number) {
+    const org = await this.findByIdOrThrow(id);
+    const { relations: relations } = DEFAULT_ORDER_RELATIONS;
+
+    const pool = await this.orderRepository.find({
+      where: {
+        providerOrganization: org,
+        provider: undefined,
+      },
+      relations: relations,
+      order: {
+        dateCreated: 'DESC',
+      },
+    });
+
+    return pool;
   }
 }

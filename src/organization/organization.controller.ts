@@ -77,4 +77,12 @@ export class OrganizationController {
   ) {
     return this.orderService.findAll(dto, { org: orgId });
   }
+
+  @Get('/:orgId/orderpool')
+  @ResponseMessage('Successfully retrieved orderpool')
+  @ApiOperation({ summary: 'Get orderpool' })
+  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_MEMBER)
+  getOrderPool(@Param('orgId', ParseIntPipe) orgId: number) {
+    return this.organizationService.getOrderPool(orgId);
+  }
 }
