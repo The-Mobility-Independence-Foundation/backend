@@ -117,6 +117,7 @@ export class UserService {
       {
         cursorColumn: 'id',
         where: findWhere,
+        relations: { organization: true },
       },
     );
   }
@@ -166,6 +167,16 @@ export class UserService {
       displayName: dto.displayName,
       type: dto.accountType,
     });
+
+    return this.userRepository.save(user);
+  }
+
+  async getUserInfo(id: number) {
+    const user = await this.findByIdOrThrow(id, {
+      relations: { organization: true },
+    });
+
+    user.lastActivity = new Date();
 
     return this.userRepository.save(user);
   }

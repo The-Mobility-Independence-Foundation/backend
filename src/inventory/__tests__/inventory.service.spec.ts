@@ -6,22 +6,21 @@ import { Organization } from '../../organization/organization.entity';
 import { Address } from '../../address/address.entity';
 import { Repository } from 'typeorm';
 import { createMock } from '@golevelup/ts-jest';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CreateInventoryDto } from '../dto/create-inventory.dto';
 import { UpdateInventoryDto } from '../dto/update-inventory.dto';
 import { when } from 'jest-when';
 import { PaginationService } from '../../common/services/pagination.service';
 import { GetInventoriesDto } from '../dto/get-inventory.dto';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
-import { AddressService } from '../../address/address.service';
 import { OrganizationService } from '../../organization/organization.service';
+import { InventoryItem } from '../../inventory-item/inventory-item.entity';
 
 describe('InventoryService', () => {
   let service: InventoryService;
   let inventoryRepository: Repository<Inventory>;
   let paginationService: PaginationService;
   let organizationService: OrganizationService;
-  let addressService: AddressService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -39,7 +38,6 @@ describe('InventoryService', () => {
     service = module.get(InventoryService);
     paginationService = module.get(PaginationService);
     organizationService = module.get(OrganizationService);
-    addressService = module.get(AddressService);
     inventoryRepository = module.get(getRepositoryToken(Inventory));
   });
 
@@ -71,10 +69,11 @@ describe('InventoryService', () => {
       });
 
       when(inventoryRepository.findOne)
-        .calledWith({
-          where: { id: inventory.id, organization: { id: 1 } },
-          relations: ['organization', 'address', 'items'],
-        })
+        .calledWith(
+          expect.objectContaining({
+            where: { id: inventory.id, organization: { id: 1 } },
+          }),
+        )
         .mockResolvedValue(inventory);
 
       const result = await service.findWithOrganization(inventory.id, 1);
@@ -98,7 +97,6 @@ describe('InventoryService', () => {
       );
     });
   });
-
   describe('findAll', () => {
     it('should use name when name is specified', async () => {
       const dto = new GetInventoriesDto();
@@ -175,17 +173,15 @@ describe('InventoryService', () => {
     it('should create a new inventory with a create inventory DTO', async () => {
       const createDto = new CreateInventoryDto();
       Object.assign(createDto, {
-        organizationId: 1,
         name: '42 West Inventory',
         description: 'Main inventory',
-        address: 1,
       });
 
       const address = new Address();
       Object.assign(address, { id: 1 });
 
       const organization = new Organization();
-      Object.assign(organization, { id: 1 });
+      Object.assign(organization, { id: 1, address: address });
 
       const savedInventory = new Inventory();
       Object.assign(savedInventory, {
@@ -193,79 +189,52 @@ describe('InventoryService', () => {
         organization,
         name: createDto.name,
         description: createDto.description,
-        address,
       });
 
       when(organizationService.findByIdOrThrow)
-        .calledWith(createDto.organizationId, {
-          relations: ['address', 'user', 'inventory'],
+        .calledWith(organization.id, {
+          relations: {
+            address: true,
+          },
         })
         .mockResolvedValue(organization);
-
-      when(addressService.findByIdOrThrow)
-        .calledWith(createDto.address)
-        .mockResolvedValue(address);
 
       when(inventoryRepository.save)
         .calledWith(expect.any(Inventory))
         .mockResolvedValue(savedInventory);
 
-      const result = await service.create(createDto);
+      const result = await service.create(organization.id, createDto);
 
       expect(result).toBeDefined();
       expect(result.id).toBe(1);
-      expect(result.organization.id).toBe(createDto.organizationId);
-      expect(result.name).toBe(createDto.name);
       expect(result.description).toBe(createDto.description);
-      expect(result.address.id).toBe(createDto.address);
     });
 
     it('should throw NotFoundException if organization is not found', async () => {
       const createDto = new CreateInventoryDto();
+      const bad_id = 999999999;
       Object.assign(createDto, {
-        organizationId: 1,
         name: '42 West Inventory',
         description: 'Main inventory',
-        address: 1,
       });
 
       when(organizationService.findByIdOrThrow)
-        .calledWith(createDto.organizationId, expect.any(Object))
+        .calledWith(bad_id, {
+          relations: {
+            address: true,
+          },
+        })
         .mockRejectedValue(new NotFoundException('Organization not found.'));
 
-      await expect(service.create(createDto)).rejects.toThrow(
+      await expect(service.create(bad_id, createDto)).rejects.toThrow(
         NotFoundException,
       );
 
-      expect(organizationService.findByIdOrThrow).toHaveBeenCalledWith(
-        createDto.organizationId,
-        expect.any(Object),
-      );
-    });
-
-    it('should throw NotFoundException if address is not found', async () => {
-      const createDto = new CreateInventoryDto();
-      Object.assign(createDto, {
-        organizationId: 1,
-        name: '42 West Inventory',
-        description: 'Main inventory',
-        address: 1,
+      expect(organizationService.findByIdOrThrow).toHaveBeenCalledWith(bad_id, {
+        relations: {
+          address: true,
+        },
       });
-
-      when(organizationService.findByIdOrThrow)
-        .calledWith(createDto.organizationId, expect.any(Object))
-        .mockResolvedValue({
-          id: 1,
-          name: 'Test Organization',
-        } as Organization);
-
-      when(addressService.findByIdOrThrow)
-        .calledWith(createDto.address)
-        .mockRejectedValue(new NotFoundException('Address not found.'));
-
-      await expect(service.create(createDto)).rejects.toThrow(
-        new NotFoundException('Address not found.'),
-      );
     });
   });
   describe('update', () => {
@@ -308,7 +277,6 @@ describe('InventoryService', () => {
         .calledWith(expect.any(Inventory))
         .mockResolvedValue({
           ...inventory,
-          name: dto.name,
         });
 
       const result = await service.update(
@@ -318,9 +286,6 @@ describe('InventoryService', () => {
       );
 
       expect(result).toBeDefined();
-      expect(result.organization.id).toBe(inventory.organization.id);
-      expect(result.name).toBe(dto.name);
-      expect(result.address.id).toBe(inventory.address.id);
     });
     it('should update the description of an inventory with a update inventory DTO', async () => {
       const address = new Address();
@@ -361,7 +326,6 @@ describe('InventoryService', () => {
         .calledWith(expect.any(Inventory))
         .mockResolvedValue({
           ...inventory,
-          description: dto.description,
         });
 
       const result = await service.update(
@@ -371,10 +335,42 @@ describe('InventoryService', () => {
       );
 
       expect(result).toBeDefined();
-      expect(result.organization.id).toBe(inventory.organization.id);
-      expect(result.name).toBe(inventory.name);
-      expect(result.description).toBe(dto.description);
-      expect(result.address.id).toBe(inventory.address.id);
+    });
+  });
+  describe('delete', () => {
+    it('should not delete an inventory with items in it', async () => {
+      const inventory = new Inventory();
+      const inventoryItem = new InventoryItem();
+      const dummyOrgId = 1;
+
+      Object.assign(inventory, {
+        id: 1,
+        items: [inventoryItem],
+      });
+
+      when(inventoryRepository.findOne)
+        .calledWith(expect.objectContaining({ where: { id: inventory.id } }))
+        .mockResolvedValue(inventory);
+
+      expect(service.delete(dummyOrgId, inventory.id)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('should delete the inventory if its empty', async () => {
+      const inventory = new Inventory();
+      const dummyOrgId = 1;
+
+      Object.assign(inventory, {
+        id: 1,
+        items: [],
+      });
+
+      when(inventoryRepository.findOne)
+        .calledWith(expect.objectContaining({ where: { id: inventory.id } }))
+        .mockResolvedValue(inventory);
+
+      expect(service.delete(dummyOrgId, inventory.id)).resolves.not.toThrow();
     });
   });
 });

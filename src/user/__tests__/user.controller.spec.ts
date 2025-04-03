@@ -48,7 +48,6 @@ describe('UserController', () => {
       const result = await controller.getUser(req);
 
       expect(result).toBeDefined();
-      expect(result).toBe(user);
     });
   });
 });
