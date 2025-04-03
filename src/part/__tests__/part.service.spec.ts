@@ -294,7 +294,6 @@ describe('PartService', () => {
       );
     });
 
-    
     it('Should update the name of a part if specified', async () => {
       Object.assign(updateDto, {
         name: 'Rays TE37',
@@ -308,7 +307,6 @@ describe('PartService', () => {
       expect(partRepository.save).toHaveBeenCalled();
     });
 
-    
     it('Should update the description of a part if specified', async () => {
       Object.assign(updateDto, {
         description: 'Bronze',
@@ -346,9 +344,7 @@ describe('PartService', () => {
 
       when(partTypeService.findByIdsOrThrow)
         .calledWith([partType.id])
-        .mockResolvedValue([
-          { id: partType.id, name: 'Wheel' } as PartType,
-        ]);
+        .mockResolvedValue([{ id: partType.id, name: 'Wheel' } as PartType]);
 
       await expect(service.update(part.id, updateDto)).resolves.not.toThrow();
 
