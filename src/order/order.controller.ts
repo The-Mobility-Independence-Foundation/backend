@@ -33,21 +33,23 @@ export class OrderController {
   @Get()
   @ResponseMessage('Successfully found orders')
   @ApiOperation({ summary: 'Get orders, with pagination' })
+  @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: true })
   findAll(@Query() dto: GetOrdersDto) {
     return this.orderService.findAll(dto);
   }
 
-  @Get(':id')
+  @Get(':orderId')
   @ResponseMessage('Successfully found order')
   @ApiOperation({ summary: 'Get information about an order' })
-  findOne(@Param('id') id: number) {
+  @UseStrategy(ResourceAccessStrategyToken.ORDER)
+  findOne(@Param('orderId') id: number) {
     return this.orderService.findByIdOrThrow(id, DEFAULT_ORDER_RELATIONS);
   }
 
   @Patch(`:orderId`)
   @ResponseMessage('Successfully updated order')
   @ApiOperation({ summary: 'Update an order' })
-  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_MEMBER)
+  @UseStrategy(ResourceAccessStrategyToken.ORDER)
   update(@Param('orderId') orderId: number, @Body() dto: UpdateOrderDto) {
     return this.orderService.update(orderId, dto);
   }
