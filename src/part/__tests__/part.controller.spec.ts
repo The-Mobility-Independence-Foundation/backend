@@ -6,13 +6,6 @@ import {
   ResourceAccessStrategyRegistry,
 } from '../../common/resource-access/interfaces/strategy-provider.interface';
 
-export const mockRepository = jest.fn(() => ({
-  metadata: {
-    columns: [],
-    relations: [],
-  },
-}));
-
 describe('PartController', () => {
   let controller: PartController;
 
