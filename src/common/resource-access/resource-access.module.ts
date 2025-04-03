@@ -14,7 +14,7 @@ import { AnyUserResourceAccessStrategy } from './strategies/any-user-resource-ac
 import { OrganizationOwnerResourceAccessStrategy } from './strategies/organization-owner-resource-access.strategy';
 import { OrganizationModule } from '../../organization/organization.module';
 import { OrganizationMemberResourceAccessStrategy } from './strategies/organization-member-resource-access.strategy';
-import { OrderResourceAccessStrategy } from './strategies/order-access.strategy';
+import { OrderResourceAccessStrategy } from './strategies/order-resource-access.strategy';
 
 const STRATEGY_PROVIDERS = [
   {

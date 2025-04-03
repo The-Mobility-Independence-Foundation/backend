@@ -29,10 +29,6 @@ export class OrderResourceAccessStrategy extends ResourceAccessStrategy {
       },
     });
 
-    if (!order) {
-      return false;
-    }
-
     return (
       user.organization?.id === order.recipientOrganization.id ||
       user.organization?.id === order.providerOrganization.id
