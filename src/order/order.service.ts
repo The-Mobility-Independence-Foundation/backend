@@ -14,7 +14,6 @@ import {
 } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserService } from '../user/user.service';
-import { OrganizationService } from '../organization/organization.service';
 import { ListingService } from '../listing/listing.service';
 import { CreateOrderDto } from './dto/create-order-dto';
 import { CreateAddressDto } from '../address/dto/create-address.dto';
@@ -34,7 +33,6 @@ export class OrderService {
 
     private readonly userService: UserService,
     private readonly listingService: ListingService,
-    private readonly organizationService: OrganizationService,
     private readonly addressService: AddressService,
     private readonly paginationService: PaginationService,
   ) {}

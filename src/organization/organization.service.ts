@@ -5,7 +5,12 @@ import {
   NotImplementedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
+import {
+  FindOptionsRelations,
+  FindOptionsWhere,
+  IsNull,
+  Repository,
+} from 'typeorm';
 import { Organization } from './organization.entity';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UserService } from '../user/user.service';
@@ -197,7 +202,7 @@ export class OrganizationService {
     const pool = await this.orderRepository.find({
       where: {
         providerOrganization: org,
-        provider: undefined,
+        provider: IsNull(),
       },
       relations: relations,
       order: {

@@ -11,5 +11,6 @@ export const DEFAULT_ORDER_RELATIONS = {
       },
     },
     recipient: true,
+    providerOrganization: true,
   },
 };

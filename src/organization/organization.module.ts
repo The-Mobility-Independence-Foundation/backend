@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrganizationController } from './organization.controller';
 import { OrganizationService } from './organization.service';
@@ -16,7 +16,7 @@ import { Order } from '../order/order.entity';
     UserModule,
     AddressModule,
     CommonModule,
-    forwardRef(() => OrderModule),
+    OrderModule,
   ],
   controllers: [OrganizationController],
   providers: [OrganizationService],

@@ -4,7 +4,6 @@ import { OrderController } from './order.controller';
 import { OrderService } from './order.service';
 import { Order } from './order.entity';
 import { UserModule } from '../user/user.module';
-import { OrganizationModule } from '../organization/organization.module';
 import { ListingModule } from '../listing/listing.module';
 import { AddressModule } from '../address/address.module';
 import { CommonModule } from '../common/common.module';
@@ -13,7 +12,6 @@ import { CommonModule } from '../common/common.module';
   imports: [
     TypeOrmModule.forFeature([Order]),
     forwardRef(() => UserModule),
-    forwardRef(() => OrganizationModule),
     forwardRef(() => ListingModule),
     AddressModule,
     CommonModule,

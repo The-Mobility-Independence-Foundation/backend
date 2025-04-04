@@ -22,7 +22,7 @@ describe('OrganizationMemberResourceAccessStrategy', () => {
 
   describe('canAccess', () => {
     let user: User;
-    
+
     beforeEach(async () => {
       user = new User();
     });
@@ -50,12 +50,17 @@ describe('OrganizationMemberResourceAccessStrategy', () => {
       });
       const params = { orgId: String(org.id) };
 
-      when(userService.findByIdOrThrow).calledWith(user.id, expect.anything()).mockResolvedValue(user);
+      when(userService.findByIdOrThrow)
+        .calledWith(user.id, expect.anything())
+        .mockResolvedValue(user);
 
       const result = await strategy.canAccess(user, params);
 
       expect(result).toBe(true);
-      expect(userService.findByIdOrThrow).toHaveBeenCalledWith(user.id, expect.anything());
+      expect(userService.findByIdOrThrow).toHaveBeenCalledWith(
+        user.id,
+        expect.anything(),
+      );
     });
 
     it('should return true when user is in org', async () => {
@@ -69,12 +74,17 @@ describe('OrganizationMemberResourceAccessStrategy', () => {
       });
       const params = { orgId: String(org.id) };
 
-      when(userService.findByIdOrThrow).calledWith(user.id, expect.anything()).mockResolvedValue(user);
+      when(userService.findByIdOrThrow)
+        .calledWith(user.id, expect.anything())
+        .mockResolvedValue(user);
 
       const result = await strategy.canAccess(user, params);
 
       expect(result).toBe(false);
-      expect(userService.findByIdOrThrow).toHaveBeenCalledWith(user.id, expect.anything());
+      expect(userService.findByIdOrThrow).toHaveBeenCalledWith(
+        user.id,
+        expect.anything(),
+      );
     });
   });
 });
