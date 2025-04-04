@@ -166,6 +166,12 @@ export class OrderService {
       findWhere.listing = { id: id.listing };
     }
 
+    if (query.listingName) {
+      findWhere.listing = { 
+        name: query.listingName,
+      };
+    }
+
     if (id && id.org) {
       if (query.sentOnly === 'true') {
         findWhere.providerOrganization = { id: id.org };

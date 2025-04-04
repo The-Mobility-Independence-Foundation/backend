@@ -30,4 +30,10 @@ export class GetOrdersDto extends CursorPaginationDto {
     description: 'True => only sent orders; False => only received',
   })
   sentOnly?: string;
+
+  @IsOptional()
+  @ApiPropertyOptional({
+    description: 'The name of the listing the order is for',
+  })
+  listingName?: string;
 }
