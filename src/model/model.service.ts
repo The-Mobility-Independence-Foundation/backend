@@ -53,23 +53,13 @@ export class ModelService {
    * @returns : A paginated list of all models
    */
   async findAll(query: GetModelsDto) {
-    const findWhere: any = {};
-
-    if (query.name) {
-      findWhere.name = query.name;
-    }
-
-    if (query.modelTypeIds) {
-      findWhere.modelTypeIds = query.modelTypeIds;
-    }
-
-    if (query.manufacturerId) {
-      findWhere.manufacturerId = query.manufacturerId;
-    }
-
-    if (query.year) {
-      findWhere.year = query.year;
-    }
+    const findWhere = Object.assign(
+      {},
+      query.name && { name: query.name },
+      query.modelTypeIds && { modelTypeIds: query.modelTypeIds },
+      query.manufacturerId && { manufacturerId: query.manufacturerId },
+      query.year && { year: query.year },
+    );
 
     const paginationDto = new CursorPaginationDto();
     Object.assign(paginationDto, {
