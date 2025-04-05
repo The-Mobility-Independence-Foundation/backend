@@ -1,47 +1,92 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Manufacturer, Model } from './model.entity';
+import { Model } from './model.entity';
 import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PaginationService } from '../common/services/pagination.service';
+import { CreateModelDto } from './dto/create-model.dto';
+import { GetModelsDto } from './dto/get-model.dto';
+import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
+import { UpdateModelDto } from './dto/update-model.dto';
+import { ModelTypeService } from '../model-type/model-type.service';
+import { ManufacturerService } from '../manufacturer/manufacturer.service';
 
 @Injectable()
 export class ModelService {
   constructor(
     @InjectRepository(Model)
     private readonly modelRepository: Repository<Model>,
-
-    @InjectRepository(Manufacturer)
-    private readonly manufacturerRepository: Repository<Manufacturer>,
+    private readonly paginationService: PaginationService,
+    private readonly modelTypeService: ModelTypeService,
+    private readonly manufacturerService: ManufacturerService,
   ) {}
 
   /**
-   *
-   * @returns
+   * Method used to create a new model
+   * @param dto : All the needed informatioin to create a mofel
+   * @returns : A success message if it was created properly
    */
-  async create() {
+  async create(dto: CreateModelDto) {
     const model = new Model();
-    const manufacturer = await this.manufacturerRepository.findOneBy({ id: 1 });
 
-    if (manufacturer) {
-      model.manufacturer = manufacturer;
-    }
-    model.name = 'Model Name';
-    model.year = 2025;
+    model.manufacturer = await this.manufacturerService.findByIdOrThrow(
+      dto.manufacturerId,
+      {
+        relations: { models: true },
+      },
+    );
+
+    model.year = dto.year;
+    model.name = dto.name;
+    model.types = await this.modelTypeService.findByIdsOrThrow(
+      dto.modelTypeIds,
+      {
+        relations: { models: true },
+      },
+    );
 
     return this.modelRepository.save(model);
   }
 
   /**
-   *
-   * @returns
+   * Find all models with possible filters
+   * @param query : Possible filters when searching
+   * @returns : A paginated list of all models
    */
-  async findAll() {
-    return this.modelRepository.find();
+  async findAll(query: GetModelsDto) {
+    const findWhere = Object.assign(
+      {},
+      query.name && { name: query.name },
+      query.modelTypeIds && { modelTypeIds: query.modelTypeIds },
+      query.manufacturerId && { manufacturerId: query.manufacturerId },
+      query.year && { year: query.year },
+    );
+
+    const paginationDto = new CursorPaginationDto();
+    Object.assign(paginationDto, {
+      cursor: query.cursor,
+      limit: query.limit,
+      direction: query.direction,
+    });
+
+    return this.paginationService.paginateWithCursor(
+      this.modelRepository,
+      paginationDto,
+      {
+        cursorColumn: 'id',
+        where: findWhere,
+        relations: {
+          manufacturer: true,
+          types: true,
+          parts: true,
+        },
+      },
+    );
   }
 
   /**
-   *
-   * @param id
-   * @returns
+   * Find a specific model give an ID
+   * @param id : The ID of the model
+   * @returns : The model being looked for
    */
   async findOne(id: number) {
     return this.modelRepository.findOneBy({ id: id });
@@ -75,5 +120,38 @@ export class ModelService {
     } else {
       throw new NotFoundException('Model not found');
     }
+  }
+
+  /**
+   * Change the information on a certain model
+   * @param id : The ID of the model wished to be changed
+   * @param dto : The information to be changed
+   * @returns : A success message if updated properly
+   */
+  async update(id: number, dto: UpdateModelDto): Promise<Model> {
+    const model = await this.findByIdOrThrow(id, {
+      relations: {
+        manufacturer: true,
+        types: true,
+        parts: true,
+      },
+    });
+
+    model.name = dto.name ?? model.name;
+    model.year = dto.year ?? model.year;
+
+    if (dto.manufacturerId) {
+      model.manufacturer = await this.manufacturerService.findByIdOrThrow(
+        dto.manufacturerId,
+      );
+    }
+
+    if (dto.modelTypeIds) {
+      model.types = await this.modelTypeService.findByIdsOrThrow(
+        dto.modelTypeIds,
+      );
+    }
+
+    return this.modelRepository.save(model);
   }
 }
