@@ -2,7 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationService } from '../common/services/pagination.service';
 import { PartType } from '../part/part.entity';
-import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
+import {
+  FindOptionsRelations,
+  FindOptionsWhere,
+  In,
+  Repository,
+} from 'typeorm';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { GetPartTypesDto } from './dto/get-part-type.dto';
 import { CreatePartTypeDto } from './dto/create-part-type.dto';
@@ -125,5 +130,29 @@ export class PartTypeService {
     }
 
     return partType;
+  }
+
+  async findByIdsOrThrow(
+    ids: number[],
+    options: Partial<{
+      where: FindOptionsWhere<Omit<PartType, 'id'>>;
+      relations: string[] | FindOptionsRelations<PartType>;
+    }> = {},
+  ) {
+    const { where = {}, relations } = options;
+
+    const partTypes = await this.partTypeRepository.find({
+      where: {
+        ...where,
+        id: In(ids),
+      },
+      relations: relations as string[],
+    });
+
+    if (partTypes.length === ids.length) {
+      return partTypes;
+    } else {
+      throw new NotFoundException('One or more part types not found');
+    }
   }
 }
