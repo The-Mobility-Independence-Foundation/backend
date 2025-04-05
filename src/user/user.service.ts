@@ -171,48 +171,4 @@ export class UserService {
 
     return this.userRepository.save(user);
   }
-
-  /**
-   * Get all bookmarks from a user
-   * @param userId - the users id
-   * @returns the array of bookmarks
-   */
-  async getBookmarks(userId: number) {
-    const user = await this.findByIdOrThrow(userId, {
-      relations: { bookmarks: true },
-    });
-
-    return user.bookmarks;
-  }
-
-  async createBookmark(userId: number, listingId: number) {
-    const user = await this.findByIdOrThrow(userId, {
-      relations: { bookmarks: true },
-    });
-    const listing = await this.listingService.findByIdOrThrow(listingId);
-    const index = user.bookmarks.indexOf(listing);
-
-    if (index > -1) {
-      // bookmark already exists
-      user.bookmarks.splice(index, 1);
-    } else {
-      // create new bookmark
-      user.bookmarks.push(listing);
-    }
-
-    return this.userRepository.save(user);
-  }
-
-  async deleteBookmark(userId: number, listingId: number) {
-    const user = await this.findByIdOrThrow(userId, {
-      relations: { bookmarks: true },
-    });
-    const listing = await this.listingService.findByIdOrThrow(listingId);
-
-    user.bookmarks = user.bookmarks.filter((list) => {
-      return list.id !== listing.id;
-    });
-
-    return this.userRepository.save(user);
-  }
 }

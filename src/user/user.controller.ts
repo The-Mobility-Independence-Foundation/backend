@@ -19,12 +19,17 @@ import { ResourceAccessStrategyToken } from '../common/resource-access/interface
 import { Request } from 'express';
 import { GetUsersDto } from './dto/get-users.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { BookmarkService } from '../bookmarks/bookmarks.service';
+import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 
 @ApiTags('users')
 @Controller('users')
 @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER)
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly bookmarkService: BookmarkService,
+  ) {}
 
   @Get('/@me')
   @ResponseMessage('Successfully retrieved user')
@@ -63,8 +68,11 @@ export class UserController {
   @ResponseMessage('Successfully retrieved bookmarks')
   @ApiOperation({ summary: 'Get all bookmarks for a given user' })
   @UseStrategy(ResourceAccessStrategyToken.USER)
-  async getBookmarks(@Param('userId', ParseIntPipe) userId: number) {
-    return this.userService.getBookmarks(userId);
+  async getBookmarks(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Query() dto: CursorPaginationDto,
+  ) {
+    return this.bookmarkService.findAll(dto, { userId: userId });
   }
 
   @Post(':userId/bookmarks/:listingId')
@@ -75,7 +83,7 @@ export class UserController {
     @Param('userId', ParseIntPipe) userId: number,
     @Param('listingId', ParseIntPipe) listingId: number,
   ) {
-    return this.userService.createBookmark(userId, listingId);
+    return this.bookmarkService.create(userId, listingId);
   }
 
   @Delete(':userId/bookmarks/:listingId')
@@ -86,6 +94,6 @@ export class UserController {
     @Param('userId', ParseIntPipe) userId: number,
     @Param('listingId', ParseIntPipe) listingId: number,
   ) {
-    return this.userService.deleteBookmark(userId, listingId);
+    return this.bookmarkService.delete(userId, listingId);
   }
 }
