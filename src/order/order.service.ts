@@ -166,8 +166,12 @@ export class OrderService {
       findWhere.listing = { id: id.listing };
     }
 
+    if (query.status) {
+      findWhere.status = query.status;
+    }
+
     if (query.listingName) {
-      findWhere.listing = { 
+      findWhere.listing = {
         name: query.listingName,
       };
     }
