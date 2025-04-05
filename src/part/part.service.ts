@@ -52,27 +52,14 @@ export class PartService {
    * @returns : A paginated list of all parts
    */
   async findAll(query: GetPartsDto) {
-    const findWhere: any = {};
-
-    if (query.name) {
-      findWhere.name = query.name;
-    }
-
-    if (query.partTypeIds) {
-      findWhere.partTypeIds = query.partTypeIds;
-    }
-
-    if (query.modelId) {
-      findWhere.modelId = query.modelId;
-    }
-
-    if (query.partNumber) {
-      findWhere.partNumber = query.partNumber;
-    }
-
-    if (query.description) {
-      findWhere.description = query.description;
-    }
+    const findWhere = Object.assign(
+      {},
+      query.name && { name: query.name },
+      query.partTypeIds && { partTypeIds: query.partTypeIds },
+      query.modelId && { modelId: query.modelId },
+      query.partNumber && { partNumber: query.partNumber },
+      query.description && { description: query.description },
+    );
 
     const paginationDto = new CursorPaginationDto();
     Object.assign(paginationDto, {
