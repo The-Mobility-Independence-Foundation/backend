@@ -36,8 +36,12 @@ export class InventoryItemController {
   @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_MEMBER, {
     adminOnly: false,
   })
-  create(@Body() dto: CreateInventoryItemDto): Promise<InventoryItem> {
-    return this.inventoryItemService.create(dto);
+  create(
+    @Param('orgId', ParseIntPipe) orgId: number,
+    @Param('inventoryId', ParseIntPipe) inventoryId: number,
+    @Body() dto: CreateInventoryItemDto
+  ): Promise<InventoryItem> {
+    return this.inventoryItemService.create(inventoryId, dto);
   }
 
   /**

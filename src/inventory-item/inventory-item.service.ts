@@ -27,7 +27,7 @@ export class InventoryItemService {
    * @param dto : All necessary information to create a new item
    * @returns : The new item being saved into the database
    */
-  async create(dto: CreateInventoryItemDto) {
+  async create(inventoryId: number, dto: CreateInventoryItemDto) {
     const inventoryItem = new InventoryItem();
 
     inventoryItem.model = await this.modelService.findByIdOrThrow(dto.modelId, {
@@ -39,7 +39,7 @@ export class InventoryItemService {
     });
 
     inventoryItem.inventory = await this.inventoryService.findByIdOrThrow(
-      dto.inventoryId,
+      inventoryId,
       {
         relations: ['organization', 'address', 'items'],
       },
@@ -200,9 +200,9 @@ export class InventoryItemService {
       });
     }
 
-    if (dto.inventoryId) {
+    if (inventoryId) {
       item.inventory = await this.inventoryService.findByIdOrThrow(
-        dto.inventoryId,
+        inventoryId,
         {
           relations: ['organization', 'address', 'items'],
         },
