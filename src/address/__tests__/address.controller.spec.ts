@@ -1,15 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AddressController } from '../address.controller';
-import { AddressService } from '../address.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Address } from '../address.entity';
-
-export const mockRepository = jest.fn(() => ({
-  metadata: {
-    columns: [],
-    relations: [],
-  },
-}));
+import { createMock } from '@golevelup/ts-jest';
 
 describe('AddressController', () => {
   let controller: AddressController;
@@ -17,16 +8,11 @@ describe('AddressController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AddressController],
-      providers: [
-        AddressService,
-        {
-          provide: getRepositoryToken(Address),
-          useClass: mockRepository,
-        },
-      ],
-    }).compile();
+    })
+      .useMocker(createMock)
+      .compile();
 
-    controller = module.get<AddressController>(AddressController);
+    controller = module.get(AddressController);
   });
 
   it('should be defined', () => {

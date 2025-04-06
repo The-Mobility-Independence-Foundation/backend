@@ -1,17 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ListingController } from './listing.controller';
-import { ListingService } from './listing.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Listing } from './listing.entity';
-import { InventoryItem } from '../inventory-item/inventory-item.entity';
-import { Organization } from '../organization/organization.entity';
-
-export const mockRepository = jest.fn(() => ({
-  metadata: {
-    columns: [],
-    relations: [],
-  },
-}));
+import { createMock } from '@golevelup/ts-jest';
 
 describe('ListingController', () => {
   let controller: ListingController;
@@ -19,24 +8,11 @@ describe('ListingController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ListingController],
-      providers: [
-        ListingService,
-        {
-          provide: getRepositoryToken(Listing),
-          useClass: mockRepository,
-        },
-        {
-          provide: getRepositoryToken(Organization),
-          useClass: mockRepository,
-        },
-        {
-          provide: getRepositoryToken(InventoryItem),
-          useClass: mockRepository,
-        },
-      ],
-    }).compile();
+    })
+      .useMocker(createMock)
+      .compile();
 
-    controller = module.get<ListingController>(ListingController);
+    controller = module.get(ListingController);
   });
 
   it('should be defined', () => {
