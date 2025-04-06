@@ -31,7 +31,7 @@ export class MessageService {
 
     message.author = sender;
     message.conversation = conversation;
-    message.messageContent = content;
+    message.content = content;
 
     const savedMessage = await this.messageRepository.save(message);
 

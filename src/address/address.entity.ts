@@ -27,4 +27,7 @@ export class Address {
 
   @OneToMany(() => Organization, (org) => org.address)
   organizations: Organization[];
+
+  @OneToMany(() => Organization, (org) => org.address)
+  orders: Organization[];
 }

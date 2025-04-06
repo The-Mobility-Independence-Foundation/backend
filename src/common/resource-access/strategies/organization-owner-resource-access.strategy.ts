@@ -24,13 +24,9 @@ export class OrganizationOwnerResourceAccessStrategy extends ResourceAccessStrat
 
     const organization = await this.organizationService.findByIdOrThrow(orgId, {
       relations: {
-        owner: true,
+        members: true,
       },
     });
-
-    if (!organization) {
-      return false;
-    }
 
     return organization.owner.id === user.id;
   }

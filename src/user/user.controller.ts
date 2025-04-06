@@ -17,12 +17,17 @@ import { ResourceAccessStrategyToken } from '../common/resource-access/interface
 import { Request } from 'express';
 import { GetUsersDto } from './dto/get-users.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { GetOrdersDto } from '../order/dto/get-orders-dto';
+import { OrderService } from '../order/order.service';
 
 @ApiTags('users')
 @Controller('users')
 @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER)
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly orderService: OrderService,
+  ) {}
 
   @Get('/@me')
   @ResponseMessage('Successfully retrieved user')
@@ -58,5 +63,16 @@ export class UserController {
     @Body() dto: UpdateUserDto,
   ) {
     return this.userService.update(userId, dto);
+  }
+
+  @Get('/:userId/orders')
+  @ResponseMessage('Successfully found orders')
+  @ApiOperation({ summary: 'Get orders, with pagination' })
+  findOrders(
+    @Query() dto: GetOrdersDto,
+    @Param('userId', ParseIntPipe) userId: number,
+  ) {
+    console.log('user', userId);
+    return this.orderService.findAll(dto, { user: userId });
   }
 }
