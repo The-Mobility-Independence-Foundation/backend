@@ -31,7 +31,7 @@ export class Manufacturer {
   @Column({ type: 'varchar', length: 50 })
   name: string;
 
-  @OneToMany(() => Model, (model) => model.types)
+  @OneToMany(() => Model, (model) => model.manufacturer)
   models: Model[];
 }
 
