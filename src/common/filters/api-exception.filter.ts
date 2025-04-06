@@ -13,7 +13,7 @@ import { ValidationException } from '../exceptions/validation.exception';
  * Exception filter for handling API exceptions
  */
 @Catch()
-export class ApiExceptionFilter implements ExceptionFilter {
+export class ApiExceptionFilter implements ExceptionFilter<Error> {
   constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
 
   /**
@@ -21,7 +21,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
    * @param exception - The exception to catch
    * @param host - The host arguments
    */
-  catch(exception: unknown, host: ArgumentsHost): void {
+  catch(exception: Error, host: ArgumentsHost): void {
     const { httpAdapter } = this.httpAdapterHost;
 
     const status =
@@ -29,7 +29,8 @@ export class ApiExceptionFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    let message = 'Internal server error';
+    let message =
+      'Something went wrong, please try again later. If the problem persists, please contact support.';
     let data = null;
 
     if (exception instanceof HttpException) {

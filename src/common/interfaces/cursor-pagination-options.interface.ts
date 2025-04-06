@@ -15,4 +15,5 @@ export interface CursorPaginationOptions<T extends ObjectLiteral> {
   relations?: FindOptionsRelations<T>;
   order?: FindOptionsOrder<T>;
   includeCount?: boolean;
+  withDeleted?: boolean;
 }

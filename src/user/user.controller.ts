@@ -21,6 +21,8 @@ import { GetUsersDto } from './dto/get-users.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { BookmarkService } from '../bookmarks/bookmarks.service';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
+import { GetOrdersDto } from '../order/dto/get-orders-dto';
+import { OrderService } from '../order/order.service';
 
 @ApiTags('users')
 @Controller('users')
@@ -29,6 +31,7 @@ export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly bookmarkService: BookmarkService,
+    private readonly orderService: OrderService,
   ) {}
 
   @Get('/@me')
@@ -36,24 +39,27 @@ export class UserController {
   @ApiOperation({ summary: 'Get the current user' })
   @UseStrategy(ResourceAccessStrategyToken.ANY_USER)
   async getUser(@Req() req: Request): Promise<User> {
-    return req.user as User;
+    const user = req.user as User;
+    return this.userService.getUserInfo(user.id);
   }
 
-  @Get()
+  @Get('/')
   @ResponseMessage('Successfully retrieved all users matching your criteria')
   @ApiOperation({ summary: 'Get all users matching search criteria' })
   async findAll(@Query() query: GetUsersDto) {
     return this.userService.findAll(query);
   }
 
-  @Get(':userId')
+  @Get('/:userId')
   @ResponseMessage('Successfully found user')
   @ApiOperation({ summary: 'Find a specific user given their id' })
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.userService.findByIdOrThrow(id);
+  async findOne(@Param('userId', ParseIntPipe) userId: number) {
+    return this.userService.findByIdOrThrow(userId, {
+      relations: { organization: true },
+    });
   }
 
-  @Patch(':userId')
+  @Patch('/:userId')
   @ResponseMessage('Successfully updated user')
   @ApiOperation({ summary: 'Update a specific user given their id' })
   @UseStrategy(ResourceAccessStrategyToken.USER)
@@ -95,5 +101,16 @@ export class UserController {
     @Param('listingId', ParseIntPipe) listingId: number,
   ) {
     return this.bookmarkService.delete(userId, listingId);
+  }
+  
+  @Get('/:userId/orders')
+  @ResponseMessage('Successfully found orders')
+  @ApiOperation({ summary: 'Get orders, with pagination' })
+  findOrders(
+    @Query() dto: GetOrdersDto,
+    @Param('userId', ParseIntPipe) userId: number,
+  ) {
+    console.log('user', userId);
+    return this.orderService.findAll(dto, { user: userId });
   }
 }

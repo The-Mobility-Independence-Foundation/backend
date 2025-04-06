@@ -9,6 +9,7 @@ import { UserAuthService } from './user-auth.service';
 import { CommonModule } from '../common/common.module';
 import { ListingModule } from '../listing/listing.module';
 import { BookmarkModule } from '../bookmarks/bookmarks.module';
+import { OrderModule } from '../order/order.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { BookmarkModule } from '../bookmarks/bookmarks.module';
     CommonModule,
     ListingModule,
     forwardRef(() => BookmarkModule),
+    forwardRef(() => OrderModule),
   ],
   controllers: [UserController],
   providers: [UserService, UserAuthService],

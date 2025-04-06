@@ -2,37 +2,91 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Part } from './part.entity';
 import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
-import { Model } from '../model/model.entity';
+import { ModelService } from '../model/model.service';
+import { PartTypeService } from '../part-type/part-type.service';
+import { PaginationService } from '../common/services/pagination.service';
+import { CreatePartDto } from './dto/create-part.dto';
+import { GetPartsDto } from './dto/get-part.dto';
+import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
+import { UpdatePartDto } from './dto/update-part.dto';
 
 @Injectable()
 export class PartService {
   constructor(
     @InjectRepository(Part)
     private readonly partRepository: Repository<Part>,
-
-    @InjectRepository(Model)
-    private readonly modelRepository: Repository<Model>,
+    private readonly modelService: ModelService,
+    private readonly partTypeService: PartTypeService,
+    private readonly paginationService: PaginationService,
   ) {}
 
-  async create() {
+  /**
+   * Method used to create a new part
+   * @param dto : All needed information to create a part
+   * @returns : A success message if it was created properly
+   */
+  async create(dto: CreatePartDto) {
     const part = new Part();
-    const model = await this.modelRepository.findOneBy({ id: 1 });
 
-    if (model) {
-      part.model = model;
-    }
+    part.model = await this.modelService.findByIdOrThrow(dto.modelId, {
+      relations: {
+        manufacturer: true,
+        parts: true,
+      },
+    });
 
-    part.name = 'Partname!';
-    part.description = '';
-    part.partNumber = 'P12-345';
+    part.types = await this.partTypeService.findByIdsOrThrow(dto.partTypeIds, {
+      relations: { parts: true },
+    });
+
+    part.name = dto.name;
+    part.description = dto.description;
+    part.partNumber = dto.partNumber;
 
     return this.partRepository.save(part);
   }
 
-  async findAll() {
-    return this.partRepository.find();
+  /**
+   * Find all parts with possible filters
+   * @param query : Possible filters when searching
+   * @returns : A paginated list of all parts
+   */
+  async findAll(query: GetPartsDto) {
+    const findWhere = Object.assign(
+      {},
+      query.name && { name: query.name },
+      query.partTypeIds && { partTypeIds: query.partTypeIds },
+      query.modelId && { modelId: query.modelId },
+      query.partNumber && { partNumber: query.partNumber },
+      query.description && { description: query.description },
+    );
+
+    const paginationDto = new CursorPaginationDto();
+    Object.assign(paginationDto, {
+      cursor: query.cursor,
+      limit: query.limit,
+      direction: query.direction,
+    });
+
+    return this.paginationService.paginateWithCursor(
+      this.partRepository,
+      paginationDto,
+      {
+        cursorColumn: 'id',
+        where: findWhere,
+        relations: {
+          model: true,
+          types: true,
+        },
+      },
+    );
   }
 
+  /**
+   * Find a specific part give an ID
+   * @param id : The ID of the part
+   * @returns : The part being looked for
+   */
   async findOne(id: number) {
     return this.partRepository.findOneBy({ id: id });
   }
@@ -65,5 +119,34 @@ export class PartService {
     } else {
       throw new NotFoundException('Part not found');
     }
+  }
+
+  /**
+   * Change the information on a certain part
+   * @param id : The Id of the part being changed
+   * @param dto : The information to be changed
+   * @returns : A success message if updated properly
+   */
+  async update(id: number, dto: UpdatePartDto): Promise<Part> {
+    const part = await this.findByIdOrThrow(id, {
+      relations: {
+        model: true,
+        types: true,
+      },
+    });
+
+    part.name = dto.name ?? part.name;
+    part.partNumber = dto.partNumber ?? part.partNumber;
+    part.description = dto.description ?? part.description;
+
+    if (dto.modelId) {
+      part.model = await this.modelService.findByIdOrThrow(dto.modelId);
+    }
+
+    if (dto.partTypeIds) {
+      part.types = await this.partTypeService.findByIdsOrThrow(dto.partTypeIds);
+    }
+
+    return this.partRepository.save(part);
   }
 }

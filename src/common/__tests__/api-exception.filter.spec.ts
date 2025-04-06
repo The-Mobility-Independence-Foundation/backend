@@ -114,7 +114,8 @@ describe('ApiExceptionFilter', () => {
         host.switchToHttp().getResponse(),
         {
           success: false,
-          message: 'Internal server error',
+          message:
+            'Something went wrong, please try again later. If the problem persists, please contact support.',
           data: null,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,

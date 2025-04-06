@@ -28,7 +28,7 @@ export class AddressService {
     return this.addressRepository.save(address);
   }
 
-  async findAll(): Promise<Address[]> {
+  async findAll() {
     return this.addressRepository.find();
   }
 

@@ -22,7 +22,7 @@ export class Message {
   conversation: Conversation;
 
   @Column({ type: 'varchar', length: 2000 })
-  messageContent: string;
+  content?: string;
 
   @Column({ type: 'timestamp', nullable: true, default: null })
   readStatus: Date | null;

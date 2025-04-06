@@ -1,7 +1,17 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Inventory } from './inventory.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
+import {
+  FindOptionsRelations,
+  FindOptionsWhere,
+  IsNull,
+  Not,
+  Repository,
+} from 'typeorm';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
 import { PaginationService } from '../common/services/pagination.service';
@@ -9,6 +19,8 @@ import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { GetInventoriesDto } from './dto/get-inventory.dto';
 import { OrganizationService } from '../organization/organization.service';
 import { AddressService } from '../address/address.service';
+import { CreateAddressDto } from '../address/dto/create-address.dto';
+import { CursorPaginationOptions } from '../common/interfaces/cursor-pagination-options.interface';
 
 @Injectable()
 export class InventoryService {
@@ -26,19 +38,34 @@ export class InventoryService {
    * @param dto : Relevant information needed to create the inventory
    * @returns The save of the inventory
    */
-  async create(dto: CreateInventoryDto): Promise<Inventory> {
+  async create(orgId: number, dto: CreateInventoryDto): Promise<Inventory> {
     const inventory = new Inventory();
+    const addressData = new CreateAddressDto();
 
-    const organization = await this.organizationService.findByIdOrThrow(
-      dto.organizationId,
-      {
-        relations: ['address', 'user', 'inventory'],
+    const organization = await this.organizationService.findByIdOrThrow(orgId, {
+      relations: {
+        address: true,
       },
-    );
+    });
     inventory.organization = organization;
 
-    const address = await this.addressService.findByIdOrThrow(dto.address);
-    inventory.address = address;
+    Object.assign(addressData, {
+      addressLine1: dto.addressLine1,
+      addressLine2: dto.addressLine2,
+      city: dto.city,
+      state: dto.state,
+      zipCode: dto.zipCode,
+    });
+
+    if (Object.values(addressData).every((v) => v !== undefined)) {
+      // if every value is defined
+      inventory.address = await this.addressService.create(addressData);
+    } else if (Object.values(addressData).every((v) => v === undefined)) {
+      // if every value is undefined
+      inventory.address = organization.address;
+    } else {
+      throw new BadRequestException('Incomplete address data provided.');
+    }
 
     inventory.name = dto.name;
     inventory.description = dto.description;
@@ -52,11 +79,19 @@ export class InventoryService {
    * @returns A collection of all relevant inventory information owned by this organization
    */
   async findAll(organizationId: number, query: GetInventoriesDto) {
-    const findWhere: any = {
+    const findWhere = {};
+    const paginationDto = new CursorPaginationDto();
+
+    Object.assign(findWhere, {
       organization: { id: organizationId },
       name: query.name,
-    };
-    const paginationDto = new CursorPaginationDto();
+    });
+
+    if (query.archived === 'true') {
+      Object.assign(findWhere, {
+        archivedAt: Not(IsNull()),
+      });
+    }
 
     Object.assign(paginationDto, {
       cursor: query.cursor,
@@ -64,13 +99,22 @@ export class InventoryService {
       direction: query.direction,
     });
 
+    const cursorOptions: CursorPaginationOptions<Inventory> = {
+      cursorColumn: 'id',
+      where: findWhere,
+      relations: {
+        address: true,
+      },
+    };
+
+    if (query.archived === undefined || query.archived === 'true') {
+      cursorOptions.withDeleted = true;
+    }
+
     return this.paginationService.paginateWithCursor(
       this.inventoryRepository,
       paginationDto,
-      {
-        cursorColumn: 'id',
-        where: findWhere,
-      },
+      cursorOptions,
     );
   }
 
@@ -110,13 +154,47 @@ export class InventoryService {
    */
   async update(organizationId: number, id: number, dto: UpdateInventoryDto) {
     const inventory = await this.findByIdOrThrow(id, {
-      relations: ['organization', 'address', 'items'],
+      relations: { address: true },
     });
 
+    if (
+      dto.addressLine1 ||
+      dto.addressLine2 ||
+      dto.city ||
+      dto.state ||
+      dto.zipCode
+    ) {
+      const oldAddress = inventory.address;
+      const addressData = new CreateAddressDto();
+
+      Object.assign(addressData, {
+        addressLine1: oldAddress.addressLine1,
+        addressLine2: oldAddress.addressLine2,
+        city: oldAddress.city,
+        state: oldAddress.state,
+        zipCode: oldAddress.zipCode,
+      });
+
+      Object.assign(addressData, {
+        addressLine1: dto.addressLine1,
+        addressLine2: dto.addressLine2,
+        city: dto.city,
+        state: dto.state,
+        zipCode: dto.zipCode,
+      });
+
+      const address = await this.addressService.create(addressData);
+      inventory.address = address;
+    }
+
     Object.assign(inventory, {
-      ...(dto.name && { name: dto.name }), // Only update name if it's in the DTO
-      ...(dto.description && { description: dto.description }), // Only update description if it's in the DTO
+      name: dto.name,
+      description: dto.description,
     });
+
+    if (dto.restore) {
+      return await this.inventoryRepository.restore(id);
+    }
 
     return await this.inventoryRepository.save(inventory);
   }
@@ -136,6 +214,7 @@ export class InventoryService {
         id,
       },
       relations: relations as string[],
+      withDeleted: true,
     });
 
     if (inventory) {
@@ -143,5 +222,23 @@ export class InventoryService {
     } else {
       throw new NotFoundException('Inventory not found');
     }
+  }
+
+  async delete(orgId: number, invId: number) {
+    const inventory = await this.findByIdOrThrow(invId, {
+      relations: {
+        items: true,
+      },
+    });
+
+    if (inventory.items.length !== 0) {
+      throw new BadRequestException(
+        'You cannot delete an inventory with items in it.',
+      );
+    }
+
+    await this.inventoryRepository.softDelete(invId);
+
+    return;
   }
 }

@@ -6,9 +6,10 @@ import {
   JoinColumn,
   ManyToOne,
   Index,
+  DeleteDateColumn,
 } from 'typeorm';
 
-export enum EntityType {
+export enum AttachmentEntityType {
   POST = 'post',
   COMMENT = 'comment',
   LISTING = 'listing',
@@ -16,34 +17,42 @@ export enum EntityType {
 }
 
 @Entity()
+@Index(['entityId', 'entityType'])
 export class Attachment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @JoinColumn()
+  @JoinColumn({ name: 'authorId' })
   @ManyToOne(() => User, (user) => user.attachmentsCreated)
   author: User;
 
-  @Index()
   @Column()
-  entity_id: number;
+  authorId: number;
 
-  @Index()
-  @Column({ type: 'enum', enum: EntityType, default: EntityType.POST })
-  entity_type: EntityType;
+  @Column()
+  entityId: number;
 
-  @Column({ type: 'varchar', length: 20 })
-  file_name: string;
-
-  @Column({ type: 'varchar', length: 15 })
-  file_size: string;
-
-  @Column({ type: 'varchar', length: 20 })
-  mime_type: string;
+  @Column({
+    type: 'enum',
+    enum: AttachmentEntityType,
+  })
+  entityType: AttachmentEntityType;
 
   @Column({ type: 'text' })
-  storage_url: string;
+  fileName: string;
+
+  @Column({ type: 'text' })
+  fileSize: string;
+
+  @Column({ type: 'text' })
+  mimeType: string;
+
+  @Column({ type: 'text' })
+  key: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  created_at: Date;
+  createdAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date | null;
 }

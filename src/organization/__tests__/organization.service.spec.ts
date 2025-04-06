@@ -21,6 +21,7 @@ import { UpdateOrganizationDto } from '../dto/update-organization.dto';
 import { UpdateAddressDto } from '../../address/dto/update-address.dto';
 import { GetOrganizationsDto } from '../dto/get-organizations.dto';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
+import { Order } from '../../order/order.entity';
 
 describe('OrganizationService', () => {
   let service: OrganizationService;
@@ -41,6 +42,10 @@ describe('OrganizationService', () => {
         {
           provide: getRepositoryToken(User),
           useValue: createMock<Repository<User>>(),
+        },
+        {
+          provide: getRepositoryToken(Order),
+          useValue: createMock<Repository<Order>>(),
         },
       ],
     })
