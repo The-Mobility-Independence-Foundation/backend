@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
   ManyToOne,
@@ -30,7 +31,7 @@ export class Manufacturer {
   @Column({ type: 'varchar', length: 50 })
   name: string;
 
-  @ManyToMany(() => Model, (model) => model.types)
+  @OneToMany(() => Model, (model) => model.types)
   models: Model[];
 }
 
@@ -40,6 +41,7 @@ export class Model {
   id: number;
 
   @ManyToOne(() => Manufacturer, (manufacturer) => manufacturer.models)
+  @JoinColumn()
   manufacturer: Manufacturer;
 
   @Column({ type: 'varchar', length: 50 })
@@ -55,6 +57,6 @@ export class Model {
   @OneToMany(() => InventoryItem, (item) => item.model)
   inventoryItems: InventoryItem[];
 
-  @ManyToMany(() => Part, (part) => part.model)
+  @OneToMany(() => Part, (part) => part.model)
   parts: Part[];
 }

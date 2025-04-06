@@ -53,8 +53,9 @@ export class ModelService {
    * @returns : A paginated list of all models
    */
   async findAll(query: GetModelsDto) {
-    const findWhere = Object.assign(
-      {},
+    const findWhere = {};
+    Object.assign(
+      findWhere,
       query.name && { name: query.name },
       query.modelTypeIds && { modelTypeIds: query.modelTypeIds },
       query.manufacturerId && { manufacturerId: query.manufacturerId },
