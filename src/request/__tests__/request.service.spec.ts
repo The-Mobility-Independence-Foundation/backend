@@ -5,19 +5,20 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { createMock } from '@golevelup/ts-jest';
 import { Repository } from 'typeorm';
 import { PaginationService } from '../../common/services/pagination.service';
-//import { UserService } from '../../user/user.service';
+import { UserService } from '../../user/user.service';
 import { CreateRequestDto } from '../dto/create-request.dto';
 import { NotFoundException } from '@nestjs/common';
 import { when } from 'jest-when';
 import { User } from '../../user/entities/user.entity';
 import { GetRequestsDto } from '../dto/get-request.dto';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
+import { UpdateRequestDto } from '../dto/update-request.dto';
 
 describe('RequestService', () => {
   let service: RequestService;
   let requestRepository: Repository<Request>;
   let paginationService: PaginationService;
-  //let userService: UserService;
+  let userService: UserService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -35,7 +36,7 @@ describe('RequestService', () => {
     service = module.get<RequestService>(RequestService);
     requestRepository = module.get(getRepositoryToken(Request));
     paginationService = module.get(PaginationService);
-    //userService = module.get(UserService);
+    userService = module.get(UserService);
   });
 
   describe('create', () => {
@@ -245,6 +246,59 @@ describe('RequestService', () => {
           relations: expect.any(Object),
         }),
       );
+    });
+  });
+
+  describe('update', () => {
+    let updateDto = new UpdateRequestDto();
+    const user = new User();
+    const request = new Request();
+
+    beforeAll(() => {
+      Object.assign(user, { id: 1 });
+      Object.assign(request, {
+        id: 1,
+        status: RequestStatus.PENDING,
+      });
+    });
+
+    beforeEach(() => {
+      updateDto = new UpdateRequestDto();
+    });
+
+    it('Should update the approver of a request if specified', async () => {
+      Object.assign(updateDto, {
+        approverId: user.id,
+      });
+
+      when(requestRepository.findOne)
+        .calledWith(expect.objectContaining({ where: { id: request.id } }))
+        .mockResolvedValue(Promise.resolve(request));
+
+      when(userService.findByIdOrThrow)
+        .calledWith(user.id)
+        .mockResolvedValue(user);
+
+      await expect(service.update(request.id, updateDto)).resolves.not.toThrow();
+
+      expect(requestRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          approver: user,
+        }),
+      );
+    });
+
+    it('Should update the status of a request if specified', async () => {
+      Object.assign(updateDto, {
+        status: RequestStatus.ACCEPTED,
+      });
+
+      when(requestRepository.findOne)
+        .calledWith(expect.objectContaining({ where: { id: request.id } }))
+        .mockResolvedValue(Promise.resolve(request));
+
+      await expect(service.update(request.id, updateDto)).resolves.not.toThrow();
+      expect(requestRepository.save).toHaveBeenCalled();
     });
   });
 });
