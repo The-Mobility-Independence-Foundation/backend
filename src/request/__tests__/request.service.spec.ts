@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { RequestController } from './request.controller';
-import { RequestService } from './request.service';
-import { Request } from './request.entity';
+import { RequestService } from '../request.service';
+import { Request } from '../request.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 
 export const mockRepository = jest.fn(() => ({
@@ -11,12 +10,11 @@ export const mockRepository = jest.fn(() => ({
   },
 }));
 
-describe('RequestController', () => {
-  let controller: RequestController;
+describe('RequestService', () => {
+  let service: RequestService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [RequestController],
       providers: [
         RequestService,
         {
@@ -26,10 +24,10 @@ describe('RequestController', () => {
       ],
     }).compile();
 
-    controller = module.get<RequestController>(RequestController);
+    service = module.get<RequestService>(RequestService);
   });
 
   it('should be defined', () => {
-    expect(controller).toBeDefined();
+    expect(service).toBeDefined();
   });
 });

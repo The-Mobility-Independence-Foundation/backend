@@ -2,7 +2,7 @@ import { Controller, Post, Get, Param } from '@nestjs/common';
 import { RequestService } from './request.service';
 import { Request } from './request.entity';
 
-@Controller('request')
+@Controller('requests')
 export class RequestController {
   constructor(private readonly requestService: RequestService) {}
 
