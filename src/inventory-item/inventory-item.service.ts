@@ -139,11 +139,9 @@ export class InventoryItemService {
         'inventory',
         'inventory.organization',
         'inventory.address',
-        'part.name',
-        'part.partNumber',
-        'model.name',
+        'part',
+        'model',
         'listings',
-        'tags.name',
       ],
     });
 
@@ -168,6 +166,10 @@ export class InventoryItemService {
     id: number,
     dto: UpdateInventoryItemDto,
   ) {
+    if (dto.restore === 'true') {
+      return this.inventoryItemRepository.restore(id);
+    }
+
     const item = await this.findByIdOrThrow(id, {
       where: {
         inventory: {
@@ -245,5 +247,11 @@ export class InventoryItemService {
     } else {
       throw new NotFoundException('Item not found');
     }
+  }
+
+  async archive(itemId: number) {
+    await this.inventoryItemRepository.softDelete(itemId);
+
+    return;
   }
 }

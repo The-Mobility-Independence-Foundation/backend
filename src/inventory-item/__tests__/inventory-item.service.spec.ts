@@ -453,11 +453,9 @@ describe('InventoryItemService', () => {
             'inventory',
             'inventory.organization',
             'inventory.address',
-            'part.name',
-            'part.partNumber',
-            'model.name',
+            'part',
+            'model',
             'listings',
-            'tags.name',
           ],
         })
         .mockResolvedValue(item);
