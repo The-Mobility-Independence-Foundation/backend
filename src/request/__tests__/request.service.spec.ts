@@ -5,7 +5,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { createMock } from '@golevelup/ts-jest';
 import { Repository } from 'typeorm';
 import { PaginationService } from '../../common/services/pagination.service';
-import { UserService } from '../../user/user.service';
+//import { UserService } from '../../user/user.service';
 import { CreateRequestDto } from '../dto/create-request.dto';
 import { NotFoundException } from '@nestjs/common';
 import { when } from 'jest-when';
@@ -17,7 +17,7 @@ describe('RequestService', () => {
   let service: RequestService;
   let requestRepository: Repository<Request>;
   let paginationService: PaginationService;
-  let userService: UserService;
+  //let userService: UserService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -35,7 +35,7 @@ describe('RequestService', () => {
     service = module.get<RequestService>(RequestService);
     requestRepository = module.get(getRepositoryToken(Request));
     paginationService = module.get(PaginationService);
-    userService = module.get(UserService);
+    //userService = module.get(UserService);
   });
 
   describe('create', () => {
