@@ -39,7 +39,6 @@ export class RequestService {
       query.email && { email: query.email },
       query.status && { status: query.status },
       query.approverId && { approverId: query.approverId },
-      query.on && { sentOn: query.on },
     );
 
     const paginationDto = new CursorPaginationDto();

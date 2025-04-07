@@ -25,10 +25,6 @@ export class GetRequestsDto extends IntersectionType(
   @IsEnum(RequestStatus)
   status?: RequestStatus;
 
-  @IsOptional()
-  @ApiPropertyOptional({ description: 'Only get requests on this date.' })
-  on?: Date;
-
   @ApiPropertyOptional()
   @IsOptional()
   @IsPositive({ message: 'Invalid approver given.' })
