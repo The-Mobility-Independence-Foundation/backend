@@ -279,7 +279,9 @@ describe('RequestService', () => {
         .calledWith(user.id)
         .mockResolvedValue(user);
 
-      await expect(service.update(request.id, updateDto)).resolves.not.toThrow();
+      await expect(
+        service.update(request.id, updateDto),
+      ).resolves.not.toThrow();
 
       expect(requestRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -297,7 +299,9 @@ describe('RequestService', () => {
         .calledWith(expect.objectContaining({ where: { id: request.id } }))
         .mockResolvedValue(Promise.resolve(request));
 
-      await expect(service.update(request.id, updateDto)).resolves.not.toThrow();
+      await expect(
+        service.update(request.id, updateDto),
+      ).resolves.not.toThrow();
       expect(requestRepository.save).toHaveBeenCalled();
     });
   });
