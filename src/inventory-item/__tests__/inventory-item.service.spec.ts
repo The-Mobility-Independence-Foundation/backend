@@ -70,14 +70,13 @@ describe('InventoryItemService', () => {
       Object.assign(createDto, {
         partId: 1,
         modelId: 1,
-        inventoryId: 1,
         quantity: 3,
         publicCount: 2,
         notes: 'nice wheel',
       });
 
       when(inventoryService.findByIdOrThrow)
-        .calledWith(createDto.inventoryId, {
+        .calledWith(1, {
           relations: ['address', 'user', 'inventory'],
         })
         .mockResolvedValue(inventory);
@@ -90,14 +89,13 @@ describe('InventoryItemService', () => {
         .calledWith(createDto.modelId)
         .mockResolvedValue(model);
 
-      await expect(service.create(createDto)).resolves.not.toThrow();
+      await expect(service.create(1, createDto)).resolves.not.toThrow();
       expect(inventoryItemRepository.save).toHaveBeenCalled();
     });
     it('should throw NotFoundException if Part is not found', async () => {
       Object.assign(createDto, {
         partId: 999,
         modelId: 1,
-        inventoryId: 1,
         quantity: 3,
         publicCount: 2,
         notes: 'nice wheel',
@@ -107,7 +105,7 @@ describe('InventoryItemService', () => {
         .calledWith(createDto.partId, expect.any(Object))
         .mockRejectedValue(new NotFoundException('Part not found.'));
 
-      await expect(service.create(createDto)).rejects.toThrow(
+      await expect(service.create(1, createDto)).rejects.toThrow(
         NotFoundException,
       );
 
@@ -120,7 +118,6 @@ describe('InventoryItemService', () => {
       Object.assign(createDto, {
         partId: 1,
         modelId: 999,
-        inventoryId: 1,
         quantity: 3,
         publicCount: 2,
         notes: 'nice wheel',
@@ -130,7 +127,7 @@ describe('InventoryItemService', () => {
         .calledWith(createDto.modelId, expect.any(Object))
         .mockRejectedValue(new NotFoundException('Model not found.'));
 
-      await expect(service.create(createDto)).rejects.toThrow(
+      await expect(service.create(1, createDto)).rejects.toThrow(
         NotFoundException,
       );
 
@@ -150,15 +147,15 @@ describe('InventoryItemService', () => {
       });
 
       when(inventoryService.findByIdOrThrow)
-        .calledWith(createDto.inventoryId, expect.any(Object))
+        .calledWith(1, expect.any(Object))
         .mockRejectedValue(new NotFoundException('Inventory not found.'));
 
-      await expect(service.create(createDto)).rejects.toThrow(
+      await expect(service.create(1, createDto)).rejects.toThrow(
         NotFoundException,
       );
 
       expect(inventoryService.findByIdOrThrow).toHaveBeenCalledWith(
-        createDto.inventoryId,
+        1,
         expect.any(Object),
       );
     });
@@ -456,11 +453,9 @@ describe('InventoryItemService', () => {
             'inventory',
             'inventory.organization',
             'inventory.address',
-            'part.name',
-            'part.partNumber',
-            'model.name',
+            'part',
+            'model',
             'listings',
-            'tags.name',
           ],
         })
         .mockResolvedValue(item);

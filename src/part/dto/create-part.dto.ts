@@ -29,7 +29,7 @@ export class CreatePartDto {
     message:
       'Part Number is too long. Maximum length is $constraint1 characters.',
   })
-  partNumber?: string | null;
+  partNumber?: string;
 
   @ApiProperty()
   @IsOptional()

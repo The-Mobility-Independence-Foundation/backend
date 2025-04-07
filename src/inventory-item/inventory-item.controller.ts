@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Patch,
   Query,
+  Delete,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
@@ -36,8 +37,12 @@ export class InventoryItemController {
   @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_MEMBER, {
     adminOnly: false,
   })
-  create(@Body() dto: CreateInventoryItemDto): Promise<InventoryItem> {
-    return this.inventoryItemService.create(dto);
+  create(
+    @Param('orgId', ParseIntPipe) orgId: number,
+    @Param('inventoryId', ParseIntPipe) inventoryId: number,
+    @Body() dto: CreateInventoryItemDto,
+  ): Promise<InventoryItem> {
+    return this.inventoryItemService.create(inventoryId, dto);
   }
 
   /**
@@ -88,5 +93,19 @@ export class InventoryItemController {
     @Body() dto: UpdateInventoryItemDto,
   ) {
     return this.inventoryItemService.update(orgId, inventoryId, id, dto);
+  }
+
+  @Delete(':itemId')
+  @ApiOperation({ summary: 'Archive an inventory item' })
+  @ResponseMessage('Successfully archived inventory item')
+  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_MEMBER, {
+    adminOnly: false,
+  })
+  archive(
+    @Param('orgId', ParseIntPipe) orgId: number,
+    @Param('inventoryId', ParseIntPipe) inventoryId: number,
+    @Param('itemId', ParseIntPipe) id: number,
+  ) {
+    return this.inventoryItemService.archive(id);
   }
 }
