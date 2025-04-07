@@ -60,8 +60,8 @@ export class BookmarkService {
         cursorColumn: 'id',
         where: findWhere,
         relations: {
-          listing: true
-        }
+          listing: true,
+        },
       },
     );
   }

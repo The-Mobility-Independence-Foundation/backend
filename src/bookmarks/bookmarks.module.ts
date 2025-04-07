@@ -9,7 +9,7 @@ import { CommonModule } from '../common/common.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Bookmark]), 
+    TypeOrmModule.forFeature([Bookmark]),
     forwardRef(() => UserModule),
     ListingModule,
     CommonModule,

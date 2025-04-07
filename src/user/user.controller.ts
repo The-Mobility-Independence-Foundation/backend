@@ -102,7 +102,7 @@ export class UserController {
   ) {
     return this.bookmarkService.delete(userId, listingId);
   }
-  
+
   @Get('/:userId/orders')
   @ResponseMessage('Successfully found orders')
   @ApiOperation({ summary: 'Get orders, with pagination' })
