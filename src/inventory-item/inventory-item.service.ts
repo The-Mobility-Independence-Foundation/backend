@@ -80,6 +80,11 @@ export class InventoryItemService {
     if (query.tagId) {
       findWhere.tags = { some: { id: query.tagId } };
     }
+    if (query.partName) {
+      findWhere.part = {
+        name: query.partName,
+      };
+    }
 
     const paginationDto = new CursorPaginationDto();
     Object.assign(paginationDto, {

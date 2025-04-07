@@ -39,7 +39,7 @@ export class InventoryItemController {
   create(
     @Param('orgId', ParseIntPipe) orgId: number,
     @Param('inventoryId', ParseIntPipe) inventoryId: number,
-    @Body() dto: CreateInventoryItemDto
+    @Body() dto: CreateInventoryItemDto,
   ): Promise<InventoryItem> {
     return this.inventoryItemService.create(inventoryId, dto);
   }

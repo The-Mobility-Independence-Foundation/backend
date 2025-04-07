@@ -47,6 +47,11 @@ export class GetInventoryItemsDto extends CursorPaginationDto {
   notes?: string;
 
   @IsOptional()
+  @ApiPropertyOptional({ description: 'The name of the part.' })
+  @IsString()
+  partName?: string;
+
+  @IsOptional()
   @ApiPropertyOptional({
     description: 'Additional attributes of the inventory item.',
   })
