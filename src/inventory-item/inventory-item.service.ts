@@ -1,6 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InventoryItem } from './inventory-item.entity';
-import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
+import {
+  FindOptionsRelations,
+  FindOptionsWhere,
+  IsNull,
+  Not,
+  Repository,
+} from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateInventoryItemDto } from './dto/create-inventory-item.dto';
 import { UpdateInventoryItemDto } from './dto/update-inventory-item.dto';
@@ -10,6 +16,7 @@ import { PaginationService } from '../common/services/pagination.service';
 import { InventoryService } from '../inventory/inventory.service';
 import { GetInventoryItemsDto } from './dto/get-inventory-item.dto';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
+import { CursorPaginationOptions } from '../common/interfaces/cursor-pagination-options.interface';
 
 @Injectable()
 export class InventoryItemService {
@@ -104,14 +111,26 @@ export class InventoryItemService {
       tags: true,
     };
 
+    if (query.status === 'archived') {
+      Object.assign(findWhere, {
+        archivedAt: Not(IsNull()),
+      });
+    }
+
+    const findOptions: CursorPaginationOptions<InventoryItem> = {
+      cursorColumn: 'id',
+      where: findWhere,
+      relations: relations,
+    };
+
+    if (query.status === 'both' || query.status === 'archived') {
+      findOptions.withDeleted = true;
+    }
+
     return this.paginationService.paginateWithCursor(
       this.inventoryItemRepository,
       paginationDto,
-      {
-        cursorColumn: 'id',
-        where: findWhere,
-        relations: relations,
-      },
+      findOptions,
     );
   }
 
