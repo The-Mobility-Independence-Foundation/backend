@@ -1,15 +1,8 @@
+import { createMock } from '@golevelup/ts-jest';
 import { Test, TestingModule } from '@nestjs/testing';
+import { STRATEGY_PROVIDERS_TOKEN, ResourceAccessStrategyRegistry } from '../../common/resource-access/interfaces/strategy-provider.interface';
 import { RequestController } from '../request.controller';
-import { RequestService } from '../request.service';
-import { Request } from '../request.entity';
-import { getRepositoryToken } from '@nestjs/typeorm';
 
-export const mockRepository = jest.fn(() => ({
-  metadata: {
-    columns: [],
-    relations: [],
-  },
-}));
 
 describe('RequestController', () => {
   let controller: RequestController;
@@ -18,15 +11,16 @@ describe('RequestController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [RequestController],
       providers: [
-        RequestService,
         {
-          provide: getRepositoryToken(Request),
-          useClass: mockRepository,
+          provide: STRATEGY_PROVIDERS_TOKEN,
+          useValue: createMock<ResourceAccessStrategyRegistry>(),
         },
       ],
-    }).compile();
+    })
+    .useMocker(createMock)
+    .compile();
 
-    controller = module.get<RequestController>(RequestController);
+    controller = module.get(RequestController);
   });
 
   it('should be defined', () => {

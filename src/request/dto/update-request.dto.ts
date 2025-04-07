@@ -12,9 +12,4 @@ export class UpdateRequestDto {
   @IsOptional()
   @IsPositive({ message: 'Invalid approver given.' })
   approverId?: number;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsDate()
-  actionTakenOn: Date;
 }

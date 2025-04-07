@@ -2,13 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { RequestService } from '../request.service';
 import { Request } from '../request.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
-
-export const mockRepository = jest.fn(() => ({
-  metadata: {
-    columns: [],
-    relations: [],
-  },
-}));
+import { createMock } from '@golevelup/ts-jest';
+import { Repository } from 'typeorm';
 
 describe('RequestService', () => {
   let service: RequestService;
@@ -19,10 +14,12 @@ describe('RequestService', () => {
         RequestService,
         {
           provide: getRepositoryToken(Request),
-          useClass: mockRepository,
+          useValue: createMock<Repository<Request>>(),
         },
       ],
-    }).compile();
+    })
+    .useMocker(createMock)
+    .compile();
 
     service = module.get<RequestService>(RequestService);
   });
