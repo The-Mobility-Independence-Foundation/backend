@@ -18,6 +18,11 @@ export class RequestService {
     private readonly userService: UserService,
   ) {}
 
+  /**
+   * Create a new request to join the site
+   * @param dto : All needed information to submit a request
+   * @returns : A success message if made correctly
+   */
   async create(dto: CreateRequestDto) {
     const request = new Request();
     request.ein = dto.ein;
@@ -30,6 +35,11 @@ export class RequestService {
     return this.requestRepository.save(request);
   }
 
+  /**
+   * Find all relevant requests
+   * @param query : Any filters to sort the requests
+   * @returns : A paginated list of all requests that fit that criteria
+   */
   async findAll(query: GetRequestsDto) {
     const findWhere = Object.assign(
       {},
@@ -65,6 +75,12 @@ export class RequestService {
     return this.requestRepository.findOneBy({ id: id });
   }
 
+  /**
+   * Changing information about a request
+   * @param id : The id of the request being changed
+   * @param dto : The information being changed in the request
+   * @returns : A success message if updated correctly
+   */
   async update(id: number, dto: UpdateRequestDto): Promise<Request> {
     const request = await this.findByIdOrThrow(id, {
       relations: {
@@ -89,6 +105,12 @@ export class RequestService {
     return this.requestRepository.save(request);
   }
 
+  /**
+   * Find a single request by using the id
+   * @param id : The id number of the request
+   * @param options : Any relations that request may have
+   * @returns : The request if it exists or an error
+   */
   async findByIdOrThrow(
     id: number,
     options: Partial<{
