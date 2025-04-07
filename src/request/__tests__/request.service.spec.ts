@@ -18,8 +18,8 @@ describe('RequestService', () => {
         },
       ],
     })
-    .useMocker(createMock)
-    .compile();
+      .useMocker(createMock)
+      .compile();
 
     service = module.get<RequestService>(RequestService);
   });

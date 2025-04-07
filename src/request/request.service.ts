@@ -38,8 +38,8 @@ export class RequestService {
       query.lastName && { lastName: query.lastName },
       query.email && { email: query.email },
       query.status && { status: query.status },
-      query.approverId && { approverId: query.approverId},
-      query.on && { sentOn: query.on},
+      query.approverId && { approverId: query.approverId },
+      query.on && { sentOn: query.on },
     );
 
     const paginationDto = new CursorPaginationDto();
@@ -82,7 +82,7 @@ export class RequestService {
         request.actionTakenOn = new Date();
       }
     }
-    
+
     if (dto.approverId) {
       request.approver = await this.userService.findByIdOrThrow(dto.approverId);
     }

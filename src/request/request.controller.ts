@@ -1,4 +1,12 @@
-import { Controller, Post, Get, Param, Body, Patch, Query } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Param,
+  Body,
+  Patch,
+  Query,
+} from '@nestjs/common';
 import { RequestService } from './request.service';
 import { Request } from './request.entity';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -27,7 +35,9 @@ export class RequestController {
   @ResponseMessage('Successfully retrieved all requests')
   @ApiOperation({ summary: 'Retrieve all requests' })
   @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: true })
-  findAll(@Query() query: GetRequestsDto): Promise<BaseApiCursorPaginationResponse<Request>> {
+  findAll(
+    @Query() query: GetRequestsDto,
+  ): Promise<BaseApiCursorPaginationResponse<Request>> {
     return this.requestService.findAll(query);
   }
 

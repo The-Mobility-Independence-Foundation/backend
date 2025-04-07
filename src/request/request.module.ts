@@ -7,9 +7,7 @@ import { CommonModule } from '../common/common.module';
 import { UserModule } from '../user/user.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Request]),
-  CommonModule,
-  UserModule],
+  imports: [TypeOrmModule.forFeature([Request]), CommonModule, UserModule],
   controllers: [RequestController],
   providers: [RequestService],
   exports: [RequestService],
