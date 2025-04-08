@@ -16,7 +16,6 @@ import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 import { OrganizationService } from '../../organization/organization.service';
 import { InventoryItem } from '../../inventory-item/inventory-item.entity';
 
-
 describe('InventoryService', () => {
   let service: InventoryService;
   let inventoryRepository: Repository<Inventory>;
