@@ -9,9 +9,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserService } from '../user/user.service';
 import { PaginationService } from '../common/services/pagination.service';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
-import { ListingService } from '../listing/listing.service';
+import { ListingsService } from '../listings/listings.service';
 import { ConversationHistory } from './entities/conversation-history.entity';
-import { ListingStatus } from '../listing/listing.entity';
+import { ListingStatus } from '../listings/listing.entity';
 import { UserRole } from '../user/entities/user.entity';
 
 @Injectable()
@@ -22,7 +22,7 @@ export class ConversationsService {
     @InjectRepository(ConversationHistory)
     private readonly conversationHistoryRepository: Repository<ConversationHistory>,
     private readonly userService: UserService,
-    private readonly listingService: ListingService,
+    private readonly listingsService: ListingsService,
     private readonly paginationService: PaginationService,
   ) {}
 
@@ -185,12 +185,12 @@ export class ConversationsService {
       throw new BadRequestException('Conversation already exists');
     }
 
-    const listing = await this.listingService.findById(listingId);
+    const listing = await this.listingsService.findByIdOrThrow(listingId);
     if (!listing) {
       throw new NotFoundException('Listing not found');
     }
 
-    if (listing.state !== ListingStatus.ACTIVE) {
+    if (listing.status !== ListingStatus.ACTIVE) {
       throw new BadRequestException('Listing is not active');
     }
 
@@ -199,7 +199,7 @@ export class ConversationsService {
       throw new NotFoundException('Initiator not found');
     }
 
-    if (listing.ownerId === initiator.organizationId) {
+    if (listing.organizationId === initiator.organizationId) {
       throw new BadRequestException(
         'Initiator cannot initiate a conversation with their own organization',
       );
@@ -255,7 +255,7 @@ export class ConversationsService {
       throw new BadRequestException('Conversation already has a participant');
     }
 
-    if (conversation.listing?.ownerId !== participant.organizationId) {
+    if (conversation.listing?.organizationId !== participant.organizationId) {
       throw new BadRequestException(
         'Participant is not part of the organization that owns the listing',
       );
@@ -350,7 +350,7 @@ export class ConversationsService {
     }
 
     if (executor.type !== UserRole.ADMIN) {
-      if (executor.organizationId !== conversation.listing?.ownerId) {
+      if (executor.organizationId !== conversation.listing?.organizationId) {
         throw new BadRequestException(
           'Executor is not part of the organization that owns the listing',
         );

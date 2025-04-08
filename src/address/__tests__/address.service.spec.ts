@@ -2,8 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AddressService } from '../address.service';
 import { Address } from '../address.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
 import { createMock } from '@golevelup/ts-jest';
+import { Repository } from 'typeorm';
 import { CreateAddressDto } from '../dto/create-address.dto';
 import { when } from 'jest-when';
 import { NotFoundException } from '@nestjs/common';
@@ -20,6 +21,21 @@ describe('AddressService', () => {
         {
           provide: getRepositoryToken(Address),
           useValue: createMock<Repository<Address>>(),
+        },
+        {
+          provide: ConfigService,
+          useValue: createMock<ConfigService>({
+            getOrThrow: jest.fn((key: string) => {
+              switch (key) {
+                case 'RADAR_SECRET_SERVER':
+                  return 'test-secret-key';
+                case 'RADAR_API_URL':
+                  return 'https://test-endpoint.com';
+                default:
+                  return '';
+              }
+            }),
+          }),
         },
       ],
     })

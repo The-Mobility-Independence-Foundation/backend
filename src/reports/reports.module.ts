@@ -6,7 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from '../common/common.module';
 import { UserModule } from '../user/user.module';
 import { CommentModule } from '../comment/comment.module';
-import { ListingModule } from '../listing/listing.module';
+import { ListingsModule } from '../listings/listings.module';
 import { PostModule } from '../post/post.module';
 
 @Module({
@@ -15,7 +15,7 @@ import { PostModule } from '../post/post.module';
     CommonModule,
     UserModule,
     CommentModule,
-    ListingModule,
+    ListingsModule,
     PostModule,
   ],
   providers: [ReportsService],

@@ -10,7 +10,7 @@ import { RequestModule } from '../request/request.module';
 import { ReviewModule } from '../review/review.module';
 import { ConversationsModule } from '../conversations/conversations.module';
 import { MessageModule } from '../message/message.module';
-import { ListingModule } from '../listing/listing.module';
+import { ListingsModule } from '../listings/listings.module';
 import { OrderModule } from '../order/order.module';
 import { InventoryItemModule } from '../inventory-item/inventory-item.module';
 import { TagModule } from '../tag/tag.module';
@@ -39,6 +39,8 @@ import { PartTypeModule } from '../part-type/part-type.module';
         type: 'postgres',
         url: configService.get('DATABASE_URL'),
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+        migrations: [__dirname + '/migrations/*{.ts,.js}'],
+        migrationsRun: configService.get('NODE_ENV') !== 'production',
         synchronize: configService.get('NODE_ENV') !== 'production',
       }),
       inject: [ConfigService],
@@ -51,7 +53,7 @@ import { PartTypeModule } from '../part-type/part-type.module';
     ReviewModule,
     ConversationsModule,
     MessageModule,
-    ListingModule,
+    ListingsModule,
     OrderModule,
     InventoryItemModule,
     TagModule,

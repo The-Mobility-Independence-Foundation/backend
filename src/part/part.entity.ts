@@ -12,18 +12,6 @@ import { InventoryItem } from '../inventory-item/inventory-item.entity';
 import { IsOptional } from 'class-validator';
 
 @Entity()
-export class PartType {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column({ type: 'varchar', length: 50 })
-  name: string;
-
-  @ManyToMany(() => Part, (part) => part.types)
-  parts: Part[];
-}
-
-@Entity()
 export class Part {
   @PrimaryGeneratedColumn()
   id: number;
@@ -34,9 +22,12 @@ export class Part {
   @Column({ type: 'varchar', length: 200 })
   description: string;
 
+  @JoinColumn({ name: 'modelId' })
   @ManyToOne(() => Model, (model) => model.parts)
-  @JoinColumn()
   model: Model;
+
+  @Column()
+  modelId: number;
 
   @IsOptional()
   @Column({ type: 'varchar', length: 30, nullable: true })
@@ -48,4 +39,16 @@ export class Part {
 
   @ManyToOne(() => InventoryItem, (invItem) => invItem.part)
   inventoryItems: InventoryItem[];
+}
+
+@Entity()
+export class PartType {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ type: 'varchar', length: 50 })
+  name: string;
+
+  @ManyToMany(() => Part, (part) => part.types)
+  parts: Part[];
 }

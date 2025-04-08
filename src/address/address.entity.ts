@@ -22,6 +22,12 @@ export class Address {
   @Column({ type: 'varchar', length: 10 })
   zipCode: string;
 
+  @Column({ type: 'float' })
+  latitude: number;
+
+  @Column({ type: 'float' })
+  longitude: number;
+
   @OneToMany(() => Inventory, (inventory) => inventory.address)
   inventories: Inventory[];
 

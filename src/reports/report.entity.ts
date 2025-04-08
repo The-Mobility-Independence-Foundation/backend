@@ -7,7 +7,7 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 import { User } from '../user/entities/user.entity';
-import { Listing } from '../listing/listing.entity';
+import { Listing } from '../listings/listing.entity';
 import { Post as PostEntity } from '../post/post.entity';
 import { Comment } from '../comment/comment.entity';
 import {

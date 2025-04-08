@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Listing } from '../../listing/listing.entity';
+import { Listing } from '../../listings/listing.entity';
 import { Post as PostEntity } from '../../post/post.entity';
 import { User } from '../../user/entities/user.entity';
 import { Report, ReportType } from '../report.entity';
@@ -18,14 +18,14 @@ import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 import { UserService } from '../../user/user.service';
 import { CommentService } from '../../comment/comment.service';
 import { PostService } from '../../post/post.service';
-import { ListingService } from '../../listing/listing.service';
+import { ListingsService } from '../../listings/listings.service';
 
 describe('ReportsService', () => {
   let service: ReportsService;
   let reportRepository: Repository<Report>;
   let paginationService: PaginationService;
   let userService: UserService;
-  let listingService: ListingService;
+  let listingsService: ListingsService;
   let commentService: CommentService;
   let postService: PostService;
 
@@ -46,7 +46,7 @@ describe('ReportsService', () => {
     reportRepository = module.get(getRepositoryToken(Report));
     paginationService = module.get(PaginationService);
     userService = module.get(UserService);
-    listingService = module.get(ListingService);
+    listingsService = module.get(ListingsService);
     postService = module.get(PostService);
     commentService = module.get(CommentService);
   });
@@ -243,7 +243,7 @@ describe('ReportsService', () => {
         .calledWith(dto.reportedUserId)
         .mockResolvedValue(offender);
 
-      when(listingService.findByIdOrThrow)
+      when(listingsService.findByIdOrThrow)
         .calledWith(dto.listingId)
         .mockResolvedValue(listing);
 

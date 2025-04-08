@@ -1,6 +1,7 @@
 import { Conversation } from '../conversations/entities/conversation.entity';
 import { InventoryItem } from '../inventory-item/inventory-item.entity';
 import { Order } from '../order/order.entity';
+import { User } from '../user/entities/user.entity';
 import { Organization } from '../organization/organization.entity';
 import { Report } from '../reports/report.entity';
 import {
@@ -10,14 +11,16 @@ import {
   OneToMany,
   JoinColumn,
   ManyToOne,
+  ManyToMany,
+  Geometry,
+  DeleteDateColumn,
 } from 'typeorm';
-import { Bookmark } from '../bookmarks/bookmarks.entity';
 
 export enum ListingStatus {
   ACTIVE = 'active',
   INACTIVE = 'inactive',
-  COMPLETE = 'complete',
   ARCHIVED = 'archived',
+  COMPLETE = 'complete',
 }
 
 @Entity()
@@ -32,12 +35,12 @@ export class Listing {
   @Column()
   inventoryItemId: number;
 
-  @JoinColumn({ name: 'ownerId' })
+  @JoinColumn({ name: 'organizationId' })
   @ManyToOne(() => Organization, (org) => org.listings)
-  owner: Organization;
+  organization: Organization;
 
   @Column()
-  ownerId: number;
+  organizationId: number;
 
   @Column({ type: 'varchar', length: 40 })
   name: string;
@@ -51,23 +54,20 @@ export class Listing {
   @Column({ default: 1 })
   quantity: number;
 
-  @Column({ type: 'float', nullable: false })
-  latitude: number;
-
-  @Column({ type: 'float', nullable: false })
-  longitude: number;
-
-  @Column({ default: false })
-  inactive: boolean;
-
-  @Column({ type: 'varchar', length: 10 })
-  zipCode: string;
-
   @Column({ type: 'enum', enum: ListingStatus, default: ListingStatus.ACTIVE })
-  state: ListingStatus;
+  status: ListingStatus;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
+
+  @Column({ type: 'geography', srid: 4326, spatialFeatureType: 'Point' })
+  point: Geometry;
+
+  @Column({ type: 'tsvector' })
+  ftsVector: string;
+
+  @DeleteDateColumn()
+  deletedAt: Date | null;
 
   @OneToMany(() => Order, (order) => order.provider)
   orders: Order[];
@@ -75,8 +75,8 @@ export class Listing {
   @OneToMany(() => Conversation, (conversation) => conversation.listing)
   conversations: Conversation[];
 
-  @OneToMany(() => Bookmark, (bookmark) => bookmark.listing)
-  bookmarks: Bookmark[];
+  @ManyToMany(() => User, (user) => user.bookmarks)
+  bookmarks: User[];
 
   @OneToMany(() => Report, (report) => report.listing)
   reports: Report[];

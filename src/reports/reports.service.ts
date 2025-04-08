@@ -20,7 +20,7 @@ import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { PaginationService } from '../common/services/pagination.service';
 import { UserService } from '../user/user.service';
 import { CommentService } from '../comment/comment.service';
-import { ListingService } from '../listing/listing.service';
+import { ListingsService } from '../listings/listings.service';
 import { PostService } from '../post/post.service';
 
 @Injectable()
@@ -33,7 +33,7 @@ export class ReportsService {
     private userService: UserService,
     private commentService: CommentService,
     private postService: PostService,
-    private listingService: ListingService,
+    private listingsService: ListingsService,
   ) {}
 
   /**
@@ -72,7 +72,7 @@ export class ReportsService {
           );
         }
 
-        report.listing = await this.listingService.findByIdOrThrow(
+        report.listing = await this.listingsService.findByIdOrThrow(
           dto.listingId,
         );
         break;

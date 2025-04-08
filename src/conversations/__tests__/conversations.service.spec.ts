@@ -5,13 +5,13 @@ import {
   Conversation,
   ConversationType,
 } from '../entities/conversation.entity';
-import { Listing, ListingStatus } from '../../listing/listing.entity';
+import { Listing, ListingStatus } from '../../listings/listing.entity';
 import { User } from '../../user/entities/user.entity';
 import { ConversationHistory } from '../entities/conversation-history.entity';
 import { createMock } from '@golevelup/ts-jest';
 import { Repository } from 'typeorm';
 import { UserService } from '../../user/user.service';
-import { ListingService } from '../../listing/listing.service';
+import { ListingsService } from '../../listings/listings.service';
 import { PaginationService } from '../../common/services/pagination.service';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
@@ -24,7 +24,7 @@ describe('ConversationsService', () => {
   let conversationRepository: Repository<Conversation>;
   let conversationHistoryRepository: Repository<ConversationHistory>;
   let userService: UserService;
-  let listingService: ListingService;
+  let listingsService: ListingsService;
   let paginationService: PaginationService;
 
   beforeEach(async () => {
@@ -50,7 +50,7 @@ describe('ConversationsService', () => {
       getRepositoryToken(ConversationHistory),
     );
     userService = module.get(UserService);
-    listingService = module.get(ListingService);
+    listingsService = module.get(ListingsService);
     paginationService = module.get(PaginationService);
   });
 
@@ -371,8 +371,8 @@ describe('ConversationsService', () => {
       const listing = new Listing();
       Object.assign(listing, {
         id: listingId,
-        state: ListingStatus.ACTIVE,
-        ownerId: 3,
+        status: ListingStatus.ACTIVE,
+        organizationId: 3,
       });
 
       const conversation = new Conversation();
@@ -388,7 +388,7 @@ describe('ConversationsService', () => {
         })
         .mockResolvedValue(null);
 
-      when(listingService.findById)
+      when(listingsService.findByIdOrThrow)
         .calledWith(listingId)
         .mockResolvedValue(listing);
 
@@ -445,9 +445,9 @@ describe('ConversationsService', () => {
         })
         .mockResolvedValue(null);
 
-      when(listingService.findById)
+      when(listingsService.findByIdOrThrow)
         .calledWith(listingId)
-        .mockResolvedValue(null);
+        .mockRejectedValue(new NotFoundException('Listing not found'));
 
       await expect(
         service.initiateListingConversation(initiatorId, listingId),
@@ -460,8 +460,8 @@ describe('ConversationsService', () => {
       const listing = new Listing();
       Object.assign(listing, {
         id: listingId,
-        state: ListingStatus.INACTIVE,
-        ownerId: 3,
+        status: ListingStatus.INACTIVE,
+        organizationId: 3,
       });
 
       when(conversationRepository.findOne)
@@ -470,7 +470,7 @@ describe('ConversationsService', () => {
         })
         .mockResolvedValue(null);
 
-      when(listingService.findById)
+      when(listingsService.findByIdOrThrow)
         .calledWith(listingId)
         .mockResolvedValue(listing);
 
@@ -485,8 +485,8 @@ describe('ConversationsService', () => {
       const listing = new Listing();
       Object.assign(listing, {
         id: listingId,
-        state: ListingStatus.ACTIVE,
-        ownerId: 3,
+        status: ListingStatus.ACTIVE,
+        organizationId: 3,
       });
 
       when(conversationRepository.findOne)
@@ -495,7 +495,7 @@ describe('ConversationsService', () => {
         })
         .mockResolvedValue(null);
 
-      when(listingService.findById)
+      when(listingsService.findByIdOrThrow)
         .calledWith(listingId)
         .mockResolvedValue(listing);
 
@@ -518,8 +518,8 @@ describe('ConversationsService', () => {
       const listing = new Listing();
       Object.assign(listing, {
         id: listingId,
-        state: ListingStatus.ACTIVE,
-        ownerId: 1,
+        status: ListingStatus.ACTIVE,
+        organizationId: 1,
       });
 
       when(conversationRepository.findOne)
@@ -528,7 +528,7 @@ describe('ConversationsService', () => {
         })
         .mockResolvedValue(null);
 
-      when(listingService.findById)
+      when(listingsService.findByIdOrThrow)
         .calledWith(listingId)
         .mockResolvedValue(listing);
 
@@ -553,7 +553,7 @@ describe('ConversationsService', () => {
 
       const listing = new Listing();
       Object.assign(listing, {
-        ownerId: 3,
+        organizationId: 3,
       });
 
       const conversation = new Conversation();
@@ -742,7 +742,7 @@ describe('ConversationsService', () => {
 
       const listing = new Listing();
       Object.assign(listing, {
-        ownerId: 3,
+        organizationId: 3,
       });
 
       const conversation = new Conversation();
@@ -932,7 +932,7 @@ describe('ConversationsService', () => {
 
       const listing = new Listing();
       Object.assign(listing, {
-        ownerId: 4,
+        organizationId: 4,
       });
 
       const conversation = new Conversation();
@@ -1002,7 +1002,7 @@ describe('ConversationsService', () => {
 
       const listing = new Listing();
       Object.assign(listing, {
-        ownerId: 1,
+        organizationId: 1,
       });
 
       const conversation = new Conversation();
@@ -1184,7 +1184,7 @@ describe('ConversationsService', () => {
 
       const listing = new Listing();
       Object.assign(listing, {
-        ownerId: 4,
+        organizationId: 4,
       });
 
       const conversation = new Conversation();
@@ -1232,7 +1232,7 @@ describe('ConversationsService', () => {
 
       const listing = new Listing();
       Object.assign(listing, {
-        ownerId: 1,
+        organizationId: 1,
       });
 
       const conversation = new Conversation();

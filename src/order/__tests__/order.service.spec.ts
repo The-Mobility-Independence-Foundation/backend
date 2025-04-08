@@ -7,9 +7,9 @@ import { Repository } from 'typeorm';
 import { createMock } from '@golevelup/ts-jest';
 import { AddressService } from '../../address/address.service';
 import { UserService } from '../../user/user.service';
-import { ListingService } from '../../listing/listing.service';
+import { ListingsService } from '../../listings/listings.service';
 import { Organization } from '../../organization/organization.entity';
-import { Listing } from '../../listing/listing.entity';
+import { Listing } from '../../listings/listing.entity';
 import { CreateOrderDto } from '../dto/create-order-dto';
 import { when } from 'jest-when';
 import { Address } from '../../address/address.entity';
@@ -23,7 +23,7 @@ describe('OrderService', () => {
   let service: OrderService;
   let userService: UserService;
   let addressService: AddressService;
-  let listingService: ListingService;
+  let listingsService: ListingsService;
   let paginationService: PaginationService;
   let repository: Repository<Order>;
 
@@ -43,7 +43,7 @@ describe('OrderService', () => {
     service = module.get(OrderService);
     userService = module.get(UserService);
     addressService = module.get(AddressService);
-    listingService = module.get(ListingService);
+    listingsService = module.get(ListingsService);
     paginationService = module.get(PaginationService);
     repository = module.get(getRepositoryToken(Order));
   });
@@ -98,7 +98,7 @@ describe('OrderService', () => {
         zipCode: address.zipCode,
       });
 
-      when(listingService.findByIdOrThrow)
+      when(listingsService.findByIdOrThrow)
         .calledWith(listing.id, expect.anything())
         .mockResolvedValue(listing);
       when(userService.findByIdOrThrow)

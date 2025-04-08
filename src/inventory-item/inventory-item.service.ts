@@ -105,8 +105,9 @@ export class InventoryItemService {
         organization: true,
         address: true,
       },
-      part: {},
-      model: {},
+      part: {
+        model: true,
+      },
       listings: true,
       tags: true,
     };
@@ -215,7 +216,7 @@ export class InventoryItemService {
     });
 
     if (dto.modelId) {
-      item.model = await this.modelService.findByIdOrThrow(dto.modelId, {
+      item.part.model = await this.modelService.findByIdOrThrow(dto.modelId, {
         relations: ['manufacturer', 'types'],
       });
     }
@@ -261,11 +262,11 @@ export class InventoryItemService {
       relations: relations as string[],
     });
 
-    if (item) {
-      return item;
-    } else {
+    if (!item) {
       throw new NotFoundException('Item not found');
     }
+
+    return item;
   }
 
   async archive(itemId: number) {

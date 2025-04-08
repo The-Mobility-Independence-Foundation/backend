@@ -14,6 +14,7 @@ import {
   Index,
 } from 'typeorm';
 import { Message } from '../../message/message.entity';
+import { Listing } from '../../listings/listing.entity';
 import { Conversation } from '../../conversations/entities/conversation.entity';
 import { Post } from '../../post/post.entity';
 import { Comment } from '../../comment/comment.entity';
@@ -67,10 +68,10 @@ export class User {
 
   @JoinColumn({ name: 'organizationId' })
   @ManyToOne(() => Organization, (org) => org.members)
-  organization: Organization | null;
+  organization?: Organization | null;
 
   @Column({ nullable: true })
-  organizationId: number | null;
+  organizationId?: number | null;
 
   @IsFirstName()
   @Column({ type: 'varchar', length: UserValidation.firstName.max })

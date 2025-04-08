@@ -1,5 +1,5 @@
 import { Audit } from '../audit/audit.entity';
-import { Listing } from '../listing/listing.entity';
+import { Listing } from '../listings/listing.entity';
 import { Inventory } from '../inventory/inventory.entity';
 import { Invite } from '../invite/invite.entity';
 import { Order } from '../order/order.entity';
@@ -70,6 +70,6 @@ export class Organization {
   @OneToMany(() => Audit, (audit) => audit.organization)
   audits: Audit[];
 
-  @OneToMany(() => Listing, (listing) => listing.owner)
+  @OneToMany(() => Listing, (listing) => listing.organization)
   listings: Listing[];
 }

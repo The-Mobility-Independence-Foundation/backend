@@ -1,5 +1,5 @@
 import { Organization } from '../organization/organization.entity';
-import { Listing } from '../listing/listing.entity';
+import { Listing } from '../listings/listing.entity';
 import { Review } from '../review/review.entity';
 import { User } from '../user/entities/user.entity';
 import {

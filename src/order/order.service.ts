@@ -14,7 +14,7 @@ import {
 } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserService } from '../user/user.service';
-import { ListingService } from '../listing/listing.service';
+import { ListingsService } from '../listings/listings.service';
 import { CreateOrderDto } from './dto/create-order-dto';
 import { CreateAddressDto } from '../address/dto/create-address.dto';
 import { AddressService } from '../address/address.service';
@@ -30,17 +30,16 @@ export class OrderService {
   constructor(
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
-
     private readonly userService: UserService,
-    private readonly listingService: ListingService,
+    private readonly listingsService: ListingsService,
     private readonly addressService: AddressService,
     private readonly paginationService: PaginationService,
   ) {}
 
   async create(dto: CreateOrderDto) {
     const order = new Order();
-    const listing = await this.listingService.findByIdOrThrow(dto.listingId, {
-      relations: { owner: true },
+    const listing = await this.listingsService.findByIdOrThrow(dto.listingId, {
+      relations: { organization: true },
     });
     const recipient = await this.userService.findByIdOrThrow(dto.recipientId, {
       relations: { organization: true },
@@ -58,7 +57,7 @@ export class OrderService {
 
     Object.assign(order, {
       listing: listing,
-      providerOrganization: listing.owner,
+      providerOrganization: listing.organization,
       recipient: recipient,
       recipientOrganization: recipient.organization,
       quantity: dto.quantity,

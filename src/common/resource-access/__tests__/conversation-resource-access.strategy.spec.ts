@@ -101,7 +101,7 @@ describe('ConversationResourceAccessStrategy', () => {
           type: ConversationType.INQUIRY,
           participantId: 2,
           initiatorId: 1,
-          listing: { ownerId: 3 },
+          listing: { organizationId: 3 },
         });
       });
 
@@ -215,7 +215,7 @@ describe('ConversationResourceAccessStrategy', () => {
         Object.assign(conversation, {
           id: 1,
           type: ConversationType.INQUIRY,
-          listing: { ownerId: 3 },
+          listing: { organizationId: 3 },
         });
 
         when(conversationsService.findById)

@@ -61,7 +61,7 @@ export class ConversationResourceAccessStrategy extends ResourceAccessStrategy {
       }
 
       // If the user is part of the organization that owns the listing, they can access the conversation
-      if (user.organizationId === conversation.listing.ownerId) {
+      if (user.organizationId === conversation.listing.organizationId) {
         return true;
       }
 

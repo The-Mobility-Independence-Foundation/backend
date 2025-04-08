@@ -1,5 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { Repository, ObjectLiteral, LessThan, MoreThan } from 'typeorm';
+import {
+  Repository,
+  ObjectLiteral,
+  LessThan,
+  MoreThan,
+  SelectQueryBuilder,
+} from 'typeorm';
 import { OffsetPaginationDto } from '../dto/offset-pagination.dto';
 import { BaseApiPaginationResponse } from '../responses/base-api-pagination.response';
 import { OffsetPaginationOptions } from '../interfaces/offset-pagination-options.interface';
@@ -165,5 +171,109 @@ export class PaginationService {
    */
   private decodeCursor(cursor: string): any {
     return Buffer.from(cursor, 'base64').toString('utf-8');
+  }
+
+  /**
+   * Paginate a TypeORM query builder using cursor-based pagination
+   * @param queryBuilder - The query builder to paginate
+   * @param paginationDto - The cursor pagination dto
+   * @param options - The cursor pagination options
+   * @returns The paginated results
+   * @template T - The type of the entity
+   */
+  async paginateWithCursorQueryBuilder<T extends ObjectLiteral>(
+    queryBuilder: SelectQueryBuilder<T>,
+    paginationDto: CursorPaginationDto,
+    options: Pick<
+      CursorPaginationOptions<T>,
+      'cursorColumn' | 'order' | 'includeCount' | 'withDeleted'
+    >,
+  ): Promise<BaseApiCursorPaginationResponse<T>> {
+    const { cursor, limit, direction } = paginationDto;
+    const {
+      cursorColumn,
+      order = {},
+      includeCount = false,
+      withDeleted = false,
+    } = options;
+    const decodedCursor = cursor ? this.decodeCursor(cursor) : undefined;
+
+    // Add cursor-based pagination
+    if (decodedCursor) {
+      queryBuilder.andWhere(
+        `:cursorColumn ${direction === 'next' ? '>' : '<'} :cursor`,
+        { cursorColumn, cursor: decodedCursor },
+      );
+    }
+
+    // Handle soft delete if needed
+    if (withDeleted) {
+      queryBuilder.withDeleted();
+    }
+
+    // Add order by clauses
+    const orderClause = {
+      ...order,
+      [cursorColumn]: direction === 'next' ? 'ASC' : 'DESC',
+    };
+
+    Object.entries(orderClause).forEach(([key, value]) => {
+      if (value === 'ASC' || value === 'DESC') {
+        queryBuilder.addOrderBy(String(key), value);
+      }
+    });
+
+    // Fetch one extra to determine if there are more results
+    queryBuilder.take(limit + 1);
+
+    const items = await queryBuilder.getMany();
+    const hasNextPage = items.length > limit;
+
+    // Remove the extra item if we have more pages
+    if (hasNextPage) {
+      items.pop();
+    }
+
+    // Determine if there's a previous page
+    let hasPreviousPage = false;
+    if (direction === 'next') {
+      hasPreviousPage = !!cursor;
+    } else {
+      if (items.length > 0) {
+        const firstItem = items[0];
+        const previousCheck = await queryBuilder
+          .clone()
+          .where(`:cursorColumn < :cursor`, {
+            cursorColumn,
+            cursor: firstItem[cursorColumn],
+          })
+          .getCount();
+        hasPreviousPage = previousCheck > 0;
+      }
+    }
+
+    let count: number | undefined;
+    if (includeCount) {
+      count = await queryBuilder.clone().getCount();
+    }
+
+    const nextCursor =
+      hasNextPage && items.length > 0
+        ? this.encodeCursor(items[items.length - 1][cursorColumn])
+        : null;
+
+    const previousCursor =
+      items.length > 0 && hasPreviousPage
+        ? this.encodeCursor(items[0][cursorColumn])
+        : null;
+
+    return {
+      results: items,
+      hasNextPage,
+      hasPreviousPage,
+      nextCursor,
+      previousCursor,
+      count,
+    };
   }
 }

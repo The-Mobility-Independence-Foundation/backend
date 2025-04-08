@@ -1,5 +1,5 @@
 import { User } from '../../user/entities/user.entity';
-import { Listing } from '../../listing/listing.entity';
+import { Listing } from '../../listings/listing.entity';
 import { Message } from '../../message/message.entity';
 import { ConversationHistory } from './conversation-history.entity';
 import {

@@ -16,9 +16,12 @@ export class Inventory {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @JoinColumn()
+  @JoinColumn({ name: 'organizationId' })
   @ManyToOne(() => Organization, (organization) => organization.inventories)
   organization: Organization;
+
+  @Column()
+  organizationId: number;
 
   @Column({ type: 'varchar', length: 40 })
   name: string;
@@ -29,9 +32,18 @@ export class Inventory {
   @DeleteDateColumn()
   archivedAt?: Date;
 
-  @JoinColumn()
+  @JoinColumn({ name: 'addressId' })
   @ManyToOne(() => Address, (address) => address.inventories)
   address: Address;
+
+  @Column()
+  addressId: number;
+
+  @Column({ type: 'float', nullable: false })
+  latitude: number;
+
+  @Column({ type: 'float', nullable: false })
+  longitude: number;
 
   @OneToMany(() => InventoryItem, (item) => item.inventory)
   items: InventoryItem[];
