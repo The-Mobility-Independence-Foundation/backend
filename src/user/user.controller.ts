@@ -116,7 +116,6 @@ export class UserController {
     @Query() dto: GetOrdersDto,
     @Param('userId', ParseIntPipe) userId: number,
   ) {
-    console.log('user', userId);
     return this.orderService.findAll(dto, { user: userId });
   }
 }

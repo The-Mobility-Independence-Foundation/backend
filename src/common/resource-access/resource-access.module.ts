@@ -15,7 +15,8 @@ import { OrganizationModule } from '../../organization/organization.module';
 import { OrganizationMemberResourceAccessStrategy } from './strategies/organization-member-resource-access.strategy';
 import { ConversationsModule } from '../../conversations/conversations.module';
 import { OrderResourceAccessStrategy } from './strategies/order-resource-access.strategy';
-
+import { UserModule } from '../../user/user.module';
+import { OrderModule } from '../../order/order.module';
 const STRATEGY_PROVIDERS = [
   {
     provide: ResourceAccessStrategyToken.ANY_USER,
@@ -43,17 +44,17 @@ const STRATEGY_PROVIDERS = [
   },
   {
     provide: ResourceAccessStrategyToken.ORGANIZATION_MEMBER,
-    useClass: ConversationResourceAccessStrategy,
+    useClass: OrganizationMemberResourceAccessStrategy,
   },
   {
     provide: ResourceAccessStrategyToken.ORDER,
-    useClass: ConversationResourceAccessStrategy,
+    useClass: OrderResourceAccessStrategy,
   },
 ] as const;
 
 @Global()
 @Module({
-  imports: [ConversationsModule, OrganizationModule],
+  imports: [ConversationsModule, OrganizationModule, UserModule, OrderModule],
   providers: [
     ResourceAccessGuard,
     ...STRATEGY_PROVIDERS,

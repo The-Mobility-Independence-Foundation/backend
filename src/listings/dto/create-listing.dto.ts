@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsObject, IsString } from 'class-validator';
+import { IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
 import { IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -35,7 +35,7 @@ export class CreateListingDto {
   })
   quantity: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsObject()
   @ApiProperty({
     description: 'The attributes of the listing',
@@ -43,5 +43,5 @@ export class CreateListingDto {
       color: 'red',
     },
   })
-  attributes: object;
+  attributes?: object;
 }

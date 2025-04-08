@@ -17,7 +17,6 @@ export class OrganizationMemberResourceAccessStrategy extends ResourceAccessStra
 
   async canAccess(user: User, params: Record<string, any>): Promise<boolean> {
     const orgId = parseInt(params[this.organizationIdParam]);
-
     if (isNaN(orgId)) {
       return false;
     }

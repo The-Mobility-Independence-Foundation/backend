@@ -1,6 +1,6 @@
-import { AttachmentResponse } from 'src/attachments/responses/attachment.response';
+import { AttachmentResponse } from '../../attachments/responses/attachment.response';
 import { ListingStatus } from '../listing.entity';
-import { AddressResponse } from 'src/address/responses/address.response';
+import { AddressResponse } from '../../address/responses/address.response';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNumber,
@@ -219,14 +219,6 @@ export class ListingResponse {
   })
   quantity: number;
 
-  @IsObject()
-  @IsNotEmpty()
-  @ApiProperty({
-    description: 'The address of the listing',
-    type: AddressResponse,
-  })
-  address: AddressResponse;
-
   @IsEnum(ListingStatus)
   @IsNotEmpty()
   @ApiProperty({
@@ -251,6 +243,14 @@ export class ListingResponse {
     example: 1,
   })
   organizationId: number;
+
+  @IsObject()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'The address of the listing',
+    type: AddressResponse,
+  })
+  address: AddressResponse;
 
   @IsArray()
   @IsNotEmpty()

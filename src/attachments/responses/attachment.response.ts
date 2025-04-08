@@ -41,6 +41,14 @@ export class AttachmentResponse {
   })
   key: string;
 
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'The url of the attachment',
+    example: 'https://example.com/image.png',
+  })
+  url: string;
+
   @IsDate()
   @IsNotEmpty()
   @ApiProperty({

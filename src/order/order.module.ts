@@ -12,7 +12,7 @@ import { CommonModule } from '../common/common.module';
   imports: [
     TypeOrmModule.forFeature([Order]),
     forwardRef(() => UserModule),
-    ListingsModule,
+    forwardRef(() => ListingsModule),
     AddressModule,
     CommonModule,
   ],

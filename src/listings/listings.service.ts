@@ -8,7 +8,6 @@ import { Listing } from './listing.entity';
 import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateListingDto } from './dto/create-listing.dto';
-import { CreateListingResponse } from './responses/create-listing.response';
 import { User } from '../user/entities/user.entity';
 import { InventoryItemService } from '../inventory-item/inventory-item.service';
 import { UpdateListingDto } from './dto/update-listing.dto';
@@ -18,6 +17,8 @@ import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cu
 import { SearchListingsDto } from './dto/search-listings.dto';
 import { AddressService } from '../address/address.service';
 import { ListingResponse } from './responses/listing.response';
+import { AttachmentsService } from '../attachments/attachments.service';
+import { AttachmentEntityType } from '../attachments/attachment.entity';
 
 @Injectable()
 export class ListingsService {
@@ -27,6 +28,7 @@ export class ListingsService {
     private readonly inventoryItemService: InventoryItemService,
     private paginationService: PaginationService,
     private addressService: AddressService,
+    private attachmentsService: AttachmentsService,
   ) {}
 
   /**
@@ -88,10 +90,10 @@ export class ListingsService {
         );
     }
 
-    queryBuilder
-      .leftJoinAndSelect('listing.inventoryItem', 'inventoryItem')
-      .leftJoinAndSelect('inventoryItem.inventory', 'inventory')
-      .leftJoinAndSelect('listing.organization', 'organization');
+    // queryBuilder
+    //   .leftJoinAndSelect('listing.inventoryItem', 'inventoryItem')
+    //   .leftJoinAndSelect('inventoryItem.inventory', 'inventory')
+    //   .leftJoinAndSelect('listing.organization', 'organization');
 
     const withDeleted = organizationId === user.organizationId;
     const result = await this.paginationService.paginateWithCursorQueryBuilder(
@@ -104,14 +106,9 @@ export class ListingsService {
       },
     );
 
-    const listings = result.results.map((listing) => {
-      return {
-        ...listing,
-        address: listing.inventoryItem.inventory.address,
-        attachments: [],
-        part: listing.inventoryItem.part,
-      };
-    });
+    const listings = await Promise.all(
+      result.results.map((listing) => this.buildListingResponse(listing.id)),
+    );
 
     return {
       ...result,
@@ -130,9 +127,10 @@ export class ListingsService {
     options: Partial<{
       where: FindOptionsWhere<Omit<Listing, 'id'>>;
       relations: FindOptionsRelations<Listing>;
+      withDeleted: boolean;
     }> = {},
   ) {
-    const { where = {}, relations } = options;
+    const { where = {}, relations, withDeleted } = options;
 
     const listing = await this.listingRepository.findOne({
       where: {
@@ -140,6 +138,7 @@ export class ListingsService {
         id: id,
       },
       relations,
+      withDeleted,
     });
 
     if (!listing) {
@@ -153,12 +152,14 @@ export class ListingsService {
    * Create a listing
    * @param user - The user creating the listing
    * @param dto - The listing data
+   * @param attachments - The files to attach to the listing
    * @returns The created listing
    */
   async create(
     user: User,
     createListingDto: CreateListingDto,
-  ): Promise<CreateListingResponse> {
+    attachments?: Express.Multer.File[],
+  ): Promise<ListingResponse> {
     const inventoryItem = await this.inventoryItemService.findByIdOrThrow(
       createListingDto.inventoryItemId,
       { relations: { inventory: { address: true } } },
@@ -176,25 +177,43 @@ export class ListingsService {
       );
     }
 
-    const listing = this.listingRepository.create({
-      inventoryItemId: inventoryItem.id,
-      organizationId: user.organizationId,
-      name: createListingDto.name,
-      description: createListingDto.description,
-      attributes: createListingDto.attributes,
-      quantity: createListingDto.quantity,
-      point: {
-        type: 'Point',
-        coordinates: [
-          inventoryItem.inventory.address.longitude,
-          inventoryItem.inventory.address.latitude,
-        ],
-      },
-    });
+    let listing: Listing | undefined;
+    try {
+      listing = await this.listingRepository.save({
+        inventoryItemId: inventoryItem.id,
+        organizationId: user.organizationId,
+        name: createListingDto.name,
+        description: createListingDto.description,
+        attributes: createListingDto.attributes || {},
+        quantity: createListingDto.quantity,
+        point: {
+          type: 'Point',
+          coordinates: [
+            inventoryItem.inventory.address.longitude,
+            inventoryItem.inventory.address.latitude,
+          ],
+        },
+      });
 
-    await this.listingRepository.save(listing);
+      if (attachments && attachments.length > 0) {
+        await this.attachmentsService.uploadFiles(
+          listing.id,
+          AttachmentEntityType.LISTING,
+          attachments,
+          user.id,
+        );
+      }
 
-    return listing;
+      return this.buildListingResponse(listing.id);
+    } catch (error) {
+      if (listing) {
+        await this.listingRepository.delete(listing.id);
+      }
+
+      throw new BadRequestException('Failed to create listing.', {
+        cause: error,
+      });
+    }
   }
 
   /**
@@ -208,7 +227,7 @@ export class ListingsService {
     user: User,
     listingId: number,
     updateListingDto: UpdateListingDto,
-  ) {
+  ): Promise<ListingResponse> {
     if (updateListingDto.inventoryItemId) {
       throw new BadRequestException(
         'You are not allowed to update the inventory item for this listing.',
@@ -254,7 +273,7 @@ export class ListingsService {
       }
     }
 
-    const updatedListing = await this.listingRepository.update(listingId, {
+    await this.listingRepository.update(listingId, {
       name: updateListingDto.name,
       description: updateListingDto.description,
       quantity: updateListingDto.quantity,
@@ -262,7 +281,7 @@ export class ListingsService {
       status: updateListingDto.status,
     });
 
-    return updatedListing;
+    return this.buildListingResponse(listingId);
   }
 
   /**
@@ -271,7 +290,7 @@ export class ListingsService {
    * @param listingId - The id of the listing
    * @returns The deleted listing
    */
-  async delete(user: User, listingId: number) {
+  async delete(user: User, listingId: number): Promise<void> {
     const listing = await this.findByIdOrThrow(listingId);
 
     if (listing.organizationId !== user.organizationId) {
@@ -285,7 +304,46 @@ export class ListingsService {
     });
 
     await this.listingRepository.softDelete(listingId);
+  }
 
-    return listing;
+  /**
+   * Build a listing response
+   * @param listingId - The id of the listing
+   * @returns The listing response
+   */
+  private async buildListingResponse(
+    listingId: number,
+  ): Promise<ListingResponse> {
+    const listing = await this.findByIdOrThrow(listingId, {
+      withDeleted: true,
+      relations: {
+        inventoryItem: {
+          inventory: {
+            address: true,
+          },
+          part: {
+            model: {
+              manufacturer: true,
+              types: true,
+            },
+            types: true,
+          },
+        },
+        organization: true,
+      },
+    });
+
+    const attachments = await this.attachmentsService.findByEntity(
+      listingId,
+      AttachmentEntityType.LISTING,
+    );
+
+    return {
+      ...listing,
+      address: listing.inventoryItem.inventory.address,
+      attachments:
+        await this.attachmentsService.formulateAttachmentResponse(attachments),
+      part: listing.inventoryItem.part,
+    };
   }
 }

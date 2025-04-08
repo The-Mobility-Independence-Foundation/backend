@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { InventoryItemController } from './inventory-item.controller';
 import { InventoryItemService } from './inventory-item.service';
@@ -17,7 +17,7 @@ import { InventoryModule } from '../inventory/inventory.module';
     PartModule,
     TagModule,
     CommonModule,
-    InventoryModule,
+    forwardRef(() => InventoryModule),
   ],
   controllers: [InventoryItemController],
   providers: [InventoryItemService],

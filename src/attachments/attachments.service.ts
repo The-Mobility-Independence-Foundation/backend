@@ -17,6 +17,7 @@ import {
 } from 'typeorm';
 import { v7 as uuidv7 } from 'uuid';
 import { Attachment, AttachmentEntityType } from './attachment.entity';
+import { AttachmentResponse } from './responses/attachment.response';
 
 @Injectable()
 export class AttachmentsService {
@@ -76,6 +77,22 @@ export class AttachmentsService {
       },
       relations,
     });
+  }
+
+  /**
+   * Formulate an attachment response
+   * @param attachments - The attachments to formulate
+   * @returns The formulated attachment response
+   */
+  async formulateAttachmentResponse(
+    attachments: Attachment[],
+  ): Promise<AttachmentResponse[]> {
+    return Promise.all(
+      attachments.map(async (attachment) => ({
+        ...attachment,
+        url: await this.generateGetPresignedUrl(attachment.key),
+      })),
+    );
   }
 
   /**

@@ -1,13 +1,14 @@
-import { Controller, Get, Param, Query, Req } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { UseStrategy } from 'src/common/resource-access/decorators/resource-access.decorator';
-import { ResourceAccessStrategyToken } from 'src/common/resource-access/interfaces/strategy-provider.interface';
+import { Controller, Get, Param, Query } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UseStrategy } from '../common/resource-access/decorators/resource-access.decorator';
+import { ResourceAccessStrategyToken } from '../common/resource-access/interfaces/strategy-provider.interface';
 import { ListingsService } from './listings.service';
 import { SearchListingsDto } from './dto/search-listings.dto';
-import { Request } from 'express';
-import { User } from 'src/user/entities/user.entity';
-import { ResponseMessage } from 'src/common/decorators/response-message.decorator';
+import { User } from '../user/entities/user.entity';
+import { ResponseMessage } from '../common/decorators/response-message.decorator';
 import { OrganizationsSearchListingsDto } from './dto/organizations-search-listings.dto';
+import { BaseApiCursorPaginationResponse } from '../common/responses/base-api-cursor-pagination.response';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 @ApiTags('organizations')
 @Controller('organizations/:orgId/listings')
@@ -16,14 +17,18 @@ export class OrganizationsListingsController {
   constructor(private readonly listingsService: ListingsService) {}
 
   @Get()
-  @ResponseMessage('Successfully retrieved organization listings')
   @ApiOperation({ summary: 'Get all listings for an organization' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully retrieved organization listings',
+    type: BaseApiCursorPaginationResponse,
+  })
+  @ResponseMessage('Successfully retrieved organization listings')
   findAll(
-    @Req() req: Request,
+    @CurrentUser() user: User,
     @Param('orgId') organizationId: number,
     @Query() query: OrganizationsSearchListingsDto,
   ) {
-    const user = req.user as User;
     const searchListingsDto: SearchListingsDto = {
       ...query,
       organizationId,
