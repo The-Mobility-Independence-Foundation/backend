@@ -213,7 +213,6 @@ describe('PaginationService', () => {
           where: [{ active: true, id: MoreThan('5') }],
           order: { createdAt: 'DESC', id: 'ASC' },
           relations: {},
-          withDeleted: false,
         })
         .mockResolvedValue(items);
 
@@ -256,7 +255,6 @@ describe('PaginationService', () => {
           order: { id: 'DESC' },
           take: paginationDto.limit + 1,
           relations: {},
-          withDeleted: false,
         })
         .mockResolvedValue(items);
 
@@ -300,7 +298,6 @@ describe('PaginationService', () => {
           order: { id: 'ASC' },
           relations: {},
           where: [{}],
-          withDeleted: false,
         })
         .mockResolvedValue(items);
 
@@ -377,7 +374,6 @@ describe('PaginationService', () => {
           where: [{}],
           order: { id: 'ASC' },
           take: paginationDto.limit + 1,
-          withDeleted: false,
         })
         .mockResolvedValue(items);
 

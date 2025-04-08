@@ -61,7 +61,6 @@ export class PaginationService {
       relations = {},
       order = {},
       includeCount = false,
-      withDeleted = false,
     } = options;
     const whereConditions = Array.isArray(where) ? where : [where];
 
@@ -91,7 +90,6 @@ export class PaginationService {
       take: limit + 1,
       where: whereConditions,
       order: orderClause,
-      withDeleted: withDeleted,
       relations,
     });
 
