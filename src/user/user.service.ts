@@ -15,6 +15,7 @@ import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { GetUsersDto } from './dto/get-users.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationService } from '../common/services/pagination.service';
+import { ListingService } from '../listing/listing.service';
 
 @Injectable()
 export class UserService {
@@ -23,6 +24,7 @@ export class UserService {
     private userRepository: Repository<User>,
     private userAuthService: UserAuthService,
     private paginationService: PaginationService,
+    private listingService: ListingService,
   ) {}
 
   /**

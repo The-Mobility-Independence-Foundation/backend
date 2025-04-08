@@ -1,7 +1,6 @@
 import { Conversation } from '../conversations/entities/conversation.entity';
 import { InventoryItem } from '../inventory-item/inventory-item.entity';
 import { Order } from '../order/order.entity';
-import { User } from '../user/entities/user.entity';
 import { Organization } from '../organization/organization.entity';
 import { Report } from '../reports/report.entity';
 import {
@@ -11,8 +10,8 @@ import {
   OneToMany,
   JoinColumn,
   ManyToOne,
-  ManyToMany,
 } from 'typeorm';
+import { Bookmark } from '../bookmarks/bookmarks.entity';
 
 export enum ListingStatus {
   ACTIVE = 'active',
@@ -76,8 +75,8 @@ export class Listing {
   @OneToMany(() => Conversation, (conversation) => conversation.listing)
   conversations: Conversation[];
 
-  @ManyToMany(() => User, (user) => user.bookmarks)
-  bookmarks: User[];
+  @OneToMany(() => Bookmark, (bookmark) => bookmark.listing)
+  bookmarks: Bookmark[];
 
   @OneToMany(() => Report, (report) => report.listing)
   reports: Report[];

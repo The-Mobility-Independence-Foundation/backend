@@ -10,13 +10,10 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
-  ManyToMany,
-  JoinTable,
   OneToOne,
   Index,
 } from 'typeorm';
 import { Message } from '../../message/message.entity';
-import { Listing } from '../../listing/listing.entity';
 import { Conversation } from '../../conversations/entities/conversation.entity';
 import { Post } from '../../post/post.entity';
 import { Comment } from '../../comment/comment.entity';
@@ -41,6 +38,7 @@ import {
 } from '../../common/decorators/user.decorators';
 import { UserValidation } from '../../common/validation/user.validation';
 import { UserAuth } from './user-auth.entity';
+import { Bookmark } from '../../bookmarks/bookmarks.entity';
 
 import { Connection } from '../../connections/connection.entity';
 import { ConversationHistory } from '../../conversations/entities/conversation-history.entity';
@@ -139,9 +137,8 @@ export class User {
   @OneToMany(() => Message, (message) => message.author)
   sentMessages: Message[];
 
-  @JoinTable({ name: 'bookmarks' })
-  @ManyToMany(() => Listing, (listing) => listing.bookmarks)
-  bookmarks: Listing[];
+  @OneToMany(() => Bookmark, (bookmark) => bookmark.user)
+  bookmarks: Bookmark[];
 
   @OneToMany(() => Connection, (connection) => connection.follower)
   following: Connection[];

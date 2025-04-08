@@ -7,6 +7,8 @@ import {
   ParseIntPipe,
   Req,
   Body,
+  Post,
+  Delete,
   ForbiddenException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -18,6 +20,8 @@ import { ResourceAccessStrategyToken } from '../common/resource-access/interface
 import { Request } from 'express';
 import { GetUsersDto } from './dto/get-users.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { BookmarkService } from '../bookmarks/bookmarks.service';
+import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { GetOrdersDto } from '../order/dto/get-orders-dto';
 import { OrderService } from '../order/order.service';
 
@@ -27,6 +31,7 @@ import { OrderService } from '../order/order.service';
 export class UserController {
   constructor(
     private readonly userService: UserService,
+    private readonly bookmarkService: BookmarkService,
     private readonly orderService: OrderService,
   ) {}
 
@@ -66,9 +71,42 @@ export class UserController {
   ) {
     const user = req.user as User;
     if (user.type !== UserRole.ADMIN && dto.accountType) {
-      throw new ForbiddenException("You must be an admin to do that.");
+      throw new ForbiddenException('You must be an admin to do that.');
     }
     return this.userService.update(userId, dto);
+  }
+
+  @Get(':userId/bookmarks')
+  @ResponseMessage('Successfully retrieved bookmarks')
+  @ApiOperation({ summary: 'Get all bookmarks for a given user' })
+  @UseStrategy(ResourceAccessStrategyToken.USER)
+  async getBookmarks(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Query() dto: CursorPaginationDto,
+  ) {
+    return this.bookmarkService.findAll(dto, { userId: userId });
+  }
+
+  @Post(':userId/bookmarks/:listingId')
+  @ResponseMessage('Successfully created bookmark')
+  @ApiOperation({ summary: 'Create a bookmark for a given listing' })
+  @UseStrategy(ResourceAccessStrategyToken.USER)
+  async createBookmark(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Param('listingId', ParseIntPipe) listingId: number,
+  ) {
+    return this.bookmarkService.create(userId, listingId);
+  }
+
+  @Delete(':userId/bookmarks/:listingId')
+  @ResponseMessage('Successfully deleted bookmark')
+  @ApiOperation({ summary: 'Delete a bookmark' })
+  @UseStrategy(ResourceAccessStrategyToken.USER)
+  async deleteBookmark(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Param('listingId', ParseIntPipe) listingId: number,
+  ) {
+    return this.bookmarkService.delete(userId, listingId);
   }
 
   @Get('/:userId/orders')
