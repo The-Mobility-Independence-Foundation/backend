@@ -7,9 +7,10 @@ import {
   ParseIntPipe,
   Req,
   Body,
+  ForbiddenException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { User } from './entities/user.entity';
+import { User, UserRole } from './entities/user.entity';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
 import { UseStrategy } from '../common/resource-access/decorators/resource-access.decorator';
@@ -61,7 +62,12 @@ export class UserController {
   async update(
     @Param('userId', ParseIntPipe) userId: number,
     @Body() dto: UpdateUserDto,
+    @Req() req: Request,
   ) {
+    const user = req.user as User;
+    if (user.type !== UserRole.ADMIN && dto.accountType) {
+      throw new ForbiddenException("You must be an admin to do that.");
+    }
     return this.userService.update(userId, dto);
   }
 
