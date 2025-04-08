@@ -22,7 +22,7 @@ export class RequestService {
     private requestRepository: Repository<Request>,
     private readonly paginationService: PaginationService,
     private readonly userService: UserService,
-    private readonly organizationService: OrganizationService
+    private readonly organizationService: OrganizationService,
   ) {}
 
   /**
@@ -108,7 +108,7 @@ export class RequestService {
       }
     }
 
-    if (dto.status === RequestStatus.ACCEPTED){
+    if (dto.status === RequestStatus.ACCEPTED) {
       await this.approvedRequest(request);
     }
 
@@ -154,7 +154,7 @@ export class RequestService {
    * @param request : The request that has been approved
    * @returns : A success message if user is updated correctly
    */
-  async approvedRequest(request: Request){
+  async approvedRequest(request: Request) {
     const orgDto = new CreateOrganizationDto();
     const updateUserDto = new UpdateUserDto();
     const user = await this.userService.findByEmail(request.email);
