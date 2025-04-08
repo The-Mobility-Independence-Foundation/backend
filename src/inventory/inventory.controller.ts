@@ -19,7 +19,7 @@ import { ResourceAccessStrategyToken } from '../common/resource-access/interface
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
 
 @ApiTags('inventory')
-@UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_MEMBER)
+@UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER)
 @Controller('organizations/:orgId/inventories')
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
@@ -31,6 +31,7 @@ export class InventoryController {
   @Post()
   @ApiOperation({ summary: 'Initiate creation of an inventory' })
   @ResponseMessage('Successfully created inventory')
+  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER, { adminOnly: false })
   create(
     @Param('orgId', ParseIntPipe) orgId: number,
     @Body() dto: CreateInventoryDto,
@@ -46,7 +47,6 @@ export class InventoryController {
   @Get()
   @ApiOperation({ summary: 'Retrieve an organizations inventories' })
   @ResponseMessage('Successfully found all inventories')
-  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_MEMBER)
   findAll(
     @Param('orgId', ParseIntPipe) orgId: number,
     @Query() query: GetInventoriesDto,
@@ -65,7 +65,6 @@ export class InventoryController {
     summary: 'Retrieve a specific inventory from an organization',
   })
   @ResponseMessage('Successfully got inventory information')
-  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_MEMBER)
   findOne(
     @Param('invId', ParseIntPipe) id: number,
     @Param('orgId', ParseIntPipe) orgId: number,
@@ -81,6 +80,7 @@ export class InventoryController {
   @Patch(':invId')
   @ApiOperation({ summary: 'Update information about an inventory' })
   @ResponseMessage('Successfully updated inventory')
+  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER, { adminOnly: false })
   update(
     @Param('orgId', ParseIntPipe) orgId: number,
     @Param('invId', ParseIntPipe) id: number,
@@ -97,6 +97,7 @@ export class InventoryController {
   @Delete(':invId')
   @ApiOperation({ summary: 'Delete an inventory. This cannot be undone.' })
   @ResponseMessage('Successfully archived inventory')
+  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER, { adminOnly: false })
   delete(
     @Param('orgId', ParseIntPipe) orgId: number,
     @Param('invId', ParseIntPipe) id: number,

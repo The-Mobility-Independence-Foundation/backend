@@ -8,8 +8,6 @@ import { UserService } from '../user/user.service';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { GetRequestsDto } from './dto/get-request.dto';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
-import { UseStrategy } from '../common/resource-access/decorators/resource-access.decorator';
-import { ResourceAccessStrategyToken } from '../common/resource-access/interfaces/strategy-provider.interface';
 import { CreateOrganizationDto } from '../organization/dto/create-organization.dto';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
 import { UserRole } from '../user/entities/user.entity';
@@ -35,7 +33,7 @@ export class RequestService {
     request.ein = dto.ein;
     request.firstName = dto.firstName;
     request.lastName = dto.lastName;
-    request.email = dto.ein;
+    request.email = dto.email;
     request.description = dto.description;
     request.name = dto.name;
 
@@ -47,7 +45,6 @@ export class RequestService {
    * @param query : Any filters to sort the requests
    * @returns : A paginated list of all requests that fit that criteria
    */
-  @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: true })
   async findAll(query: GetRequestsDto) {
     const findWhere = Object.assign(
       {},
@@ -79,7 +76,6 @@ export class RequestService {
     );
   }
 
-  @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: true })
   async findOne(id: number) {
     return this.requestRepository.findOneBy({ id: id });
   }
@@ -90,7 +86,6 @@ export class RequestService {
    * @param dto : The information being changed in the request
    * @returns : A success message if updated correctly
    */
-  @UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER, { adminOnly: true })
   async update(id: number, dto: UpdateRequestDto): Promise<Request> {
     const request = await this.findByIdOrThrow(id, {
       relations: {

@@ -35,6 +35,7 @@ export class RequestController {
   @Get('/')
   @ResponseMessage('Successfully retrieved all requests')
   @ApiOperation({ summary: 'Retrieve all requests' })
+  @UseStrategy(ResourceAccessStrategyToken.GUEST, { adminOnly: true })
   findAll(
     @Query() query: GetRequestsDto,
   ): Promise<BaseApiCursorPaginationResponse<Request>> {
@@ -44,6 +45,7 @@ export class RequestController {
   @Get('/:id')
   @ResponseMessage('Successfully retrieved a request')
   @ApiOperation({ summary: 'Retrieve a specific request' })
+  @UseStrategy(ResourceAccessStrategyToken.GUEST, { adminOnly: true })
   findOne(@Param('id') id: number): Promise<Request | null> {
     return this.requestService.findByIdOrThrow(id);
   }
@@ -51,6 +53,7 @@ export class RequestController {
   @Patch(':id')
   @ResponseMessage('Successfully updated a request')
   @ApiOperation({ summary: 'Update information about a request' })
+  @UseStrategy(ResourceAccessStrategyToken.GUEST, { adminOnly: true })
   update(@Param('id') id: number, @Body() dto: UpdateRequestDto) {
     return this.requestService.update(id, dto);
   }

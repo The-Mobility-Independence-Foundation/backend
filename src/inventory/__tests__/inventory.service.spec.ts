@@ -15,10 +15,7 @@ import { GetInventoriesDto } from '../dto/get-inventory.dto';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 import { OrganizationService } from '../../organization/organization.service';
 import { InventoryItem } from '../../inventory-item/inventory-item.entity';
-import {
-  STRATEGY_PROVIDERS_TOKEN,
-  ResourceAccessStrategyRegistry,
-} from '../../common/resource-access/interfaces/strategy-provider.interface';
+
 
 describe('InventoryService', () => {
   let service: InventoryService;
@@ -33,10 +30,6 @@ describe('InventoryService', () => {
         {
           provide: getRepositoryToken(Inventory),
           useValue: createMock<Repository<Inventory>>(),
-        },
-        {
-          provide: STRATEGY_PROVIDERS_TOKEN,
-          useValue: createMock<ResourceAccessStrategyRegistry>(),
         },
       ],
     })

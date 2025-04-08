@@ -21,8 +21,6 @@ import { OrganizationService } from '../organization/organization.service';
 import { AddressService } from '../address/address.service';
 import { CreateAddressDto } from '../address/dto/create-address.dto';
 import { CursorPaginationOptions } from '../common/interfaces/cursor-pagination-options.interface';
-import { UseStrategy } from '../common/resource-access/decorators/resource-access.decorator';
-import { ResourceAccessStrategyToken } from '../common/resource-access/interfaces/strategy-provider.interface';
 
 @Injectable()
 export class InventoryService {
@@ -39,7 +37,6 @@ export class InventoryService {
    * @param dto : Relevant information needed to create the inventory
    * @returns The save of the inventory
    */
-  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER)
   async create(orgId: number, dto: CreateInventoryDto): Promise<Inventory> {
     const inventory = new Inventory();
     const addressData = new CreateAddressDto();
@@ -154,7 +151,6 @@ export class InventoryService {
    * @param id : The id of the inventory that wants to change
    * @param dto : The updated information
    */
-  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER)
   async update(organizationId: number, id: number, dto: UpdateInventoryDto) {
     const inventory = await this.findByIdOrThrow(id, {
       relations: { address: true },
@@ -227,7 +223,6 @@ export class InventoryService {
     }
   }
 
-  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER)
   async delete(orgId: number, invId: number) {
     const inventory = await this.findByIdOrThrow(invId, {
       relations: {
