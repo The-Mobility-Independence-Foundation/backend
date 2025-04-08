@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Listing } from './listing.entity';
+import { Listing, ListingStatus } from './listing.entity';
 import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InventoryItem } from '../inventory-item/inventory-item.entity';
@@ -17,6 +17,44 @@ export class ListingService {
     @InjectRepository(InventoryItem)
     private readonly inventoryItemRepository: Repository<InventoryItem>,
   ) {}
+
+  /**
+   * Find a listing by id
+   * @param id - The id of the listing
+   * @param options - Optional query options
+   * @returns The listing record
+   */
+  async findById(
+    id: number,
+    options: Partial<{
+      where: FindOptionsWhere<Omit<Listing, 'id'>>;
+      relations: FindOptionsRelations<Listing>;
+    }> = {},
+  ) {
+    const { where = {}, relations } = options;
+
+    return this.listingRepository.findOne({
+      where: {
+        ...where,
+        id: id,
+      },
+      relations,
+    });
+  }
+
+  /**
+   * Check if a listing is active
+   * @param listingId - The id of the listing
+   * @returns True if the listing is active, false otherwise
+   */
+  async isActive(listingId: number) {
+    const listing = await this.findById(listingId);
+    if (!listing) {
+      return false;
+    }
+
+    return listing.state === ListingStatus.ACTIVE;
+  }
 
   async create() {
     const listing = new Listing();

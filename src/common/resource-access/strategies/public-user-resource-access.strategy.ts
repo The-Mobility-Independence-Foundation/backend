@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { User, UserRole } from '../../../user/entities/user.entity';
-import { ResourceAccessStrategy } from './resource-access.strategy';
+import { ResourceAccessStrategy } from './generic/resource-access.strategy';
 
 /**
  * Strategy for public user resource access

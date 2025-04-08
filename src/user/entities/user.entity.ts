@@ -17,7 +17,7 @@ import {
 } from 'typeorm';
 import { Message } from '../../message/message.entity';
 import { Listing } from '../../listing/listing.entity';
-import { Conversation } from '../../conversation/conversation.entity';
+import { Conversation } from '../../conversations/entities/conversation.entity';
 import { Post } from '../../post/post.entity';
 import { Comment } from '../../comment/comment.entity';
 import { PostSubscription } from '../../post-subscription/post-subscription.entity';
@@ -41,8 +41,9 @@ import {
 } from '../../common/decorators/user.decorators';
 import { UserValidation } from '../../common/validation/user.validation';
 import { UserAuth } from './user-auth.entity';
-import { Connection } from '../../connections/connection.entity';
 
+import { Connection } from '../../connections/connection.entity';
+import { ConversationHistory } from '../../conversations/entities/conversation-history.entity';
 /**
  * The role of a user
  */
@@ -57,13 +58,21 @@ export enum UserRole {
  * A user
  */
 @Entity()
+@Index(['email'], { unique: true })
+@Index(['displayName'])
+@Index(['type'])
+@Index(['organizationId'])
+@Index(['inactive'])
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @JoinColumn({ name: 'organizationId' })
   @ManyToOne(() => Organization, (org) => org.members)
-  @JoinColumn()
   organization: Organization | null;
+
+  @Column({ nullable: true })
+  organizationId: number | null;
 
   @IsFirstName()
   @Column({ type: 'varchar', length: UserValidation.firstName.max })
@@ -74,7 +83,6 @@ export class User {
   lastName: string;
 
   @IsEmail()
-  @Index({ unique: true })
   @Column({ type: 'varchar', length: UserValidation.email.max })
   email: string;
 
@@ -83,7 +91,7 @@ export class User {
   displayName: string;
 
   @IsEnum(UserRole)
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.GUEST })
   type: UserRole;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
@@ -141,11 +149,14 @@ export class User {
   @OneToMany(() => Connection, (connection) => connection.following)
   followers: Connection[];
 
-  @OneToMany(
-    () => Conversation,
-    (conversation) => conversation.participant1 && conversation.participant2,
-  )
-  conversations: Conversation[];
+  @OneToMany(() => Conversation, (conversation) => conversation.initiator)
+  initiatedConversations: Conversation[];
+
+  @OneToMany(() => ConversationHistory, (history) => history.participant)
+  handledConversations: ConversationHistory[];
+
+  @OneToMany(() => Conversation, (conversation) => conversation.participant)
+  participantConversations: Conversation[];
 
   @OneToMany(() => Post, (post) => post.user)
   posts: Post[];

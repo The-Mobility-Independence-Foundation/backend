@@ -89,25 +89,6 @@ export class AttachmentsService {
   }
 
   /**
-   * Format the url of the uploaded file
-   * @param key - The key of the uploaded file
-   * @returns The url of the uploaded file
-   */
-  formatUrlByKey(key: string): string {
-    return `https://${this.bucketName}.r2.cloudflarestorage.com/${key}`;
-  }
-
-  /**
-   * Format the url of the uploaded file
-   * @param entityType - The type of the entity the attachment belongs to
-   * @param uuid - The uuid of the uploaded file
-   * @returns The url of the uploaded file
-   */
-  formatUrlByEntity(entityType: AttachmentEntityType, uuid: string): string {
-    return `https://${this.bucketName}.r2.cloudflarestorage.com/${entityType}/${uuid}`;
-  }
-
-  /**
    * Upload multiple files to R2 and return the attachments
    * @param entityId - The id of the entity the attachment belongs to
    * @param entityType - The type of the entity the attachment belongs to
@@ -187,7 +168,7 @@ export class AttachmentsService {
   async generateGetPresignedUrl(
     key: string,
     expiresIn: number = AttachmentsService.EXPIRES_IN,
-  ): Promise<{ url: string }> {
+  ): Promise<string> {
     const command = new GetObjectCommand({
       Bucket: this.bucketName,
       Key: key,
@@ -197,7 +178,19 @@ export class AttachmentsService {
       expiresIn: expiresIn,
     });
 
-    return { url };
+    return url;
+  }
+
+  /**
+   * Soft delete attachments by entity id and type
+   * @param entityId - The id of the entity the attachment belongs to
+   * @param entityType - The type of the entity the attachment belongs to
+   */
+  async softDeleteByEntity(
+    entityId: number,
+    entityType: AttachmentEntityType,
+  ): Promise<void> {
+    await this.attachmentRepository.softDelete({ entityId, entityType });
   }
 
   /**

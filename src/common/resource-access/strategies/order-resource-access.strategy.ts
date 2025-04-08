@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '../../../user/entities/user.entity';
-import { ResourceAccessStrategy } from './resource-access.strategy';
 import { OrderService } from '../../../order/order.service';
+import { ResourceAccessStrategy } from './generic/resource-access.strategy';
 
 /**
  * Strategy for organization resource access

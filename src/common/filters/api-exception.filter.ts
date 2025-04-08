@@ -50,6 +50,7 @@ export class ApiExceptionFilter implements ExceptionFilter<Error> {
     const responseBody: BaseApiResponse = {
       success: false,
       message,
+      error: exception.stack,
       data,
     };
 
