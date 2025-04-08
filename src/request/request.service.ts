@@ -10,6 +10,10 @@ import { GetRequestsDto } from './dto/get-request.dto';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { UseStrategy } from '../common/resource-access/decorators/resource-access.decorator';
 import { ResourceAccessStrategyToken } from '../common/resource-access/interfaces/strategy-provider.interface';
+import { CreateOrganizationDto } from '../organization/dto/create-organization.dto';
+import { UpdateUserDto } from '../user/dto/update-user.dto';
+import { UserRole } from '../user/entities/user.entity';
+import { OrganizationService } from '../organization/organization.service';
 
 @Injectable()
 export class RequestService {
@@ -18,6 +22,7 @@ export class RequestService {
     private requestRepository: Repository<Request>,
     private readonly paginationService: PaginationService,
     private readonly userService: UserService,
+    private readonly organizationService: OrganizationService
   ) {}
 
   /**
@@ -103,6 +108,10 @@ export class RequestService {
       }
     }
 
+    if (dto.status === RequestStatus.ACCEPTED){
+      await this.approvedRequest(request);
+    }
+
     if (dto.approverId) {
       request.approver = await this.userService.findByIdOrThrow(dto.approverId);
     }
@@ -138,5 +147,34 @@ export class RequestService {
     } else {
       throw new NotFoundException('Request not found');
     }
+  }
+
+  /**
+   * Create an org and change user role when a request is approved
+   * @param request : The request that has been approved
+   * @returns : A success message if user is updated correctly
+   */
+  async approvedRequest(request: Request){
+    const orgDto = new CreateOrganizationDto();
+    const updateUserDto = new UpdateUserDto();
+    const user = await this.userService.findByEmail(request.email);
+
+    if (!user) {
+      throw new NotFoundException('User with that email not found');
+    }
+
+    Object.assign(orgDto, {
+      ownerId: user.id,
+      name: request.name,
+      ein: request.ein,
+      phone: ' ',
+    });
+
+    Object.assign(updateUserDto, {
+      accountType: UserRole.USER,
+    });
+
+    await this.organizationService.create(orgDto);
+    return await this.userService.update(user.id, updateUserDto);
   }
 }
