@@ -13,6 +13,7 @@ import { User } from '../../user/entities/user.entity';
 import { GetRequestsDto } from '../dto/get-request.dto';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 import { UpdateRequestDto } from '../dto/update-request.dto';
+import { STRATEGY_PROVIDERS_TOKEN, ResourceAccessStrategyRegistry } from '../../common/resource-access/interfaces/strategy-provider.interface';
 
 describe('RequestService', () => {
   let service: RequestService;
@@ -27,6 +28,10 @@ describe('RequestService', () => {
         {
           provide: getRepositoryToken(Request),
           useValue: createMock<Repository<Request>>(),
+        },
+        {
+          provide: STRATEGY_PROVIDERS_TOKEN,
+          useValue: createMock<ResourceAccessStrategyRegistry>(),
         },
       ],
     })
