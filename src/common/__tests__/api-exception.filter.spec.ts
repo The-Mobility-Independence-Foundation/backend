@@ -58,6 +58,7 @@ describe('ApiExceptionFilter', () => {
               },
             },
           },
+          error: exception.stack,
         },
         HttpStatus.BAD_REQUEST,
       );
@@ -81,6 +82,7 @@ describe('ApiExceptionFilter', () => {
           success: false,
           message: exception.message,
           data: { errors },
+          error: exception.stack,
         },
         HttpStatus.BAD_REQUEST,
       );
@@ -100,6 +102,7 @@ describe('ApiExceptionFilter', () => {
           success: false,
           message: exception.message,
           data: null,
+          error: exception.stack,
         },
         HttpStatus.NOT_FOUND,
       );
@@ -117,6 +120,7 @@ describe('ApiExceptionFilter', () => {
           message:
             'Something went wrong, please try again later. If the problem persists, please contact support.',
           data: null,
+          error: exception.stack,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );

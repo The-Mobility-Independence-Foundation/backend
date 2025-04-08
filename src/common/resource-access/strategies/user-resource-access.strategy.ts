@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { User, UserRole } from '../../../user/entities/user.entity';
-import { ResourceAccessStrategy } from './resource-access.strategy';
+import { ResourceAccessStrategy } from './generic/resource-access.strategy';
 
 /**
  * Strategy for user resource access
@@ -17,9 +17,5 @@ export class UserResourceAccessStrategy extends ResourceAccessStrategy {
 
     const resourceUserId = parseInt(params[this.userIdParam]);
     return !isNaN(resourceUserId) && user.id === resourceUserId;
-  }
-
-  getForbiddenMessage(): string {
-    return "You do not have permission to access this user's data";
   }
 }

@@ -52,6 +52,30 @@ export class UserService {
   }
 
   /**
+   * Find a user by id
+   * @param id - The id of the user
+   * @param options - Optional query options
+   * @returns The user record
+   */
+  async findById(
+    id: number,
+    options: Partial<{
+      where: FindOptionsWhere<Omit<User, 'id'>>;
+      relations: FindOptionsRelations<User>;
+    }> = {},
+  ) {
+    const { where = {}, relations } = options;
+
+    return this.userRepository.findOne({
+      where: {
+        ...where,
+        id: id,
+      },
+      relations,
+    });
+  }
+
+  /**
    * Create a new user
    * @param data - The data to create the user with
    * @returns The user record

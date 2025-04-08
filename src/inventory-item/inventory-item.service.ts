@@ -1,6 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InventoryItem } from './inventory-item.entity';
-import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
+import {
+  FindOptionsRelations,
+  FindOptionsWhere,
+  IsNull,
+  Not,
+  Repository,
+} from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateInventoryItemDto } from './dto/create-inventory-item.dto';
 import { UpdateInventoryItemDto } from './dto/update-inventory-item.dto';
@@ -10,6 +16,7 @@ import { PaginationService } from '../common/services/pagination.service';
 import { InventoryService } from '../inventory/inventory.service';
 import { GetInventoryItemsDto } from './dto/get-inventory-item.dto';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
+import { CursorPaginationOptions } from '../common/interfaces/cursor-pagination-options.interface';
 
 @Injectable()
 export class InventoryItemService {
@@ -27,7 +34,7 @@ export class InventoryItemService {
    * @param dto : All necessary information to create a new item
    * @returns : The new item being saved into the database
    */
-  async create(dto: CreateInventoryItemDto) {
+  async create(inventoryId: number, dto: CreateInventoryItemDto) {
     const inventoryItem = new InventoryItem();
 
     inventoryItem.model = await this.modelService.findByIdOrThrow(dto.modelId, {
@@ -39,7 +46,7 @@ export class InventoryItemService {
     });
 
     inventoryItem.inventory = await this.inventoryService.findByIdOrThrow(
-      dto.inventoryId,
+      inventoryId,
       {
         relations: ['organization', 'address', 'items'],
       },
@@ -80,6 +87,11 @@ export class InventoryItemService {
     if (query.tagId) {
       findWhere.tags = { some: { id: query.tagId } };
     }
+    if (query.partName) {
+      findWhere.part = {
+        name: query.partName,
+      };
+    }
 
     const paginationDto = new CursorPaginationDto();
     Object.assign(paginationDto, {
@@ -99,14 +111,26 @@ export class InventoryItemService {
       tags: true,
     };
 
+    if (query.status === 'archived') {
+      Object.assign(findWhere, {
+        archivedAt: Not(IsNull()),
+      });
+    }
+
+    const findOptions: CursorPaginationOptions<InventoryItem> = {
+      cursorColumn: 'id',
+      where: findWhere,
+      relations: relations,
+    };
+
+    if (query.status === 'both' || query.status === 'archived') {
+      findOptions.withDeleted = true;
+    }
+
     return this.paginationService.paginateWithCursor(
       this.inventoryItemRepository,
       paginationDto,
-      {
-        cursorColumn: 'id',
-        where: findWhere,
-        relations: relations,
-      },
+      findOptions,
     );
   }
 
@@ -134,11 +158,9 @@ export class InventoryItemService {
         'inventory',
         'inventory.organization',
         'inventory.address',
-        'part.name',
-        'part.partNumber',
-        'model.name',
+        'part',
+        'model',
         'listings',
-        'tags.name',
       ],
     });
 
@@ -163,6 +185,10 @@ export class InventoryItemService {
     id: number,
     dto: UpdateInventoryItemDto,
   ) {
+    if (dto.restore === 'true') {
+      return this.inventoryItemRepository.restore(id);
+    }
+
     const item = await this.findByIdOrThrow(id, {
       where: {
         inventory: {
@@ -200,9 +226,9 @@ export class InventoryItemService {
       });
     }
 
-    if (dto.inventoryId) {
+    if (inventoryId) {
       item.inventory = await this.inventoryService.findByIdOrThrow(
-        dto.inventoryId,
+        inventoryId,
         {
           relations: ['organization', 'address', 'items'],
         },
@@ -240,5 +266,11 @@ export class InventoryItemService {
     } else {
       throw new NotFoundException('Item not found');
     }
+  }
+
+  async archive(itemId: number) {
+    await this.inventoryItemRepository.softDelete(itemId);
+
+    return;
   }
 }

@@ -140,40 +140,6 @@ describe('AttachmentsService', () => {
     });
   });
 
-  describe('formatKey', () => {
-    it('should format the key correctly', () => {
-      const entityType = AttachmentEntityType.POST;
-      const uuid = 'test-uuid';
-
-      const key = service.formatKey(entityType, uuid);
-
-      expect(key).toBe(`${entityType}/${uuid}`);
-    });
-  });
-
-  describe('formatUrlByKey', () => {
-    it('should format the URL correctly by key', () => {
-      const key = 'post/test-uuid';
-
-      const url = service.formatUrlByKey(key);
-
-      expect(url).toBe(`https://test-bucket.r2.cloudflarestorage.com/${key}`);
-    });
-  });
-
-  describe('formatUrlByEntity', () => {
-    it('should format the URL correctly by entity', () => {
-      const entityType = AttachmentEntityType.POST;
-      const uuid = 'test-uuid';
-
-      const url = service.formatUrlByEntity(entityType, uuid);
-
-      expect(url).toBe(
-        `https://test-bucket.r2.cloudflarestorage.com/${entityType}/${uuid}`,
-      );
-    });
-  });
-
   describe('uploadFiles', () => {
     it('should upload files successfully', async () => {
       const entityId = 1;
@@ -340,7 +306,7 @@ describe('AttachmentsService', () => {
 
       const result = await service.generateGetPresignedUrl(key, expiresIn);
 
-      expect(result).toEqual({ url: signedUrl });
+      expect(result).toEqual(signedUrl);
     });
 
     it('should use default expiration time if not provided', async () => {
@@ -362,7 +328,21 @@ describe('AttachmentsService', () => {
 
       const result = await service.generateGetPresignedUrl(key);
 
-      expect(result).toEqual({ url: signedUrl });
+      expect(result).toEqual(signedUrl);
+    });
+  });
+
+  describe('softDeleteByEntity', () => {
+    it('should soft delete attachments by entity id and type', async () => {
+      const entityId = 1;
+      const entityType = AttachmentEntityType.POST;
+
+      await service.softDeleteByEntity(entityId, entityType);
+
+      expect(attachmentRepository.softDelete).toHaveBeenCalledWith({
+        entityId,
+        entityType,
+      });
     });
   });
 

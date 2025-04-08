@@ -58,13 +58,4 @@ describe('UserResourceAccessStrategy', () => {
       expect(result).toBe(false);
     });
   });
-
-  describe('getForbiddenMessage', () => {
-    it('should return the default forbidden message', () => {
-      const message = strategy.getForbiddenMessage();
-      expect(message).toBe(
-        "You do not have permission to access this user's data",
-      );
-    });
-  });
 });

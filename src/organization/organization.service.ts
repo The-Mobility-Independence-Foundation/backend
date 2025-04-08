@@ -42,6 +42,30 @@ export class OrganizationService {
     private readonly paginationService: PaginationService,
   ) {}
 
+  /**
+   * Find an organization by id
+   * @param id - The id of the organization
+   * @param options - Optional query options
+   * @returns The organization record
+   */
+  async findById(
+    id: number,
+    options: Partial<{
+      where: FindOptionsWhere<Omit<Organization, 'id'>>;
+      relations: FindOptionsRelations<Organization>;
+    }> = {},
+  ) {
+    const { where = {}, relations } = options;
+
+    return this.organizationRepository.findOne({
+      where: {
+        ...where,
+        id: id,
+      },
+      relations,
+    });
+  }
+
   async create(dto: CreateOrganizationDto) {
     const organization = new Organization();
     const owner = await this.userService.findByIdOrThrow(dto.ownerId);

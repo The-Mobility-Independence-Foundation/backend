@@ -10,6 +10,7 @@ import {
   ManyToMany,
   JoinTable,
   Check,
+  DeleteDateColumn,
 } from 'typeorm';
 import { Tag } from '../tag/tag.entity';
 import { Model } from '../model/model.entity';
@@ -39,6 +40,9 @@ export class InventoryItem {
   @Column({ default: 0 })
   @Check(`"publicCount" <= "quantity"`)
   publicCount: number;
+
+  @DeleteDateColumn()
+  archivedAt: Date;
 
   @IsOptional()
   @Column({ type: 'varchar', length: 500, nullable: true })

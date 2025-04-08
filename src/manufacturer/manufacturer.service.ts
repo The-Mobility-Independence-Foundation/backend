@@ -87,7 +87,7 @@ export class ManufacturerService {
     id: number,
     options: Partial<{
       where: FindOptionsWhere<Omit<Manufacturer, 'id'>>;
-      relations: string[] | FindOptionsRelations<Manufacturer>;
+      relations: FindOptionsRelations<Manufacturer>;
     }> = {},
   ) {
     const { where = {}, relations } = options;

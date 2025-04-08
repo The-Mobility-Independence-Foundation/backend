@@ -1,5 +1,5 @@
 import { Type } from '@nestjs/common';
-import { ResourceAccessStrategy } from '../strategies/resource-access.strategy';
+import { ResourceAccessStrategy } from '../strategies/generic/resource-access.strategy';
 
 /**
  * Token for injecting the strategy providers registry

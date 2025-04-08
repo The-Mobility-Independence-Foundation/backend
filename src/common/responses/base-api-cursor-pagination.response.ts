@@ -15,11 +15,11 @@ export class BaseApiCursorPaginationResponse<T extends ObjectLiteral> {
   @ApiProperty({ type: Boolean })
   hasPreviousPage: boolean;
 
-  @ApiProperty({ type: String })
+  @ApiProperty({ type: String, nullable: true })
   nextCursor: string | null;
 
-  @ApiProperty({ type: String, required: false })
-  previousCursor?: string | null;
+  @ApiProperty({ type: String, nullable: true })
+  previousCursor: string | null;
 
   @ApiProperty({ type: Number, required: false })
   count?: number;

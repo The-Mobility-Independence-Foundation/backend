@@ -18,6 +18,7 @@ export enum AttachmentEntityType {
 
 @Entity()
 @Index(['entityId', 'entityType'])
+@Index(['authorId'])
 export class Attachment {
   @PrimaryGeneratedColumn()
   id: number;

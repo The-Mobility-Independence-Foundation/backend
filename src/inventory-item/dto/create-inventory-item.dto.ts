@@ -25,12 +25,6 @@ export class CreateInventoryItemDto {
   @ApiProperty()
   @IsPositive()
   @IsInt()
-  @IsNotEmpty({ message: 'Inventory cannot be blank.' })
-  inventoryId: number;
-
-  @ApiProperty()
-  @IsPositive()
-  @IsInt()
   @IsNotEmpty({ message: 'Quantity cannot be blank.' })
   quantity: number;
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '../../../user/entities/user.entity';
-import { ResourceAccessStrategy } from './resource-access.strategy';
+import { ResourceAccessStrategy } from './generic/resource-access.strategy';
 import { UserService } from '../../../user/user.service';
 
 /**

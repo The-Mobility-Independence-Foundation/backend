@@ -1,4 +1,4 @@
-import { Conversation } from '../conversation/conversation.entity';
+import { Conversation } from '../conversations/entities/conversation.entity';
 import { InventoryItem } from '../inventory-item/inventory-item.entity';
 import { Order } from '../order/order.entity';
 import { Organization } from '../organization/organization.entity';
@@ -25,13 +25,19 @@ export class Listing {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @JoinColumn()
+  @JoinColumn({ name: 'inventoryItemId' })
   @ManyToOne(() => InventoryItem, (invItem) => invItem.listings)
   inventoryItem: InventoryItem;
 
-  @JoinColumn()
+  @Column()
+  inventoryItemId: number;
+
+  @JoinColumn({ name: 'ownerId' })
   @ManyToOne(() => Organization, (org) => org.listings)
   owner: Organization;
+
+  @Column()
+  ownerId: number;
 
   @Column({ type: 'varchar', length: 40 })
   name: string;

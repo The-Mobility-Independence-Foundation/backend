@@ -1,4 +1,4 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsInt,
   IsObject,
@@ -47,6 +47,11 @@ export class GetInventoryItemsDto extends CursorPaginationDto {
   notes?: string;
 
   @IsOptional()
+  @ApiPropertyOptional({ description: 'The name of the part.' })
+  @IsString()
+  partName?: string;
+
+  @IsOptional()
   @ApiPropertyOptional({
     description: 'Additional attributes of the inventory item.',
   })
@@ -57,4 +62,14 @@ export class GetInventoryItemsDto extends CursorPaginationDto {
   @ApiPropertyOptional({ description: 'Tag related to the inventory item.' })
   @IsInt()
   tagId?: number;
+
+  @IsOptional()
+  @ApiProperty({
+    description: 'The status of inventory items to get',
+    default: 'unarchived',
+    enum: ['unarchived', 'archived', 'both'],
+    required: false,
+  })
+  @IsString()
+  status: string;
 }
