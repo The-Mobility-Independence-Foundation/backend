@@ -71,7 +71,7 @@ export class UserController {
   ) {
     const user = req.user as User;
     if (user.type !== UserRole.ADMIN && dto.accountType) {
-      throw new ForbiddenException("You must be an admin to do that.");
+      throw new ForbiddenException('You must be an admin to do that.');
     }
     return this.userService.update(userId, dto);
   }
