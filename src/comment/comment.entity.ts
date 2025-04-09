@@ -1,0 +1,58 @@
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
+import { Post } from '../post/post.entity';
+import { User } from '../user/entities/user.entity';
+import { Forum } from '../forum/forum.entity';
+import { Report } from '../reports/report.entity';
+
+@Entity()
+export class Comment {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @ManyToOne(() => Comment, (comment) => comment.childComments, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'parentCommentId' })
+  parentComment: Comment | null;
+
+  @OneToMany(() => Comment, (comment) => comment.parentComment)
+  childComments: Comment[];
+
+  @ManyToOne(() => Post, (post) => post.comments)
+  @JoinColumn({ name: 'postId' })
+  post: Post;
+
+  @ManyToOne(() => User, (user) => user.comments)
+  @JoinColumn({ name: 'authorId' })
+  author: User;
+
+  @ManyToOne(() => Forum, (forum) => forum.comments)
+  @JoinColumn({ name: 'forumId' })
+  forum: Forum;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  postedOn: Date;
+
+  @Column({ type: 'timestamp', nullable: true, default: null })
+  editedOn: Date | null;
+
+  @ManyToOne(() => User, (user) => user.editedComments)
+  @JoinColumn({ name: 'editorId' })
+  editedBy: User;
+
+  @Column({ type: 'varchar', length: 2000 })
+  content: string;
+
+  @Column({ default: false })
+  hidden: boolean;
+
+  @OneToMany(() => Report, (report) => report.comment)
+  report: Report[];
+}
