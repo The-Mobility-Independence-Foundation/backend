@@ -27,7 +27,6 @@ export class InventoryService {
   constructor(
     @InjectRepository(Inventory)
     private readonly inventoryRepository: Repository<Inventory>,
-
     private readonly paginationService: PaginationService,
     private readonly organizationService: OrganizationService,
     private readonly addressService: AddressService,

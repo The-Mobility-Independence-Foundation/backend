@@ -31,7 +31,9 @@ export class InventoryController {
   @Post()
   @ApiOperation({ summary: 'Initiate creation of an inventory' })
   @ResponseMessage('Successfully created inventory')
-  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER)
+  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER, {
+    adminOnly: false,
+  })
   create(
     @Param('orgId', ParseIntPipe) orgId: number,
     @Body() dto: CreateInventoryDto,
@@ -79,8 +81,10 @@ export class InventoryController {
    */
   @Patch(':invId')
   @ApiOperation({ summary: 'Update information about an inventory' })
-  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER)
   @ResponseMessage('Successfully updated inventory')
+  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER, {
+    adminOnly: false,
+  })
   update(
     @Param('orgId', ParseIntPipe) orgId: number,
     @Param('invId', ParseIntPipe) id: number,
@@ -96,8 +100,10 @@ export class InventoryController {
    */
   @Delete(':invId')
   @ApiOperation({ summary: 'Delete an inventory. This cannot be undone.' })
-  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER)
   @ResponseMessage('Successfully archived inventory')
+  @UseStrategy(ResourceAccessStrategyToken.ORGANIZATION_OWNER, {
+    adminOnly: false,
+  })
   delete(
     @Param('orgId', ParseIntPipe) orgId: number,
     @Param('invId', ParseIntPipe) id: number,
