@@ -6,7 +6,7 @@ import {
   ManyToOne,
   CreateDateColumn,
 } from 'typeorm';
-import { Listing } from '../listing/listing.entity';
+import { Listing } from '../listings/listing.entity';
 
 @Entity()
 export class Bookmark {

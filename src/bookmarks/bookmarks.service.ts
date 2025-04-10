@@ -3,7 +3,7 @@ import { Bookmark } from './bookmarks.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { UserService } from '../user/user.service';
-import { ListingService } from '../listing/listing.service';
+import { ListingsService } from '../listings/listings.service';
 import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
 import { PaginationService } from '../common/services/pagination.service';
 
@@ -14,13 +14,13 @@ export class BookmarkService {
     private readonly bookmarkRepository: Repository<Bookmark>,
 
     private readonly userService: UserService,
-    private readonly listingService: ListingService,
+    private readonly listingsService: ListingsService,
     private readonly paginationService: PaginationService,
   ) {}
 
   async create(userId: number, listingId: number) {
     const user = await this.userService.findByIdOrThrow(userId);
-    const listing = await this.listingService.findByIdOrThrow(listingId);
+    const listing = await this.listingsService.findByIdOrThrow(listingId);
 
     const bookmark = new Bookmark();
     Object.assign(bookmark, {

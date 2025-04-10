@@ -14,7 +14,6 @@ import {
   Index,
 } from 'typeorm';
 import { Message } from '../../message/message.entity';
-import { Listing } from '../../listings/listing.entity';
 import { Conversation } from '../../conversations/entities/conversation.entity';
 import { Post } from '../../post/post.entity';
 import { Comment } from '../../comment/comment.entity';

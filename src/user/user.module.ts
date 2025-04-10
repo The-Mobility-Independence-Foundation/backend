@@ -7,7 +7,7 @@ import { Organization } from '../organization/organization.entity';
 import { UserAuth } from './entities/user-auth.entity';
 import { UserAuthService } from './user-auth.service';
 import { CommonModule } from '../common/common.module';
-import { ListingModule } from '../listing/listing.module';
+import { ListingsModule } from '../listings/listings.module';
 import { BookmarkModule } from '../bookmarks/bookmarks.module';
 import { OrderModule } from '../order/order.module';
 
@@ -15,7 +15,7 @@ import { OrderModule } from '../order/order.module';
   imports: [
     TypeOrmModule.forFeature([User, Organization, UserAuth]),
     CommonModule,
-    ListingModule,
+    ListingsModule,
     forwardRef(() => BookmarkModule),
     forwardRef(() => OrderModule),
   ],

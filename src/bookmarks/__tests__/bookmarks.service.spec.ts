@@ -5,10 +5,10 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { createMock } from '@golevelup/ts-jest';
 import { when } from 'jest-when';
-import { ListingService } from '../../listing/listing.service';
+import { ListingsService } from '../../listings/listings.service';
 import { UserService } from '../../user/user.service';
 import { User } from '../../user/entities/user.entity';
-import { Listing } from '../../listing/listing.entity';
+import { Listing } from '../../listings/listing.entity';
 import { NotFoundException } from '@nestjs/common';
 import { CursorPaginationDto } from '../../common/dto/cursor-pagination.dto';
 
@@ -16,7 +16,7 @@ describe('BookmarkService', () => {
   let service: BookmarkService;
   let repository: Repository<Bookmark>;
   let userService: UserService;
-  let listingService: ListingService;
+  let listingsService: ListingsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -34,7 +34,7 @@ describe('BookmarkService', () => {
     service = module.get(BookmarkService);
     repository = module.get(getRepositoryToken(Bookmark));
     userService = module.get(UserService);
-    listingService = module.get(ListingService);
+    listingsService = module.get(ListingsService);
   });
 
   it('should be defined', () => {
@@ -55,7 +55,7 @@ describe('BookmarkService', () => {
       when(userService.findByIdOrThrow)
         .calledWith(user.id)
         .mockResolvedValue(user);
-      when(listingService.findByIdOrThrow)
+      when(listingsService.findByIdOrThrow)
         .calledWith(listing.id)
         .mockResolvedValue(listing);
 

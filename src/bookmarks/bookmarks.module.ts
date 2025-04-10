@@ -4,14 +4,14 @@ import { BookmarkController } from './bookmarks.controller';
 import { Bookmark } from './bookmarks.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from '../user/user.module';
-import { ListingModule } from '../listing/listing.module';
+import { ListingsModule } from '../listings/listings.module';
 import { CommonModule } from '../common/common.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Bookmark]),
     forwardRef(() => UserModule),
-    ListingModule,
+    ListingsModule,
     CommonModule,
   ],
   providers: [BookmarkService],
