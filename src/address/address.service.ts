@@ -94,6 +94,20 @@ export class AddressService {
 
     Object.assign(address, dto);
 
+    try {
+      const [address_result] = await this.geocode(dto.zipCode);
+
+      Object.assign(address, {
+        latitude: address_result.latitude,
+        longitude: address_result.longitude,
+      });
+    } catch {
+      Object.assign(address, {
+        latitude: 0,
+        longitude: 0,
+      });
+    }
+
     return this.addressRepository.save(address);
   }
 
@@ -107,6 +121,22 @@ export class AddressService {
     const address = await this.findByIdOrThrow(id);
 
     Object.assign(address, dto);
+
+    try {
+      if (dto.zipCode) {
+        const [address_result] = await this.geocode(dto.zipCode);
+
+        Object.assign(address, {
+          latitude: address_result.latitude,
+          longitude: address_result.longitude,
+        });
+      }
+    } catch {
+      Object.assign(address, {
+        latitude: 0,
+        longitude: 0,
+      });
+    }
 
     return this.addressRepository.save(address);
   }

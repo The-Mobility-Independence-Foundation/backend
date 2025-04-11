@@ -59,9 +59,10 @@ describe('AddressService', () => {
         addressLine2: 'line 2',
         city: 'cityville',
         state: 'statelandia',
-        zip: '12345',
+        zipCode: '12345',
       });
-      Object.assign(address, dto);
+
+      Object.assign(address, { ...dto, latitude: 0, longitude: 0 });
 
       when(repository.save).calledWith(address).mockResolvedValue(address);
 
