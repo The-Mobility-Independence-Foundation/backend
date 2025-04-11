@@ -39,12 +39,6 @@ export class Inventory {
   @Column()
   addressId: number;
 
-  @Column({ type: 'float', nullable: false })
-  latitude: number;
-
-  @Column({ type: 'float', nullable: false })
-  longitude: number;
-
   @OneToMany(() => InventoryItem, (item) => item.inventory)
   items: InventoryItem[];
 }
