@@ -1,0 +1,23 @@
+import { forwardRef, Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { OrderController } from './order.controller';
+import { OrderService } from './order.service';
+import { Order } from './order.entity';
+import { UserModule } from '../user/user.module';
+import { ListingsModule } from '../listings/listings.module';
+import { AddressModule } from '../address/address.module';
+import { CommonModule } from '../common/common.module';
+
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([Order]),
+    forwardRef(() => UserModule),
+    forwardRef(() => ListingsModule),
+    AddressModule,
+    CommonModule,
+  ],
+  controllers: [OrderController],
+  providers: [OrderService],
+  exports: [OrderService],
+})
+export class OrderModule {}

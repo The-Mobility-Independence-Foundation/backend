@@ -1,0 +1,121 @@
+import {
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Query,
+  ParseIntPipe,
+  Req,
+  Body,
+  Post,
+  Delete,
+  ForbiddenException,
+} from '@nestjs/common';
+import { UserService } from './user.service';
+import { User, UserRole } from './entities/user.entity';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ResponseMessage } from '../common/decorators/response-message.decorator';
+import { UseStrategy } from '../common/resource-access/decorators/resource-access.decorator';
+import { ResourceAccessStrategyToken } from '../common/resource-access/interfaces/strategy-provider.interface';
+import { Request } from 'express';
+import { GetUsersDto } from './dto/get-users.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { BookmarkService } from '../bookmarks/bookmarks.service';
+import { CursorPaginationDto } from '../common/dto/cursor-pagination.dto';
+import { GetOrdersDto } from '../order/dto/get-orders-dto';
+import { OrderService } from '../order/order.service';
+
+@ApiTags('users')
+@Controller('users')
+@UseStrategy(ResourceAccessStrategyToken.PUBLIC_USER)
+export class UserController {
+  constructor(
+    private readonly userService: UserService,
+    private readonly bookmarkService: BookmarkService,
+    private readonly orderService: OrderService,
+  ) {}
+
+  @Get('/@me')
+  @ResponseMessage('Successfully retrieved user')
+  @ApiOperation({ summary: 'Get the current user' })
+  @UseStrategy(ResourceAccessStrategyToken.ANY_USER)
+  async getUser(@Req() req: Request): Promise<User> {
+    const user = req.user as User;
+    return this.userService.getUserInfo(user.id);
+  }
+
+  @Get('/')
+  @ResponseMessage('Successfully retrieved all users matching your criteria')
+  @ApiOperation({ summary: 'Get all users matching search criteria' })
+  async findAll(@Query() query: GetUsersDto) {
+    return this.userService.findAll(query);
+  }
+
+  @Get('/:userId')
+  @ResponseMessage('Successfully found user')
+  @ApiOperation({ summary: 'Find a specific user given their id' })
+  async findOne(@Param('userId', ParseIntPipe) userId: number) {
+    return this.userService.findByIdOrThrow(userId, {
+      relations: { organization: true },
+    });
+  }
+
+  @Patch('/:userId')
+  @ResponseMessage('Successfully updated user')
+  @ApiOperation({ summary: 'Update a specific user given their id' })
+  @UseStrategy(ResourceAccessStrategyToken.USER)
+  async update(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Body() dto: UpdateUserDto,
+    @Req() req: Request,
+  ) {
+    const user = req.user as User;
+    if (user.type !== UserRole.ADMIN && dto.accountType) {
+      throw new ForbiddenException('You must be an admin to do that.');
+    }
+    return this.userService.update(userId, dto);
+  }
+
+  @Get(':userId/bookmarks')
+  @ResponseMessage('Successfully retrieved bookmarks')
+  @ApiOperation({ summary: 'Get all bookmarks for a given user' })
+  @UseStrategy(ResourceAccessStrategyToken.USER)
+  async getBookmarks(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Query() dto: CursorPaginationDto,
+  ) {
+    return this.bookmarkService.findAll(dto, { userId: userId });
+  }
+
+  @Post(':userId/bookmarks/:listingId')
+  @ResponseMessage('Successfully created bookmark')
+  @ApiOperation({ summary: 'Create a bookmark for a given listing' })
+  @UseStrategy(ResourceAccessStrategyToken.USER)
+  async createBookmark(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Param('listingId', ParseIntPipe) listingId: number,
+  ) {
+    return this.bookmarkService.create(userId, listingId);
+  }
+
+  @Delete(':userId/bookmarks/:listingId')
+  @ResponseMessage('Successfully deleted bookmark')
+  @ApiOperation({ summary: 'Delete a bookmark' })
+  @UseStrategy(ResourceAccessStrategyToken.USER)
+  async deleteBookmark(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Param('listingId', ParseIntPipe) listingId: number,
+  ) {
+    return this.bookmarkService.delete(userId, listingId);
+  }
+
+  @Get('/:userId/orders')
+  @ResponseMessage('Successfully found orders')
+  @ApiOperation({ summary: 'Get orders, with pagination' })
+  findOrders(
+    @Query() dto: GetOrdersDto,
+    @Param('userId', ParseIntPipe) userId: number,
+  ) {
+    return this.orderService.findAll(dto, { user: userId });
+  }
+}
