@@ -30,6 +30,12 @@ export class ListingFtsTriggerMigration1743718263642
       EXECUTE FUNCTION update_listing_fts_vector();
     `);
 
+    // add the column to the table
+await queryRunner.query(`
+  ALTER TABLE "listing"
+  ADD COLUMN IF NOT EXISTS "ftsVector" tsvector
+`);
+
     // Create a GIN index on the ftsVector column for better search performance
     await queryRunner.query(`
       CREATE INDEX IF NOT EXISTS listing_fts_gin_idx ON listing USING GIN ("ftsVector");
